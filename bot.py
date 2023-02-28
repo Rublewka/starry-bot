@@ -1,4 +1,2 @@
-gjdugfbiufhg
-fkgufg
-nghjk
-rerer
+include discord
+import discord
