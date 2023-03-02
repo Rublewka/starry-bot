@@ -2,25 +2,20 @@ import discord
 from discord.ext import commands
 from config import settings
 
-prefix = settings['PREFIX'] # Получение переменной "prefix" из нашего config.py
+prefix = settings['PREFIX']
 
-client = commands.Bot(command_prefix = settings['PREFIX'], intents=discord.Intents.all()) # Создаем переменную client используемую для всех наших взаимодействий с ботом
+client = commands.Bot(command_prefix = settings['PREFIX'], intents=discord.Intents.all())
 
-client.remove_command('help') # Удаляем изначальную команду "help"
+client.remove_command('help') 
 
-@client.event # Объявление события
-async def on_ready(): # Объявление асинхронной функции
+@client.event
+async def on_ready(): 
 
-    print (f"Logged on as {settings['NAME BOT']}") # Сообщение в консоль при готовности бота
+    print (f"Logged on as {settings['NAME BOT']}") # bot-readiness
 
-
-    await client.change_presence(status=discord.Status.dnd)
-# Статус бота (Для примера выбрал стриминг)
-    # Cообщение/команда которая отображается в статусе у бота (https://prnt.sc/uog6r6), меняется с помощью: name=f'{prefix}help' (Пример: name=f'Hello world!') (https://prnt.sc/uog9hx)
-
-# Пример команды с выводом результата через обычное сообщение:
+    await client.change_presence(status=discord.Status.dnd) #bot-status
 # Ping
-@client.command(aliases = ['Ping', 'PING', 'pING', 'ping', 'Пинг', 'ПИНГ', 'пИНГ', 'пинг', 'Понг', 'ПОНГ', 'пОНГ', 'понг'])
+@client.command(aliases = ['Ping', 'PING', 'pING', 'ping'])
 #@client.command - объявление команды | (aliases = ['Ping', 'PING' ...]) - Альтернативное название команды
 async def __ping(ctx): # Объявление асинхронной функции __ping с возможностью публикации сообщения
     ping = client.ws.latency # Получаем пинг клиента
@@ -51,33 +46,32 @@ async def __ping(ctx): # Объявление асинхронной функц�
     print(f'[Logs:utils] На данный момент пинг == {ping * 1000:.0f}ms | {prefix}ping') # Вывод пинга в консоль
     #Итог: https://prnt.sc/uogljj
 
-# Пример команды с выводом результата через embed:
 # Help
-#@client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
-#async def __help (ctx):
-    #emb = discord.Embed( title = 'ДОСТУПНЫЕ КОМАНДЫ:', description = 'ВНИМАНИЕ! Бот ещё в разработке!', colour = discord.Color.red() )
-    # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
+@client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
+async def __help (ctx):
+    emb = discord.Embed( title = 'ДОСТУПНЫЕ КОМАНДЫ:', description = 'ВНИМАНИЕ! Бот ещё в разработке!', colour = discord.Color.red() )
+     title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
 
-    #emb.set_author(name = ctx.author.name, icon_url = ctx.author.avatar_url)
+    emb.set_author(name = ctx.author.name, icon_url = ctx.author.avatar_url)
     # Отображает: ctx.author.name - Имя отправителя, ctx.author.avatar_url - Аватар отправителя
-    #emb.add_field( name = 'Информация', value = f'`{prefix}хелп` `{prefix}инфо` `{prefix}сервер` `{prefix}профиль` `{prefix}авторы` ', inline=False)
-    #emb.add_field( name = 'Модерирование', value = f'`{prefix}мут` `{prefix}размут` `{prefix}бан` `{prefix}кик` `{prefix}очистить` ', inline=False)
+    emb.add_field( name = 'Информация', value = f'`{prefix}хелп` `{prefix}инфо` `{prefix}сервер` `{prefix}профиль` `{prefix}авторы` ', inline=False)
+    emb.add_field( name = 'Модерирование', value = f'`{prefix}мут` `{prefix}размут` `{prefix}бан` `{prefix}кик` `{prefix}очистить` ', inline=False)
     # Отображаемый блок текста. name - Жирный крупный текст | value - обычный текст под "name" | inline = True - Блоки текста будут в одну строку (https://prnt.sc/uogw2x) / inline = False - Блоки текста будут один под другим (https://prnt.sc/uogx3t)
-    #emb.set_thumbnail(url = client.user.avatar_url)
-    # emb.set_thumbnail - Добавляет картинку около текста (Например: emb.set_thumbnail(url = "https://icons.iconarchive.com/icons/elegantthemes/beautiful-flat-one-color/128/unlocked-icon.png") (NOAD) добавит картинку замка (https://prnt.sc/uogztb)) | client.user.avatar_url - Отображает аватарку бота
-    #emb.set_footer( icon_url = client.user.avatar_url, text = f'{client.user.name} © Copyright 2020 | Все права защищены' )
-    # emb.set_thumbnail - Добавляет картинку под текстом | client.user.avatar_url - Аватарка бота | ctx.guild.name - Имя сервера
+    emb.set_thumbnail(url = client.user.avatar_url)
+     emb.set_thumbnail - Добавляет картинку около текста (Например: emb.set_thumbnail(url = "https://icons.iconarchive.com/icons/elegantthemes/beautiful-flat-one-color/128/unlocked-icon.png") (NOAD) добавит картинку замка (https://prnt.sc/uogztb)) | client.user.avatar_url - Отображает аватарку бота
+    emb.set_footer( icon_url = client.user.avatar_url, text = f'{client.user.name} © Copyright 2020 | Все права защищены' )
+     emb.set_thumbnail - Добавляет картинку под текстом | client.user.avatar_url - Аватарка бота | ctx.guild.name - Имя сервера
 
-    #await ctx.send ( embed = emb)
+    await ctx.send ( embed = emb)
     # Отправляет сообщение и так же преобразует emb в embed
 
-    #print(f'[Logs:info] Справка по командам была успешно выведена | {prefix}help ')
+    print(f'[Logs:info] Справка по командам была успешно выведена | {prefix}help ')
     # Информация, что команда "help" была использована
     # Итог: https://prnt.sc/uoh6v6
 
 # Добавление аргументов асинхронной функции, реакции на сообщение:
 #Kick
-@client.command(aliases = ['кик', 'Кик', 'кИК', 'КИК', 'Kick', 'kICK', 'KICK', 'kick'])
+@client.command(aliases = ['Kick', 'kICK', 'KICK', 'kick'])
 @commands.has_permissions ( administrator = True ) # Команда только для пользователей имеющих роль с правами "Администратор"
 async def __kick(ctx, member: discord.Member, *, reason = None): # Асинхронная функция __kick(ctx, member: discord.Member, *, reason = None)
     #Аргументы: ctx - отправка сообщения с помощью команды (Обязательно)
@@ -86,7 +80,7 @@ async def __kick(ctx, member: discord.Member, *, reason = None): # Асинхр�
     #Аргументы: reason = None - "reason" ----- может быть любой текст, но для удобства использовал reason, "None" - значение по умолчанию
     await ctx.message.add_reaction('✅') # Добавляет реакцию к сообщению с командой
     await member.kick( reason = reason ) # Кикнуть пользователя по причине (Преобразует причину бота в причину дискорда)
-    emb = discord.Embed( title = 'kick', description = f'Пользователь {member}  был кикнут по причине { reason } ', colour = discord.Color.red() )
+    emb = discord.Embed( title = 'Kicked', description = f'Пользователь {member}  был кикнут по причине { reason } ', colour = discord.Color.red() )
     emb.set_author( name = client.user.name )
     emb.set_footer( text = ctx.author.name, icon_url = ctx.author.avatar_url )
     emb.set_thumbnail(url = client.user.avatar_url)
