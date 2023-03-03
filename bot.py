@@ -53,10 +53,10 @@ async def __help (ctx):
 
     emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
     # Отображает:  Аватар отправителя
-    emb.add_field( name = 'Информация', value = f'`>{prefix}help - Выводит справку по командам` `>{prefix}ping - Выводит задержку бота в миллисекндах (ms)` ', inline=False) # `{prefix}server` `{prefix}profile` 
+    emb.add_field( name = 'Информация', value = f'>`{prefix}help - Выводит справку по командам` >`{prefix}ping - Выводит задержку бота в миллисекндах (ms)` ', inline=False) # `{prefix}server` `{prefix}profile` 
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
     emb.set_thumbnail(url = client.user.avatar.url)
-    emb.set_footer( icon_url = client.user.avatar.url, text = f'{client.user.name} © Copyright 2023 | Все права защищены' )
+    emb.set_footer( icon_url = client.user.avatar.url, text = f'**Rublewka BOT** © Copyright 2023 | Все права защищены' )
 
     await ctx.send ( embed = emb)
     # преобразование embed 
@@ -100,7 +100,7 @@ async def __help (ctx):
 		#emb.add_field( name = 'Использование', value = "!кик <@⁣Участник | ID>", inline=False)
 		#emb.add_field( name = 'Пример', value = "`!кик @⁣Участник`\n┗ Кикнет указаного участника.", inline=False)
 		#emb.set_thumbnail(url = client.user.avatar_url)
-		#emb.set_footer( icon_url = client.user.avatar_url, text = f"{settings['OWNER NAME']} © Copyright 2023 | Все права защищены"   )
+		#emb.set_footer( icon_url = client.user.avatar_url, text = f"**Rublewka BOT** © Copyright 2023 | Все права защищены"   )
 		#await ctx.send ( embed = emb)
 		#print(f"[Logs:error] Необходимо указать участника | {prefix}kick")
 
@@ -109,7 +109,7 @@ async def __help (ctx):
 		#emb.set_author(name = ctx.author.name, icon_url = ctx.author.avatar_url)
 		#emb.add_field( name = 'ОШИБКА!', value = "У вас недостаточно прав!", inline=False)
 		#emb.set_thumbnail(url = client.user.avatar_url)
-		#emb.set_footer( icon_url = client.user.avatar_url, text = f"{settings['OWNER NAME']} © Copyright 2023 | Все права защищены"   )
+		#emb.set_footer( icon_url = client.user.avatar_url, text = f"**Rublewka BOT** © Copyright 2023 | Все права защищены"   )
 		#await ctx.send ( embed = emb)
 		#print(f"[Logs:Error] [Ошибка доступа] Пользователь [{ctx.author}] попытался кикнуть | {prefix}kick")
 
