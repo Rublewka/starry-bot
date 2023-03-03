@@ -4,7 +4,7 @@ from config import settings
 from misc import channels
 prefix = settings['PREFIX']
 
-client = commands.Bot(command_prefix = settings['PREFIX'], intents=discord.Intents.all())
+client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 
 client.remove_command('help') 
 
