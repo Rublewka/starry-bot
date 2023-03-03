@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from config import settings
-
+from misc import channels
 prefix = settings['PREFIX']
 
 client = commands.Bot(command_prefix = settings['PREFIX'], intents=discord.Intents.all())
@@ -12,7 +12,7 @@ client.remove_command('help')
 async def on_ready(): 
 
     print (f"Logged on as {settings['NAME BOT']}") # bot-readiness
-
+    ctx.message.send()
     await client.change_presence(status=discord.Status.dnd) #bot-status
 
 # ___________
@@ -44,35 +44,35 @@ greyple = 0x99aab5
 # ___________
 
 # Ping
-@client.command(aliases = ['Ping', 'PING', 'pING', 'ping'])
+@client.command(aliases = ['Ping', 'PING', 'pING', 'ping', ' ping', ' PING', ' pING', ' Ping'])
 async def __ping(ctx): 
     ping = client.ws.latency # Получаем пинг клиента
 
     ping_emoji = '🟩🔳🔳🔳🔳' # Эмоция пинга, если он меньше 100ms
 
-    if ping > 0.10000000000000000:
-        ping_emoji = '🟧🟩🔳🔳🔳' # Эмоция пинга, если он больше 100ms
-
     if ping > 0.15000000000000000:
-        ping_emoji = '🟥🟧🟩🔳🔳' # Эмоция пинга, если он больше 150ms
+        ping_emoji = '🟧🟩🔳🔳🔳' # Эмоция пинга, если он больше 150ms
 
     if ping > 0.20000000000000000:
-        ping_emoji = '🟥🟥🟧🟩🔳' # Эмоция пинга, если он больше 200ms
+        ping_emoji = '🟥🟧🟩🔳🔳' # Эмоция пинга, если он больше 200ms
 
     if ping > 0.25000000000000000:
-        ping_emoji = '🟥🟥🟥🟧🟩' # Эмоция пинга, если он больше 250ms
+        ping_emoji = '🟥🟥🟧🟩🔳' # Эмоция пинга, если он больше 250ms
 
     if ping > 0.30000000000000000:
-        ping_emoji = '🟥🟥🟥🟥🟧' # Эмоция пинга, если он больше 300ms
+        ping_emoji = '🟥🟥🟥🟧🟩' # Эмоция пинга, если он больше 300ms
 
     if ping > 0.35000000000000000:
-        ping_emoji = '🟥🟥🟥🟥🟥' # Эмоция пинга, если он больше 350ms
+        ping_emoji = '🟥🟥🟥🟥🟧' # Эмоция пинга, если он больше 350ms
+
+    if ping > 0.40000000000000000:
+        ping_emoji = '🟥🟥🟥🟥🟥' # Эмоция пинга, если он больше 400ms
 
     message = await ctx.send('Пожалуйста, подождите. . .') # Переменная message с первоначальным сообщением
     await message.edit(content = f'Понг! {ping_emoji} `{ping * 1000:.0f}ms` :ping_pong:') # Редактирование первого сообщения на итоговое (На сам пинг)
     print(f'[Logs:utils] Пинг сервера был выведен | {prefix}ping') # Информация в консоль, что команда "ping" была использована
     print(f'[Logs:utils] На данный момент пинг == {ping * 1000:.0f}ms | {prefix}ping') # Вывод пинга в консоль
-    #Итог: https://prnt.sc/uogljj
+    # Ping end
 
 # Help
 @client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
