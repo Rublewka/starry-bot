@@ -81,9 +81,9 @@ async def __help (ctx):
     # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
     emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
     # Отображает Аватар отправителя
-    emb.add_field( name = {prefix}'help', value = f'`Отображает эту команду`', inline=False)
+    emb.add_field( name = ';help', value = f'`Отображает эту команду`', inline=False)
     # TODO - `{prefix}server` `{prefix}profile` 
-    emb.add_field( name = {prefix}'ping', value = f'`Отображает задержку бота в миллисекундах (ms)`', inline=False)
+    emb.add_field( name = ';ping', value = f'`Отображает задержку бота в миллисекундах (ms)`', inline=False)
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
     emb.set_thumbnail(url = client.user.avatar.url)
     emb.set_footer( icon_url = client.user.avatar.url, text = f'Rublewka BOT © Copyright 2023 | Все права защищены' )
