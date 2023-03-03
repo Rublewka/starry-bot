@@ -70,7 +70,7 @@ async def __help (ctx):
 
 
 #Не работает/в разработке
-
+#\/\/\/
 
 #Kick
 #@client.command(aliases = ['Kick', 'kICK', 'KICK', 'kick'])
