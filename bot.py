@@ -14,9 +14,37 @@ async def on_ready():
     print (f"Logged on as {settings['NAME BOT']}") # bot-readiness
 
     await client.change_presence(status=discord.Status.dnd) #bot-status
+
+
+# colors
+class colors:
+    default = 0
+    teal = 0x1abc9c
+    dark_teal = 0x11806a
+    green = 0x2ecc71
+    dark_green = 0x1f8b4c
+    blue = 0x3498db
+    dark_blue = 0x206694
+    purple = 0x9b59b6
+    dark_purple = 0x71368a
+    magenta = 0xe91e63
+    dark_magenta = 0xad1457
+    gold = 0xf1c40f
+    dark_gold = 0xc27c0e
+    orange = 0xe67e22
+    dark_orange = 0xa84300
+    red = 0xe74c3c
+    dark_red = 0x992d22
+    lighter_grey = 0x95a5a6
+    dark_grey = 0x607d8b
+    light_grey = 0x979c9f
+    darker_grey = 0x546e7a
+    blurple = 0x7289da
+    greyple = 0x99aab5
+
 # Ping
 @client.command(aliases = ['Ping', 'PING', 'pING', 'ping'])
-async def __ping(ctx): # Объявление асинхронной функции __ping с возможностью публикации сообщения
+async def __ping(ctx): 
     ping = client.ws.latency # Получаем пинг клиента
 
     ping_emoji = '🟩🔳🔳🔳🔳' # Эмоция пинга, если он меньше 100ms
@@ -48,12 +76,12 @@ async def __ping(ctx): # Объявление асинхронной функц�
 # Help
 @client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
 async def __help (ctx):
-    emb = discord.Embed( title = 'ДОСТУПНЫЕ КОМАНДЫ:', description = '**ВНИМАНИЕ!** Бот ещё в разработке!', colour = discord.Color.red() )
+    emb = discord.Embed( title = 'Навигация по командам', description = '**ВНИМАНИЕ!** Бот ещё в разработке!', colour = teal )
     # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
-
     emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
     # Отображает:  Аватар отправителя
-    emb.add_field( name = 'Информация', value = f'>`{prefix}help - Выводит справку по командам` >`{prefix}ping - Выводит задержку бота в миллисекндах (ms)` ', inline=False) # `{prefix}server` `{prefix}profile` 
+    emb.add_field( name = '{prefix}help', value = f'`Отображает эту команду`', inline=False) # `{prefix}server` `{prefix}profile` 
+    emb.add_field( name = '{prefix}ping', value = f'`Отображает задержку бота в миллисекундах (ms)`', inline=False)
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
     emb.set_thumbnail(url = client.user.avatar.url)
     emb.set_footer( icon_url = client.user.avatar.url, text = f'**Rublewka BOT** © Copyright 2023 | Все права защищены' )
