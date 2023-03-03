@@ -53,7 +53,7 @@ async def __help (ctx):
 
     emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
     # Отображает:  Аватар отправителя
-    emb.add_field( name = 'Информация', value = f'`{prefix}help` `{prefix}ping` ', inline=False) # `{prefix}server` `{prefix}profile` 
+    emb.add_field( name = 'Информация', value = f'`{prefix}help - Выводит справку по командам` `{prefix}ping - Выводит задержку бота в миллисекндах (ms)` ', inline=True) # `{prefix}server` `{prefix}profile` 
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
     emb.set_thumbnail(url = client.user.avatar.url)
     emb.set_footer( icon_url = client.user.avatar.url, text = f'{client.user.name} © Copyright 2023 | Все права защищены' )
