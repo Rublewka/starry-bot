@@ -12,7 +12,7 @@ client.remove_command('help')
 async def on_ready(): 
 
     print (f"Logged on as {settings['NAME BOT']}") # bot-readiness
-    ctx.message.send()
+    #ctx.message.send()
     await client.change_presence(status=discord.Status.dnd) #bot-status
 
 # ___________
