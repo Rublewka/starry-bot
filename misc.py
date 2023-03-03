@@ -1,4 +1,4 @@
-channels = {
+channelsids = {
 	# ungrouped
 	'verification': '1075138657666740224',
 	'verif-instructions': '1075306702708146176',
@@ -25,7 +25,7 @@ channels = {
 	'announcements': '1008577770097496129',
 	'roles': '1045010584078401626',
 	'happy-bday': '1051877618535903242',
-	'rublewka-bot-updates': '1051877618535903242',
+	'rublewka-bot-status': '1051877618535903242',
 	'resources': '1008577770097496130',
 
 	# main

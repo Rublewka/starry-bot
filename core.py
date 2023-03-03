@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from config import settings
-from misc import channels
+from misc import channelsids
 prefix = settings['PREFIX']
 
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
@@ -11,9 +11,9 @@ client.remove_command('help')
 @client.event
 async def on_ready(): 
 
-    print (f"Logged on as {settings['NAME BOT']}") # bot-readiness
-    channels['rublewka-bot-status'].send('Bot has been restarted successfully')
-    await client.change_presence(status=discord.Status.dnd) #bot-status
+    print (f"Logged on as {settings['NAME BOT']}") # startup message in console
+    channels['rublewka-bot-status'].send('Bot has been restarted successfully') # startup message in status channel
+    await client.change_presence(status=discord.Status.dnd) # presence
 
 # ___________
 # colors
