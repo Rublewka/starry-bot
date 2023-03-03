@@ -64,6 +64,14 @@ async def __help (ctx):
     print(f'[Logs:info] Справка по командам была успешно выведена | {prefix}help ')
     # Информация, что команда "help" была использована
 
+
+
+
+
+
+#Не работает/в разработке
+
+
 #Kick
 #@client.command(aliases = ['Kick', 'kICK', 'KICK', 'kick'])
 #@commands.has_permissions ( administrator = True ) # Команда только для пользователей имеющих роль с правами "Администратор"
