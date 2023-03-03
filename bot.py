@@ -46,7 +46,7 @@ async def __ping(ctx): # Объявление асинхронной функц�
     #Итог: https://prnt.sc/uogljj
 
 # Help
-@client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
+@bot.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
 async def __help (ctx):
     emb = discord.Embed( title = 'ДОСТУПНЫЕ КОМАНДЫ:', description = 'ВНИМАНИЕ! Бот ещё в разработке!', colour = discord.Color.red() )
     # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
