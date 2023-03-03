@@ -46,7 +46,7 @@ async def __ping(ctx): # Объявление асинхронной функц�
     #Итог: https://prnt.sc/uogljj
 
 # Help
-@bot.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
+@client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
 async def __help (ctx):
     emb = discord.Embed( title = 'ДОСТУПНЫЕ КОМАНДЫ:', description = 'ВНИМАНИЕ! Бот ещё в разработке!', colour = discord.Color.red() )
     # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
@@ -55,8 +55,8 @@ async def __help (ctx):
     # Отображает:  Аватар отправителя
     emb.add_field( name = 'Информация', value = f'`{prefix}help` `{prefix}ping` ', inline=False) # `{prefix}server` `{prefix}profile` 
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
-    emb.set_thumbnail(url = client.user.avatar_url)
-    emb.set_footer( icon_url = client.user.avatar_url, text = f'{client.user.name} © Copyright 2023 | Все права защищены' )
+    emb.set_thumbnail(url = client.user.avatar.url)
+    emb.set_footer( icon_url = client.user.avatar.url, text = f'{client.user.name} © Copyright 2023 | Все права защищены' )
 
     await ctx.send ( embed = emb)
     # преобразование embed 
