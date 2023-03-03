@@ -12,7 +12,7 @@ client.remove_command('help')
 async def on_ready(): 
 
     print (f"Logged on as {settings['NAME BOT']}") # bot-readiness
-    #ctx.message.send()
+    channels['rublewka-bot-status'].send('Bot has been restarted successfully')
     await client.change_presence(status=discord.Status.dnd) #bot-status
 
 # ___________
