@@ -51,7 +51,7 @@ async def __help (ctx):
     emb = discord.Embed( title = 'ДОСТУПНЫЕ КОМАНДЫ:', description = 'ВНИМАНИЕ! Бот ещё в разработке!', colour = discord.Color.red() )
      title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
 
-    emb.set_author(name = ctx.author.name, icon_url = ctx.author.avatar_url)
+    emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
     # Отображает:  Аватар отправителя
     emb.add_field( name = 'Информация', value = f'`{prefix}help` `{prefix}ping` ', inline=False) # `{prefix}server` `{prefix}profile` 
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
