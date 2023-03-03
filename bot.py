@@ -48,12 +48,12 @@ async def __ping(ctx): # Объявление асинхронной функц�
 # Help
 @client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
 async def __help (ctx):
-    emb = discord.Embed( title = 'ДОСТУПНЫЕ КОМАНДЫ:', description = 'ВНИМАНИЕ! Бот ещё в разработке!', colour = discord.Color.red() )
+    emb = discord.Embed( title = 'ДОСТУПНЫЕ КОМАНДЫ:', description = '**ВНИМАНИЕ!** Бот ещё в разработке!', colour = discord.Color.red() )
     # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
 
     emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
     # Отображает:  Аватар отправителя
-    emb.add_field( name = 'Информация', value = f'`{prefix}help - Выводит справку по командам` `{prefix}ping - Выводит задержку бота в миллисекндах (ms)` ', inline=True) # `{prefix}server` `{prefix}profile` 
+    emb.add_field( name = 'Информация', value = f'`>{prefix}help - Выводит справку по командам` `>{prefix}ping - Выводит задержку бота в миллисекндах (ms)` ', inline=False) # `{prefix}server` `{prefix}profile` 
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
     emb.set_thumbnail(url = client.user.avatar.url)
     emb.set_footer( icon_url = client.user.avatar.url, text = f'{client.user.name} © Copyright 2023 | Все права защищены' )
