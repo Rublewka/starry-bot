@@ -1,5 +1,5 @@
 settings = {
-	'TOKEN': 'MTA3NDcyMTg5MDczNzg2NDcxNg.GtdbEY.hrbhDr3Hu1WHvABXHfH-FKkVJORJvt_yprqJ4E', # Получение токена - https://prnt.sc/uofhur
+	'TOKEN': 'MTA3NDcyMTg5MDczNzg2NDcxNg.Gd-18g.PzKAC5jxKNTGJSGtQ86ApmD0UCUrc3DiLu6QN0', # Получение токена - https://prnt.sc/uofhur
 	'NAME BOT': 'Rublewka BOT', # Имя вашего бота
 	'ID': '1074721890737864716', # Получение ID - https://prnt.sc/uofik2
 	'PREFIX': ';', # Префикс
