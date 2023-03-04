@@ -64,7 +64,7 @@ greyple = 0x99aab5
 # Ping
 @client.command(aliases = ['Ping', 'PING', 'pING', 'ping', ' ping', ' PING', ' pING', ' Ping'])
 async def __ping(ctx): 
-    ping = discord.AutoShardedClient.ws.latency # Получаем пинг клиента
+    ping = discord.AutoShardedClient.latency # Получаем пинг клиента
 
     ping_emoji = '🟩🔳🔳🔳🔳' # Эмоция пинга, если он меньше 100ms
 
