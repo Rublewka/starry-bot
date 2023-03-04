@@ -26,7 +26,10 @@ async def on_ready():
     print(f"[Logs:startup] Bot Info: {settings['NAME BOT']}")
     print(f"[Logs:startup] Bot ID: {settings['ID']}")
     rbs = client.get_channel(1076240177032351765)
-    await rbs.send(f'Successfull restart!') # startup message in status channel
+    await rbs.send(f"""
+        Successfull restart!
+        <@&1081247864040198154>    
+        """) # startup message in status channel
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     await client.change_presence(status=discord.Status.dnd) # presence
     print ("[Logs:startup] Bot start success")
