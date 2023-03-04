@@ -30,7 +30,7 @@ async def on_ready():
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     await client.change_presence(status=discord.Status.dnd) # presence
     print ("[Logs:startup] Bot start success")
-    print ("[Logs:startup] ___=====____=====____")
+    print ("[Logs:startup] ____=====____=====____")
 # startup end
 
 # ___________
