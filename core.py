@@ -30,6 +30,7 @@ async def on_ready():
     await rbs.send(f'Successfull restart!') # startup message in status channel
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     await client.change_presence(status=discord.Status.dnd) # presence
+    print ("Bot start success")
 # startup end
 
 # ___________
