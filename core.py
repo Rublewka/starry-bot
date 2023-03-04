@@ -1,8 +1,9 @@
 # setup
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from config import settings
 from misc import channelsids
+from itertools import cycle
 from discordLevelingSystem import DiscordLevelingSystem, LevelUpAnnouncement, RoleAward
 prefix = settings['PREFIX']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
@@ -10,6 +11,15 @@ client.remove_command('help')
 lvl = DiscordLevelingSystem()
 # setup end
 
+status = cycle([
+    'Listening to TheSkout',
+    ';help'
+    'Wathing you'
+])
+
+@tasks.loop(seconds=30)
+async def status_swap():
+    await client.change_presence(activity=discord.game(next(status)))
 #startup
 @client.event
 async def on_ready(): 
@@ -20,6 +30,8 @@ async def on_ready():
     print (f"[Logs:startup] Sent message to RBS channel successfully")
     await client.change_presence(status=discord.Status.dnd) # presence
 # startup end
+
+
 
 # ___________
 # colors
