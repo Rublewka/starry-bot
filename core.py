@@ -122,7 +122,7 @@ async def on_message( message ):
 
     msg = message.content.lower()
 
-    if msg in bad_words
+    if msg in bad_words:
         await message.delete()
         await message.author.send(f'{message.author.name}, на сервере **Rublewka** не разрешается использовать/употреблять настоящие имена')
 #_______________
