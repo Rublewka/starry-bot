@@ -13,14 +13,7 @@ lvl = DiscordLevelingSystem()
 #startup
 @client.event
 async def on_ready(): 
-    print ("______         _      _                  _            ______  _____  _____   _  ______          _____  _            _____  _                   _      _  _    _____  _____  __   _____ 
-| ___ \       | |    | |                | |           | ___ \|  _  ||_   _| | | | ___ \        |_   _|| |          /  ___|| |                 | |   _| || |_ |  _  |/ __  \/  | |____ |
-| |_/ / _   _ | |__  | |  ___ __      __| | __  __ _  | |_/ /| | | |  | |   | | | |_/ / _   _    | |  | |__    ___ \ `--. | | __  ___   _   _ | |_ |_  __  _| \ V / `' / /'`| |     / /
-|    / | | | || '_ \ | | / _ \\ \ /\ / /| |/ / / _` | | ___ \| | | |  | |   | | | ___ \| | | |   | |  | '_ \  / _ \ `--. \| |/ / / _ \ | | | || __| _| || |_  / _ \   / /   | |     \ \
-| |\ \ | |_| || |_) || ||  __/ \ V  V / |   < | (_| | | |_/ /\ \_/ /  | |   | | | |_/ /| |_| |   | |  | | | ||  __//\__/ /|   < | (_) || |_| || |_ |_  __  _|| |_| |./ /____| |_.___/ /
-\_| \_| \__,_||_.__/ |_| \___|  \_/\_/  |_|\_\ \__,_| \____/  \___/   \_/   | | \____/  \__, |   \_/  |_| |_| \___|\____/ |_|\_\ \___/  \__,_| \__|  |_||_|  \_____/\_____/\___/\____/ 
-                                                                            | |          __/ |                                                                                         
-                                                                            |_|         |___/                                                                                          ")
+
     print (f"Logged on as {settings['NAME BOT']}") # startup message in console
     rbs = client.get_channel(1076240177032351765)
     await rbs.send(f'Successfull restart!') # startup message in status channel
@@ -110,7 +103,7 @@ async def __help (ctx):
 
 #_______________
 # level system
-# lvl.create_database_file(r'/home/container/')    already created
+# lvl.create_database_file(r'/home/container/') already created
 lvl.connect_to_database_file(r'/home/container/DiscordLevelingSystem.db')
 
 VIPmember = 1038234609206435942
