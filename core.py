@@ -22,8 +22,7 @@ async def on_ready():
 ║║║╚╗║╚╝║║╚╝║║╚╗║║═╣╚╗╔╗╔╝║╔╗╗║╚╝╚╗    ║╚═╝║║╚═╝║ ╔╝╚╗ 
 ╚╝╚═╝╚══╝╚══╝╚═╝╚══╝ ╚╝╚╝ ╚╝╚╝╚═══╝    ╚═══╝╚═══╝ ╚══╝ 
    """)
-    print("[Logs:startup] INFO")
-    print()
+    print("[Logs:startup] ____=====INFO=====____")
     print(f"[Logs:startup] Bot Info: {settings['NAME BOT']}")
     print(f"[Logs:startup] Bot ID: {settings['ID']}")
     rbs = client.get_channel(1076240177032351765)
@@ -31,6 +30,7 @@ async def on_ready():
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     await client.change_presence(status=discord.Status.dnd) # presence
     print ("[Logs:startup] Bot start success")
+    print ("[Logs:startup] ___=====____=====____")
 # startup end
 
 # ___________
