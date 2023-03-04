@@ -103,7 +103,7 @@ async def __help (ctx):
 
 #_______________
 # level system
-lvl.create_database_file(r'/home/container/')
+# lvl.create_database_file(r'/home/container/')    already created
 lvl.connect_to_database_file(r'/home/container/DiscordLevelingSystem.db')
 
 VIPmember = 1038234609206435942
