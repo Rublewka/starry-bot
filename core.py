@@ -115,36 +115,6 @@ async def __help (ctx):
 
 #_______________
 # level system
-# lvl.create_database_file(r'/home/container/') already created
-lvl.connect_to_database_file(r'/home/container/DiscordLevelingSystem.db')
-
-VIPmember = 1038234609206435942
-lvlupchan = 1081536448056004638
-
-@client.event
-async def on_message(message):
-    await lvl.award_xp(amount=[15, 25], message=message, bonus=DiscordLevelingSystem.Bonus([VIPmember], 20, multiply=False)) 
-    # xp gain
-
-@client.command()
-async def rank(ctx):
-    data = await lvl.get_data_for(ctx.author)
-    await ctx.send(f'You are level {data.level} and your rank is {data.rank}') 
-    # rank command
-
-@client.command()
-async def leaderboard(ctx):
-    data = await lvl.each_member_data(ctx.guild, sort_by='rank')
-    # leaderboard
-
-embed = discord.Embed()
-embed.set_author(name=LevelUpAnnouncement.Member.name, icon_url=LevelUpAnnouncement.Member.avatar_url)
-embed.description = f'Congrats {LevelUpAnnouncement.Member.mention}! You are now level {LevelUpAnnouncement.LEVEL} 😎'
-
-announcement = LevelUpAnnouncement(embed, level_up_channel_ids = [lvlupchan])
-
-lvl = DiscordLevelingSystem(level_up_announcement=announcement)
-    # lvl up announce
 
 #_______________
 
