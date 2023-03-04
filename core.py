@@ -14,7 +14,7 @@ async def on_ready():
     print (f"Logged on as {settings['NAME BOT']}") # startup message in console
     rbs = client.get_channel(1076240177032351765)
     await rbs.send(f'Successfull restart!') # startup message in status channel
-    print (f"[Logs|Startup] Sent message to RBS channel successfully")
+    print (f"[Logs:startup] Sent message to RBS channel successfully")
     await client.change_presence(status=discord.Status.dnd) # presence
 
 # ___________
