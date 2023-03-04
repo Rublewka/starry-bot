@@ -125,15 +125,15 @@ async def __help (ctx):
     # Информация, что команда "help" была использована
 
 # Filter
-@client.event
-async def on_message( message ):
-    await client.process_commands( message )
-    msg = message.content.lower()
-    with open('prohibitednames.txt') as bad_words:
-    if msg in bad_words:
-        await message.delete()
-        await message.author.send(f'{message.author.name}, на сервере **Rublewka** не разрешается использовать/употреблять настоящие имена')
-        print('[Logs:moderation] Message {message} has been deleted due to filter violations')
+#@client.event
+#async def on_message( message ):
+#    await client.process_commands( message )
+#    msg = message.content.lower()
+#    with open('prohibitednames.txt') as bad_words:
+#    if msg in bad_words:
+#        await message.delete()
+#        await message.author.send(f'{message.author.name}, на сервере **Rublewka** не разрешается использовать/употреблять настоящие имена')
+#        print('[Logs:moderation] Message {message} has been deleted due to filter violations')
 #_______________
 # level system
 
