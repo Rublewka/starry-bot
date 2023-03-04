@@ -30,9 +30,11 @@ async def on_ready():
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     await client.change_presence(status=discord.Status.dnd) # presence
     print ("[Logs:startup] Bot start success")
-    print ("[Logs:startup] ____=====____=====____")
+    print ("[Logs:startup] ____=====INFO=====____")
 # startup end
+# variables section
 
+bad_words = ['даня', 'ярик', 'карина'] # prohibited words
 # ___________
 # colors
 default = 0
@@ -60,6 +62,7 @@ blurple = 0x7289da
 greyple = 0x99aab5
 
 # ___________
+# variables section end
 
 # Ping
 @client.command(aliases = ['Ping', 'PING', 'pING', 'ping', ' ping', ' PING', ' pING', ' Ping'])
@@ -112,7 +115,16 @@ async def __help (ctx):
     print(f'[Logs:info] Справка по командам была успешно выведена | {prefix}help ')
     # Информация, что команда "help" была использована
 
+# Filter
+@client.event
+async def on_message( message ):
+    await client.process_commands( message )
 
+    msg = message.content.lower()
+
+    if msg in bad_words
+        await message.delete()
+        await message.author.send(f'{message.author.name}, на сервере **Rublewka** не разрешается использовать/употреблять настоящие имена')
 #_______________
 # level system
 

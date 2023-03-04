@@ -62,3 +62,12 @@ channelsids = {
 	'channels':'1045183183316066404',
 	'transactions':'1038193737181970562',
 }
+
+
+
+
+
+# Useful console commands
+
+# py -3 -m pip list    для requiremets.txt
+# py -3 -m pip install discord     установка библиотек Discord
