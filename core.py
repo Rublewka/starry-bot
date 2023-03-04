@@ -5,7 +5,7 @@ from config import settings
 from misc import channelsids
 from itertools import cycle
 prefix = settings['PREFIX']
-client = commands.AutoShardedBot(shard_count = 1, command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
+client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
 # setup end
 
@@ -26,7 +26,7 @@ async def on_ready():
     print()
     print(f"[Logs:startup] Bot Info: {settings['NAME BOT']}")
     print(f"[Logs:startup] Bot ID: {settings['ID']}")
-    rbs = client.get_channel({channelsids['rublewka-bot-status']})
+    rbs = client.get_channel(1076240177032351765)
     await rbs.send(f'Successfull restart!') # startup message in status channel
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     await client.change_presence(status=discord.Status.dnd) # presence
@@ -64,7 +64,7 @@ greyple = 0x99aab5
 # Ping
 @client.command(aliases = ['Ping', 'PING', 'pING', 'ping', ' ping', ' PING', ' pING', ' Ping'])
 async def __ping(ctx): 
-    ping = discord.AutoShardedClient.latency # Получаем пинг клиента
+    ping = client.ws.latency # Получаем пинг клиента
 
     ping_emoji = '🟩🔳🔳🔳🔳' # Эмоция пинга, если он меньше 100ms
 
