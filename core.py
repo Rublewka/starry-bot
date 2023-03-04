@@ -130,7 +130,6 @@ async def on_message( message ):
     await client.process_commands( message )
     msg = message.content.lower()
     with open('prohibitednames.txt') as bad_words:
-        if msg in bad_words.read():
     if msg in bad_words:
         await message.delete()
         await message.author.send(f'{message.author.name}, на сервере **Rublewka** не разрешается использовать/употреблять настоящие имена')
