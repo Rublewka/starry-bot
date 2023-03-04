@@ -5,7 +5,7 @@ from config import settings
 from misc import channelsids
 from itertools import cycle
 prefix = settings['PREFIX']
-client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
+client = commands.AutoShardedBot(shard_count = 1, command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
 # setup end
 
@@ -13,7 +13,19 @@ client.remove_command('help')
 @client.event
 async def on_ready(): 
 
-    print (f"Logged on as {settings['NAME BOT']}") # startup message in console
+    print (f"Logged on as ") # startup message in console
+    print ("""
+╔═══╗    ╔╗  ╔╗           ╔╗           ╔══╗ ╔═══╗╔════╗
+║╔═╗║    ║║  ║║           ║║           ║╔╗║ ║╔═╗║║╔╗╔╗║
+║╚═╝║╔╗╔╗║╚═╗║║ ╔══╗╔╗╔╗╔╗║║╔╗╔══╗     ║╚╝╚╗║║ ║║╚╝║║╚╝
+║╔╗╔╝║║║║║╔╗║║║ ║╔╗║║╚╝╚╝║║╚╝╝╚ ╗║     ║╔═╗║║║ ║║  ║║  
+║║║╚╗║╚╝║║╚╝║║╚╗║║═╣╚╗╔╗╔╝║╔╗╗║╚╝╚╗    ║╚═╝║║╚═╝║ ╔╝╚╗ 
+╚╝╚═╝╚══╝╚══╝╚═╝╚══╝ ╚╝╚╝ ╚╝╚╝╚═══╝    ╚═══╝╚═══╝ ╚══╝ 
+   """)
+    print("INFO")
+    print()
+    print(f"Bot Info: {settings['NAME BOT']}")
+    print(f"Bot ID: {settings['ID']}")
     rbs = client.get_channel(1076240177032351765)
     await rbs.send(f'Successfull restart!') # startup message in status channel
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
