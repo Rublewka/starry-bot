@@ -17,9 +17,6 @@ status = cycle([
     'Wathing you'
 ])
 
-@tasks.loop(seconds=30)
-async def status_swap():
-    await client.change_presence(activity=discord.game(next(status)))
 #startup
 @client.event
 async def on_ready(): 
@@ -31,6 +28,9 @@ async def on_ready():
     await client.change_presence(status=discord.Status.dnd) # presence
 # startup end
 
+@tasks.loop(seconds=30)
+async def status_swap():
+    await client.change_presence(activity=discord.game(next(status)))
 
 
 # ___________
