@@ -28,7 +28,7 @@ async def on_ready():
     rbs = client.get_channel(1076240177032351765)
     await rbs.send(f"""
         Successfull restart!
-        <@&1081247864040198154>    
+    @everyone 
         """) # startup message in status channel
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     await client.change_presence(status=discord.Status.dnd) # presence
