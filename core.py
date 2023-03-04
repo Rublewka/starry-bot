@@ -13,7 +13,7 @@ client.remove_command('help')
 @client.event
 async def on_ready(): 
 
-    print (f"Logged on as ") # startup message in console
+    print (f"[Logs:startup] Logged on as ") # startup message in console
     print ("""
 ╔═══╗    ╔╗  ╔╗           ╔╗           ╔══╗ ╔═══╗╔════╗
 ║╔═╗║    ║║  ║║           ║║           ║╔╗║ ║╔═╗║║╔╗╔╗║
@@ -22,15 +22,15 @@ async def on_ready():
 ║║║╚╗║╚╝║║╚╝║║╚╗║║═╣╚╗╔╗╔╝║╔╗╗║╚╝╚╗    ║╚═╝║║╚═╝║ ╔╝╚╗ 
 ╚╝╚═╝╚══╝╚══╝╚═╝╚══╝ ╚╝╚╝ ╚╝╚╝╚═══╝    ╚═══╝╚═══╝ ╚══╝ 
    """)
-    print("INFO")
+    print("[Logs:startup] INFO")
     print()
-    print(f"Bot Info: {settings['NAME BOT']}")
-    print(f"Bot ID: {settings['ID']}")
+    print(f"[Logs:startup] Bot Info: {settings['NAME BOT']}")
+    print(f"[Logs:startup] Bot ID: {settings['ID']}")
     rbs = client.get_channel(1076240177032351765)
     await rbs.send(f'Successfull restart!') # startup message in status channel
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     await client.change_presence(status=discord.Status.dnd) # presence
-    print ("Bot start success")
+    print ("[Logs:startup] Bot start success")
 # startup end
 
 # ___________
