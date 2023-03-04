@@ -103,23 +103,23 @@ async def __help (ctx):
 
 #_______________
 # level system
-lvl.connect_to_database_file(r':/home/container/DiscordLevelingSystem.db')
+lvl.connect_to_database_file('/home/container/DiscordLevelingSystem.db')
 
 VIPmember = 1038234609206435942
 lvlupchan = 1081536448056004638
 
-@bot.event
+@client.event
 async def on_message(message):
     await lvl.award_xp(amount=[15, 25], message=message, bonus=DiscordLevelingSystem.Bonus([VIPmember], 20, multiply=False)) 
     # xp gain
 
-@bot.command()
+@client.command()
 async def rank(ctx):
     data = await lvl.get_data_for(ctx.author)
     await ctx.send(f'You are level {data.level} and your rank is {data.rank}') 
     # rank command
 
-@bot.command()
+@client.command()
 async def leaderboard(ctx):
     data = await lvl.each_member_data(ctx.guild, sort_by='rank')
     # leaderboard
