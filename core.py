@@ -5,7 +5,7 @@ import os
 import sys
 import asyncio
 import random
-from discord.ext import commands, tasks, loop
+from discord.ext import commands, tasks
 from config import settings
 from misc import channelsids
 prefix = settings['PREFIX']
