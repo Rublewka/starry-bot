@@ -5,10 +5,9 @@ import os
 import sys
 import asyncio
 import random
-from discord.ext import commands, tasks
+from discord.ext import commands, tasks, loop
 from config import settings
 from misc import channelsids
-from itertools import loop
 prefix = settings['PREFIX']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
