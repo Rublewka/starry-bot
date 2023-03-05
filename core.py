@@ -1,5 +1,10 @@
 # setup
 import discord
+import json
+import os
+import sys
+import asyncio
+import random
 from discord.ext import commands, tasks
 from config import settings
 from misc import channelsids
@@ -27,14 +32,33 @@ async def on_ready():
     print(f"[Logs:startup] Bot ID: {settings['ID']}")
     rbs = client.get_channel(1076240177032351765)
     await rbs.send(f"""
-        Successfull restart!
-@everyone 
+@everyone        
+Successfull restart!
         """) # startup message in status channel
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
-    await client.change_presence(status=discord.Status.dnd) # presence
     print ("[Logs:startup] Bot start success")
     print ("[Logs:startup] ____=====INFO=====____")
+    
+    await client.change_presence(activity=discord.Game(name="with TheSkout | ;help")) # presence
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Rublewka | ;help")) # presence
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="Apple Music | ;help")) # presence
+
+
 # startup end
+
+# status
+async def st_sw():
+    await client.wait_until_ready()
+
+    statuses = ["with TheSkout | ;help", "Rublewka | ;help", "Apple Music | ;help"]
+
+    while not client.is_closed()
+        status = random.choice(statuses)
+        await client.change_presence(activity=discord.Game(name=status))
+        await asyncio.sleep(15)
+
+
+client.loop.create_task(st_sw())
 # variables section
 
 
@@ -103,6 +127,9 @@ async def __ping(ctx):
     print(f'[Logs:utils] Пинг сервера был выведен | {prefix}ping') # Информация в консоль, что команда "ping" была использована
     print(f'[Logs:utils] На данный момент пинг == {ping * 1000:.0f}ms | {prefix}ping') # Вывод пинга в консоль
     # Ping end
+
+# voice channels
+
 
 # Help
 @client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
