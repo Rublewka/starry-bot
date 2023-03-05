@@ -52,7 +52,7 @@ async def st_sw():
 
     statuses = ["with TheSkout | ;help", "Rublewka | ;help", "Apple Music | ;help"]
 
-    while not client.is_closed()
+    while not client.is_closed():
         status = random.choice(statuses)
         await client.change_presence(activity=discord.Game(name=status))
         await asyncio.sleep(15)
