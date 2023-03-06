@@ -5,6 +5,7 @@ import os
 import sys
 import asyncio
 import random
+import http.client, urllib.request, urllib.parse, urllib.error, time
 from discord.ext import commands, tasks
 from config import settings
 from misc import channelsids
@@ -62,8 +63,13 @@ Successfull restart!
 #prohibitedwords = open(prohibitedwords_path, 'r')
 
 #bad_words = [prohibitedwords.read()]
-
-
+# _______
+# metrics
+api_key = 'd5c8f50a-7e74-421e-a5ad-d62ed8d3ebdb'
+page_id = '1423jz25bbfm'
+metric_id = 'w3bdmlxfy40f'
+api_base = 'https://api.statuspage.io/v1'
+# metrics end
 # ___________
 # colors
 default = 0
@@ -124,6 +130,38 @@ async def __ping(ctx):
     print(f'[Logs:utils] На данный момент пинг == {ping * 1000:.0f}ms | {prefix}ping') # Вывод пинга в консоль
     # Ping end
 
+# statuspage.io
+# metrics
+# need at least 1 data point for every 5 minutes
+# submit random data for the whole day
+total_points = (60 / 5 * 24)
+total_points.times.each do |i|
+  dhash = {
+    timestamp: Time.now.to_i - i * 5 * 60,
+    value: rand(100)
+  }
+
+  response = HTTParty.post(
+    "#{api_base}/pages/#{page_id}/metrics/#{metric_id}/data.json",
+    headers: {
+      'Authorization' => "OAuth #{api_key}",
+    },
+    body: {
+      data: dhash
+    }
+  )
+
+  unless response["error"]
+    puts "Submitted point #{i+1} of #{total_points}"
+    sleep 1
+  else
+    genericError = "Error encountered. Please ensure that your page code and authorization key are correct."
+    puts genericError
+    break
+  end
+end
+# metrics end
+# statuspage.ip end
 # voice channels
 
 
