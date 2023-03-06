@@ -158,7 +158,7 @@ for i in range(total_points):
   response = conn.getresponse()
 
   if (response.status >= 400):
-    print f"Error encountered. Please ensure that your page code and authorization key are correct."
+    print (f"Error encountered. Please ensure that your page code and authorization key are correct.")
     print(response.read())
     break
   else:
