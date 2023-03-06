@@ -1,7 +1,7 @@
 # setup
 import discord
 import json
-import os
+import os, os.path
 import sys
 import asyncio
 import random
@@ -138,26 +138,26 @@ async def __ping(ctx):
 # submit random data for the whole day
 total_points = int((60 / 5 * 24))
 for i in range(total_points):
-  ts = int(time.time()) - (i * 5 * 60)
-  value = random.randint(0, 99)
-  params = json.dumps({
-              'data' : {
-                         'timestamp': ts,
-                          'value': value
-                        }
+    ts = int(time.time()) - (i * 5 * 60)
+    value = random.randint(0, 99)
+    params = json.dumps({
+                'data' : {
+                            'timestamp': ts,
+                            'value': value
+                            }
             })
-  headers = {"Content-Type": "application/json", "Authorization": "OAuth " + api_key}
-  conn = http.client.HTTPSConnection(api_base)
-  conn.request("POST", "/pages/" + page_id + "/metrics/" + metric_id + "/data.json", params, headers)
-  response = conn.getresponse()
+    headers = {"Content-Type": "application/json", "Authorization": "OAuth " + api_key}
+    conn = http.client.HTTPSConnection(api_base)
+    conn.request("POST", "/pages/" + page_id + "/metrics/" + metric_id + "/data.json", params, headers)
+    response = conn.getresponse()
 
-  if (response.status >= 500):
-    genericError = "Error encountered. Please ensure that your page code and authorization key are correct."
-    print(genericError)
-    break
-  else:
-    print("Submitted point " + str(i + 1) + " of " + str(total_points))
-    time.sleep(1)
+    if (response.status >= 500):
+        genericError = "Error encountered. Please ensure that your page code and authorization key are correct."
+        print(genericError)
+        break
+    else:
+        print("Submitted point " + str(i + 1) + " of " + str(total_points))
+        time.sleep(1)
 # metrics end
 # statuspage.ip end
 # voice channels
