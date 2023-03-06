@@ -136,28 +136,35 @@ async def __ping(ctx):
 # submit random data for the whole day
 # need 1 data point every 5 minutes
 # submit random data for the whole day
-total_points = int((60 / 5 * 24))
-for i in range(total_points):
-    ts = int(time.time()) - (i * 5 * 60)
-    value = random.randint(0, 99)
-    params = json.dumps({
-                'data' : {
-                            'timestamp': ts,
-                            'value': value
-                            }
-            })
-    headers = {"Content-Type": "application/json", "Authorization": "OAuth " + api_key}
-    conn = http.client.HTTPSConnection(api_base)
-    conn.request("POST", "/pages/" + page_id + "/metrics/" + metric_id + "/data.json", params, headers)
-    response = conn.getresponse()
+import httplib, urllib, time, random, json
 
-    if (response.status >= 500):
-        genericError = "Error encountered. Please ensure that your page code and authorization key are correct."
-        print(genericError)
-        break
-    else:
-        print("Submitted point " + str(i + 1) + " of " + str(total_points))
-        time.sleep(1)
+# the following 4 are the actual values that pertain to your account and this specific metric
+# need 1 data point every 5 minutes
+# submit random data for the whole day
+total_points = (60 / 5 * 24)
+for i in range(total_points):
+  ts = int(time.time()) - (i * 5 * 60)
+  value = random.randint(0, 99)
+  params = json.dumps({
+      "data": {
+          "timestamp": ts,
+          "value": value
+      }
+  })
+  headers = {"Content-Type": "application/json", "Authorization": "OAuth " + api_key}
+
+  conn = httplib.HTTPSConnection(api_base)
+  conn.request("POST", "/pages/" + page_id + "/metrics/" + metric_id + "/data.json", params, headers)
+  response = conn.getresponse()
+
+  if (response.status >= 400):
+    print f"Error encountered. Please ensure that your page code and authorization key are correct."
+    print(response.read())
+    break
+  else:
+    print "Submitted point " + str(i + 1) + " of " + str(total_points)
+    time.sleep(1)
+
 # metrics end
 # statuspage.ip end
 # voice channels
