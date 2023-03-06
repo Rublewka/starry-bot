@@ -5,7 +5,7 @@ import os, os.path
 import sys
 import asyncio
 import random
-import http.client, urllib.request, urllib.parse, urllib.error, time
+import http.client, urllib3
 from discord.ext import commands, tasks
 from config import settings
 from misc import channelsids
