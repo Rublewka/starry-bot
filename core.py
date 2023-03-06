@@ -162,7 +162,7 @@ for i in range(total_points):
     print(response.read())
     break
   else:
-    print "Submitted point " + str(i + 1) + " of " + str(total_points)
+    print ("Submitted point " + str(i + 1) + " of " + str(total_points))
     time.sleep(1)
 
 # metrics end
