@@ -134,32 +134,30 @@ async def __ping(ctx):
 # metrics
 # need at least 1 data point for every 5 minutes
 # submit random data for the whole day
-total_points = (60 / 5 * 24)
-total_points.times.each do |i|
-  dhash = {
-    timestamp: Time.now.to_i - i * 5 * 60,
-    value: rand(100)
-  }
+# need 1 data point every 5 minutes
+# submit random data for the whole day
+total_points = int((60 / 5 * 24))
+for i in range(total_points):
+  ts = int(time.time()) - (i * 5 * 60)
+  value = random.randint(0, 99)
+  params = json.dumps({
+              'data' : {
+                         'timestamp': ts,
+                          'value': value
+                        }
+            })
+  headers = {"Content-Type": "application/json", "Authorization": "OAuth " + api_key}
+  conn = http.client.HTTPSConnection(api_base)
+  conn.request("POST", "/pages/" + page_id + "/metrics/" + metric_id + "/data.json", params, headers)
+  response = conn.getresponse()
 
-  response = HTTParty.post(
-    "#{api_base}/pages/#{page_id}/metrics/#{metric_id}/data.json",
-    headers: {
-      'Authorization' => "OAuth #{api_key}",
-    },
-    body: {
-      data: dhash
-    }
-  )
-
-  unless response["error"]
-    puts "Submitted point #{i+1} of #{total_points}"
-    sleep 1
-  else
+  if (response.status >= 500):
     genericError = "Error encountered. Please ensure that your page code and authorization key are correct."
-    puts genericError
+    print(genericError)
     break
-  end
-end
+  else:
+    print("Submitted point " + str(i + 1) + " of " + str(total_points))
+    time.sleep(1)
 # metrics end
 # statuspage.ip end
 # voice channels
