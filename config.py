@@ -1,8 +1,0 @@
-settings = {
-	'TOKEN': 'MTA4MTY2Mjk5NTYzOTMwODM2OQ.GuZjwj.2XEmkqRKevdas80IQg8zbwewdYBVEqD95VNCE4', #	TOKEN
-	'NAME BOT': 'Rublewka BOT', # BOT NAME
-	'ID': '1081662995639308369', # BOT ID
-	'PREFIX': ';', # PREFIX
-	'OWNER':'TheSkout#8213',    # OWNER USERNAME
-	'OWNER NAME':'TheSkout' # OWNER NAME
-}
