@@ -5,7 +5,7 @@ import os, os.path
 import sys
 import asyncio
 import random
-import http.client, urllib3
+# import http.client, urllib3
 from discord.ext import commands, tasks
 from config import settings
 from misc import channelsids
@@ -136,7 +136,7 @@ async def __ping(ctx):
 # submit random data for the whole day
 # need 1 data point every 5 minutes
 # submit random data for the whole day
-import httplib, urllib, time, random, json
+ import httplib, urllib, time, random, json
 
 # the following 4 are the actual values that pertain to your account and this specific metric
 # need 1 data point every 5 minutes
