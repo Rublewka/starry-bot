@@ -146,11 +146,11 @@ async def __ping(ctx):
 #  ts = int(time.time()) - (i * 5 * 60)
 #  value = random.randint(0, 99)
 #  params = json.dumps({
-      "data": {
-          "timestamp": ts,
-          "value": value
-      }
-  })
+      #"data": {
+          #"timestamp": ts,
+         # "value": value
+     # }
+#  })
 #  headers = {"Content-Type": "application/json", "Authorization": "OAuth " + api_key}
 
 #  conn = httplib.HTTPSConnection(api_base)
