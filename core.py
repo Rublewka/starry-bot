@@ -155,15 +155,15 @@ async def __ping(ctx):
 
 #  conn = httplib.HTTPSConnection(api_base)
 #  conn.request("POST", "/pages/" + page_id + "/metrics/" + metric_id + "/data.json", params, headers)
-  response = conn.getresponse()
+#  response = conn.getresponse()
 
-  if (response.status >= 400):
-    print (f"Error encountered. Please ensure that your page code and authorization key are correct.")
-    print(response.read())
-    break
-  else:
-    print ("Submitted point " + str(i + 1) + " of " + str(total_points))
-    time.sleep(1)
+#  if (response.status >= 400):
+#    print (f"Error encountered. Please ensure that your page code and authorization key are correct.")
+#    print(response.read())
+#    break
+#  else:
+#    print ("Submitted point " + str(i + 1) + " of " + str(total_points))
+#    time.sleep(1)
 
 # metrics end
 # statuspage.ip end
