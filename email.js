@@ -115,7 +115,7 @@ function read(threadId) {
 
 //send message to webhook
 function webhook(from, date, subject, body) {
-  axios.post('https://discord.com/api/webhooks/WEBHOOK_LINK_HERE', {
+  axios.post('https://discord.com/api/webhooks/1082614648987201557/zES1aRo6VUNJQGieOEF3PgVTYemI5ixhUTKA_3lxs1LjF4-vjhG-I77a_lyJNJaRHig', {
                 embeds: [
                   {
                     author: {
@@ -138,7 +138,7 @@ function webhook(from, date, subject, body) {
 //send error message to webhook
 function webhookError(title, error) {
   console.log(error);
-  axios.post('https://discord.com/api/webhooks/WEBHOOK_LINK_HERE', {
+  axios.post('https://discord.com/api/webhooks/1082614648987201557/zES1aRo6VUNJQGieOEF3PgVTYemI5ixhUTKA_3lxs1LjF4-vjhG-I77a_lyJNJaRHig', {
                 embeds: [
                   {
                     author: {
