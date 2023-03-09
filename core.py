@@ -130,7 +130,7 @@ async def connect(ctx):
         await client.VoiceChannel.move_to(vc)
         await ctx.reply(f'Бот переместился в канал {vc}')
     else:
-        voice = await client.VoiceChannel.connect(vc)
+        voice = await client.voice_connect(vc)
         await ctx.reply(f'Бот присоеденился к каналу {vc}')
 
 @client.command()
