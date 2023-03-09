@@ -123,10 +123,10 @@ async def connect(ctx):
     voice = get(client.voice_clients, guild = ctx.guild)
 
     if voice and voice.is_connected():
-        await voice.move_to(vc)
+        await client.voice.move_to(vc)
         await ctx.reply(f'Бот переместился в канал {vc}')
     else:
-        voice = await voice.connect(vc)
+        voice = await client.voice.connect(vc)
         await ctx.reply(f'Бот присоеденился к каналу {vc}')
 
 @client.command()
@@ -136,10 +136,10 @@ async def leave(ctx):
     voice = get(client.voice_clients, guild = ctx.guild)
 
     if voice and voice.is_connected():
-        await voice.disconnect(vc)
+        await client.voice.disconnect(vc)
         await ctx.reply(f'Бот отключился от канала {vc}')
     else:
-        voice = await voice.disconnect(vc)
+        voice = await client.voice.disconnect(vc)
         await ctx.reply(f'Бот отключился от канала {vc}')
 # music
 
