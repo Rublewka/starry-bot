@@ -38,24 +38,21 @@ Successfull restart!
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     print ("[Logs:startup] Bot start success")
     print ("[Logs:startup] ____=====INFO=====____")
-    
-#    await client.change_presence(activity=discord.Game(name="with TheSkout | ;help")) # presence
-#    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Rublewka | ;help")) # presence
-#    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="Apple Music | ;help")) # presence
-
 
 # startup end
 
 # status
-#async def st_sw():
-#    await client.wait_until_ready()
+async def st_sw():
+    await client.wait_until_ready()
 
-#    statuses = ["with TheSkout | ;help", "Rublewka | ;help", "Apple Music | ;help"]
+    statuses = ["with TheSkout | ;help", "Rublewka | ;help"]
 
-#    while not client.is_closed():
-#        status = random.choice(statuses)
-#        await client.change_presence(activity=discord.Game(name=status))
-#        await asyncio.sleep(15)
+    while not client.is_closed():
+        status = random.choice(statuses)
+        await client.change_presence(activity=discord.Game(name=status))
+        await asyncio.sleep(15)
+
+
 # variables section
 
 
