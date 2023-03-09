@@ -5,8 +5,9 @@ import os, os.path
 import sys
 import asyncio
 import random
-# import http.client, urllib3
+import youtube_dl
 from discord.ext import commands, tasks
+from discord.utils import get
 from config import settings
 from misc import channelsids
 prefix = settings['PREFIX']
@@ -38,24 +39,9 @@ Successfull restart!
     print (f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     print ("[Logs:startup] Bot start success")
     print ("[Logs:startup] ____=====INFO=====____")
-    
-#    await client.change_presence(activity=discord.Game(name="with TheSkout | ;help")) # presence
-#    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Rublewka | ;help")) # presence
-#    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="Apple Music | ;help")) # presence
-
 
 # startup end
 
-# status
-#async def st_sw():
-#    await client.wait_until_ready()
-
-#    statuses = ["with TheSkout | ;help", "Rublewka | ;help", "Apple Music | ;help"]
-
-#    while not client.is_closed():
-#        status = random.choice(statuses)
-#        await client.change_presence(activity=discord.Game(name=status))
-#        await asyncio.sleep(15)
 # variables section
 
 
@@ -129,45 +115,36 @@ async def __ping(ctx):
     print(f'[Logs:utils] Пинг сервера был выведен | {prefix}ping') # Информация в консоль, что команда "ping" была использована
     print(f'[Logs:utils] На данный момент пинг == {ping * 1000:.0f}ms | {prefix}ping') # Вывод пинга в консоль
     # Ping end
+# voice
 
-# statuspage.io
-# metrics
-# need at least 1 data point for every 5 minutes
-# submit random data for the whole day
-# need 1 data point every 5 minutes
-# submit random data for the whole day
-# import httplib, urllib, time, random, json
+# ❗ ❗ ❗ ❗ ❗ 
+# @client.command()
+#async def connect(ctx):
+#    global voice
+#    vc = ctx = ctx.message.author.voice.channel
+#    voice = get(client.voice_clients, guild = ctx.guild)
 
-# the following 4 are the actual values that pertain to your account and this specific metric
-# need 1 data point every 5 minutes
-# submit random data for the whole day
-#total_points = (60 / 5 * 24)
-#for i in range(total_points):
-#  ts = int(time.time()) - (i * 5 * 60)
-#  value = random.randint(0, 99)
-#  params = json.dumps({
-      #"data": {
-          #"timestamp": ts,
-         # "value": value
-     # }
-#  })
-#  headers = {"Content-Type": "application/json", "Authorization": "OAuth " + api_key}
+#    if voice and voice.is_connected():
+#        await voice.move_to(vc)
+#        await ctx.reply(f'Бот переместился в канал {vc}')
+#    else:
+#        voice = await voice.connect(vc)
+#        await ctx.reply(f'Бот присоеденился к каналу {vc}')
 
-#  conn = httplib.HTTPSConnection(api_base)
-#  conn.request("POST", "/pages/" + page_id + "/metrics/" + metric_id + "/data.json", params, headers)
-#  response = conn.getresponse()
+#@client.command()
+#async def leave(ctx):
+#    global voice
+#    vc = ctx = ctx.message.author.voice.channel
+#    voice = get(client.voice_clients, guild = ctx.guild)
 
-#  if (response.status >= 400):
-#    print (f"Error encountered. Please ensure that your page code and authorization key are correct.")
-#    print(response.read())
-#    break
-#  else:
-#    print ("Submitted point " + str(i + 1) + " of " + str(total_points))
-#    time.sleep(1)
+#    if voice and voice.is_connected():
+#        await voice.disconnect(vc)
+#        await ctx.reply(f'Бот отключился от канала {vc}')
+#    else:
+#        voice = await voice.disconnect(vc)
+#        await ctx.reply(f'Бот отключился от канала {vc}')
+# music
 
-# metrics end
-# statuspage.ip end
-# voice channels
 
 
 # Help
