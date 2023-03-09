@@ -116,31 +116,33 @@ async def __ping(ctx):
     print(f'[Logs:utils] На данный момент пинг == {ping * 1000:.0f}ms | {prefix}ping') # Вывод пинга в консоль
     # Ping end
 # voice
-@client.command()
-async def connect(ctx):
-    global voice
-    vc = ctx = ctx.message.author.voice.channel
-    voice = get(client.voice_clients, guild = ctx.guild)
 
-    if voice and voice.is_connected():
-        await client.voice.move_to(vc)
-        await ctx.reply(f'Бот переместился в канал {vc}')
-    else:
-        voice = await client.voice.connect(vc)
-        await ctx.reply(f'Бот присоеденился к каналу {vc}')
+# ❗ ❗ ❗ ❗ ❗ 
+# @client.command()
+#async def connect(ctx):
+#    global voice
+#    vc = ctx = ctx.message.author.voice.channel
+#    voice = get(client.voice_clients, guild = ctx.guild)
 
-@client.command()
-async def leave(ctx):
-    global voice
-    vc = ctx = ctx.message.author.voice.channel
-    voice = get(client.voice_clients, guild = ctx.guild)
+#    if voice and voice.is_connected():
+#        await voice.move_to(vc)
+#        await ctx.reply(f'Бот переместился в канал {vc}')
+#    else:
+#        voice = await voice.connect(vc)
+#        await ctx.reply(f'Бот присоеденился к каналу {vc}')
 
-    if voice and voice.is_connected():
-        await client.voice.disconnect(vc)
-        await ctx.reply(f'Бот отключился от канала {vc}')
-    else:
-        voice = await client.voice.disconnect(vc)
-        await ctx.reply(f'Бот отключился от канала {vc}')
+#@client.command()
+#async def leave(ctx):
+#    global voice
+#    vc = ctx = ctx.message.author.voice.channel
+#    voice = get(client.voice_clients, guild = ctx.guild)
+
+#    if voice and voice.is_connected():
+#        await voice.disconnect(vc)
+#        await ctx.reply(f'Бот отключился от канала {vc}')
+#    else:
+#        voice = await voice.disconnect(vc)
+#        await ctx.reply(f'Бот отключился от канала {vc}')
 # music
 
 
