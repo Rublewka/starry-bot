@@ -127,7 +127,7 @@ async def join(ctx):
         await vchan.connect()
         await ctx.reply("Успешно подключился к голосовому каналу")
     else:
-        await ctx.куздн("Вы должны быть в голосовом канале, чтобы использовать эту команду")
+        await ctx.reply("Вы должны быть в голосовом канале, чтобы использовать эту команду")
 
 @client.command(pass_context = True)
 async def leave(ctx):
@@ -135,7 +135,7 @@ async def leave(ctx):
         await ctx.guild.voice_client.disconnect()
         await ctx.reply("Успешно отключился от голосового канала")
     else:
-        await ctx.куздн("Я не в голосовом канале")# music
+        await ctx.reply("Я не в голосовом канале")# music
 
 
 
