@@ -388,7 +388,7 @@ class VoiceState:
             self.voice = None
 
 
-class Music(client.Cog):
+class Music(client.cogs):
     def __init__(self, bot: client.Bot):
         self.bot = bot
         self.voice_states = {}
