@@ -162,7 +162,7 @@ async def play(ctx, url : str):
         }],
     }
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         print('[Logs:music] Загрузка файла...')
         ydl.download([url])
 
