@@ -135,20 +135,63 @@ async def leave(ctx):
         await ctx.guild.voice_client.disconnect()
         await ctx.reply("Успешно отключился от голосового канала")
     else:
-        await ctx.reply("Я не в голосовом канале")# music
+        await ctx.reply("Я не в голосовом канале")
 
+# music
+@client.command()
+async def play(ctx, url : str):
+    song_there = os.path.isfile('song.mp3')
+
+    try:
+        if song_there = true:
+            os.remove('song.mp3')
+            print('[Logs:music] Старый файл удален')
+    except PermissionError:
+        print('[Logs:music] Не удалось удалить файл')
+
+    await ctx.reply('Пожалуйтса ожидайте')
+
+    voice = get(client.voice_clients, guild = ctx.guild)
+
+    ydl_opts = {
+        'format' : 'bestaudio/best',
+        'postprocessors' : [{
+            'key' : 'FFmpegExtractAudio',
+            'prefferedcodec' : 'mp3',
+            'prefferedquality' : '192'
+        }],
+    }
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl
+        print('[Logs:music] Загрузка файла...')
+        ydl.download([url])
+
+    for file in os.listdir('./'):
+        if file.endwith('.mp3'):
+            name = file
+            print(f'[Logs:music] Переименовываю файл: {file}')
+            os.rename(file, 'song.mp3')
+
+    voice.play(discord.FFmpegPCMAudio('song.mp3'), after = lambda e: print('[Logs:music] Проигрывание завершено'))
+    voice.source = discord.PCMVolumeTransformer(voice.source)
+    voice.source.volume = 0.07
+
+    song_name = name.rsplit('-', 2)
+    await ctx.reply(f'Сейчас играет: {song_name[0]}')
 
 
 # Help
 @client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
 async def __help (ctx):
+#    emb.add_field(name = f'{prefix}help', value = f'`Отображает эту команду`', inline=False)
     emb = discord.Embed( title = 'Навигация по командам', description = '**ВНИМАНИЕ!** Бот ещё в разработке!', colour = teal )
     # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
     emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
     # Отображает Аватар отправителя
-    emb.add_field( name = ';help', value = f'`Отображает эту команду`', inline=False)
+    emb.add_field(name = f'{prefix}help', value = f'`Отображает эту команду`', inline=False)
     # TODO - `{prefix}server` `{prefix}profile` 
-    emb.add_field( name = ';ping', value = f'`Отображает задержку бота в миллисекундах (ms)`', inline=False)
+    emb.add_field(name = f'{prefix}ping', value = f'`Отображает задержку бота в миллисекундах (ms)`', inline=False)
+#    emb.add_field(name = f'{prefix}join', value = f'`Подключение бота к голосовому каналу`', inline=False)
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
     emb.set_thumbnail(url = client.user.avatar.url)
     emb.set_footer( icon_url = client.user.avatar.url, text = f'Rublewka BOT © Copyright 2023 | Все права защищены' )
