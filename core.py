@@ -120,32 +120,22 @@ async def __ping(ctx):
 # voice
 
 # ❗ ❗ ❗ ❗ ❗ 
-@client.command()
-async def connect(ctx):
-    global voice
-    vc = ctx = ctx.message.author.voice.channel
-    voice = get(client.voice_clients, guild = ctx.guild)
-
-    if voice and client.VoiceChannel.is_connected():
-        await client.VoiceChannel.move_to(vc)
-        await ctx.reply(f'Бот переместился в канал {vc}')
+@client.command(pass_context = True)
+async def join(ctx):
+    if (ctx.author.voice):
+        vchan = ctx.message.author.voice.channel
+        await vchan.connect()
+        await ctx.reply("Успешно подключился к голосовому каналу")
     else:
-        voice = await client.voice_connect(vc)
-        await ctx.reply(f'Бот присоеденился к каналу {vc}')
+        await ctx.куздн("Вы должны быть в голосовом канале, чтобы использовать эту команду")
 
-@client.command()
+@client.command(pass_context = True)
 async def leave(ctx):
-    global voice
-    vc = ctx = ctx.message.author.voice.channel
-    voice = get(client.voice_clients, guild = ctx.guild)
-
-    if voice and client.VoiceChannel.is_connected():
-        await client.VoiceChannel.disconnect(vc)
-        await ctx.reply(f'Бот отключился от канала {vc}')
+    if (ctx.voice_client):
+        await ctx.guild.voice_client.disconnect()
+        await ctx.reply("Успешно отключился от голосового канала")
     else:
-        voice = await client.VoiceChannel.disconnect(vc)
-        await ctx.reply(f'Бот отключился от канала {vc}')
-# music
+        await ctx.куздн("Я не в голосовом канале")# music
 
 
 
