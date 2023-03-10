@@ -143,7 +143,7 @@ async def play(ctx, url : str):
     song_there = os.path.isfile('song.mp3')
 
     try:
-        if song_there == true:
+        if song_there == True:
             os.remove('song.mp3')
             print('[Logs:music] Старый файл удален')
     except PermissionError:
