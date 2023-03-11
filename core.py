@@ -9,14 +9,13 @@ import math
 import random
 import asyncio
 import ffmpeg
-import youtube_dl
+import yt_dlp
 from discord.ext import commands, tasks
 from discord.utils import get
 from config import settings
 from async_timeout import timeout
 from discord import FFmpegPCMAudio
 from discord import TextChannel
-from youtube_dl import YoutubeDL
 prefix = settings['PREFIX']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
