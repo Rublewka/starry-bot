@@ -16,6 +16,7 @@ from config import settings
 from async_timeout import timeout
 from discord import FFmpegPCMAudio
 from discord import TextChannel
+from yt_dlp import YoutubeDL
 prefix = settings['PREFIX']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
