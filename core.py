@@ -13,9 +13,14 @@ import youtube_dl
 from discord.ext import commands, tasks
 from discord.utils import get
 from config import settings
+from badwords import badwords
 from async_timeout import timeout
 from misc import channelsids
+from discord import FFmpegPCMAudio
+from discord import TextChannel
+from youtube_dl import YoutubeDL
 prefix = settings['PREFIX']
+badwords = badwords['badwords']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
 # setup end
@@ -218,15 +223,14 @@ async def __help (ctx):
     # Информация, что команда "help" была использована
 
 # Filter
-#@client.event
-#async def on_message( message ):
-#    await client.process_commands( message )
-#    msg = message.content.lower()
-#    with open('prohibitednames.txt') as bad_words:
-#    if msg in bad_words:
-#        await message.delete()
-#        await message.author.send(f'{message.author.name}, на сервере **Rublewka** не разрешается использовать/употреблять настоящие имена')
-#        print('[Logs:moderation] Message {message} has been deleted due to filter violations')
+@client.event
+async def on_message( message ):
+    await client.process_commands( message )
+    msg = message.content.lower()
+    if msg in badwords:
+        await message.delete()
+        await message.author.send(f'{message.author.name}, на сервере **Rublewka** не разрешается использовать/употреблять настоящие имена')
+        print('[Logs:moderation] Message {message} has been deleted due to filter violations')
 #_______________
 # level system
 
