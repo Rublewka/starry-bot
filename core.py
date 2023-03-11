@@ -13,14 +13,14 @@ import youtube_dl
 from discord.ext import commands, tasks
 from discord.utils import get
 from config import settings
-from badwords import badwords
+from misc import names
 from async_timeout import timeout
 from misc import channelsids
 from discord import FFmpegPCMAudio
 from discord import TextChannel
 from youtube_dl import YoutubeDL
 prefix = settings['PREFIX']
-badwords = badwords['badwords']
+badwords = names
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
 # setup end
