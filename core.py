@@ -145,45 +145,54 @@ async def leave(ctx):
 # music
 
 @client.command()
-async def play(ctx, url : str):
-    song_there = os.path.isfile('song.mp3')
+async def play(ctx, url):
+    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
+    FFMPEG_OPTIONS = {
+        'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+    voice = get(client.voice_clients, guild=ctx.guild)
 
-    try:
-        if song_there == True:
-            os.remove('song.mp3')
-            print('[Logs:music] Старый файл удален')
-    except PermissionError:
-        print('[Logs:music] Не удалось удалить файл')
+    if not voice.is_playing():
+        with YoutubeDL(YDL_OPTIONS) as ydl:
+            info = ydl.extract_info(url, download=False)
+        URL = info['url']
+        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
+        voice.is_playing()
+        await ctx.send('Bot is playing')
 
-    await ctx.reply('Пожалуйтса ожидайте')
+# check if the bot is already playing
+    else:
+        await ctx.send("Bot is already playing")
+        return
 
-    voice = get(client.voice_clients, guild = ctx.guild)
 
-    ydl_opts = {
-        'format' : 'bestaudio/best',
-        'postprocessors' : [{
-            'key' : 'FFmpegExtractAudio',
-            'preferredcodec' : 'mp3',
-            'preferredquality' : '192'
-        }],
-    }
+# command to resume voice if it is paused
+@client.command()
+async def resume(ctx):
+    voice = get(client.voice_clients, guild=ctx.guild)
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        print('[Logs:music] Загрузка файла...')
-        ydl.download([url])
+    if not voice.is_playing():
+        voice.resume()
+        await ctx.send('Bot is resuming')
 
-    for file in os.listdir('./'):
-        if file.endwith('.mp3'):
-            name = file
-            print(f'[Logs:music] Переименовываю файл: {file}')
-            os.rename(file, 'song.mp3')
 
-    voice.play(discord.FFmpegPCMAudio('song.mp3'), after = lambda e: print('[Logs:music] Проигрывание завершено'))
-    voice.source = discord.PCMVolumeTransformer(voice.source)
-    voice.source.volume = 0.07
+# command to pause voice if it is playing
+@client.command()
+async def pause(ctx):
+    voice = get(client.voice_clients, guild=ctx.guild)
 
-    song_name = name.rsplit('-', 2)
-    await ctx.reply(f'Сейчас играет: {song_name[0]}')
+    if voice.is_playing():
+        voice.pause()
+        await ctx.send('Bot has been paused')
+
+
+# command to stop voice
+@client.command()
+async def stop(ctx):
+    voice = get(client.voice_clients, guild=ctx.guild)
+
+    if voice.is_playing():
+        voice.stop()
+        await ctx.send('Stopping...')
 
 
 # Help
