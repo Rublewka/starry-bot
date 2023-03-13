@@ -157,12 +157,12 @@ async def play(ctx, url):
         URL = info['url']
         voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
         voice.is_playing()
-        await ctx.send('Bot is playing')
+#        await ctx.send('Bot is playing')
 
 # check if the bot is already playing
-    else:
-        await ctx.send("Bot is already playing")
-        return
+#    else:
+#        await ctx.send("Bot is already playing")
+#        return
 
 
 # command to resume voice if it is paused
@@ -172,7 +172,7 @@ async def resume(ctx):
 
     if not voice.is_playing():
         voice.resume()
-        await ctx.send('Bot is resuming')
+#        await ctx.send('Bot is resuming')
 
 
 # command to pause voice if it is playing
@@ -182,7 +182,7 @@ async def pause(ctx):
 
     if voice.is_playing():
         voice.pause()
-        await ctx.send('Bot has been paused')
+#        await ctx.send('Bot has been paused')
 
 
 # command to stop voice
@@ -192,7 +192,7 @@ async def stop(ctx):
 
     if voice.is_playing():
         voice.stop()
-        await ctx.send('Stopping...')
+#        await ctx.send('Stopping...')
 
 
 # Help
