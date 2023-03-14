@@ -61,7 +61,7 @@ bad_words = bad_words_unsplited.split()
 api_key = 'd5c8f50a-7e74-421e-a5ad-d62ed8d3ebdb'
 page_id = '1423jz25bbfm'
 metric_id = 'w3bdmlxfy40f'
-api_base = 'https://api.statuspage.io/v1'
+api_base = 'api.statuspage.io/v1'
 # metrics end
 # ___________
 # colors
