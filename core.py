@@ -10,6 +10,9 @@ import random
 import asyncio
 import ffmpeg
 import yt_dlp
+import http.client
+import urllib3
+import time
 from discord.ext import commands, tasks
 from discord.utils import get
 from config import settings
