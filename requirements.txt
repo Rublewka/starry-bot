@@ -11,7 +11,7 @@ discord.py[voice]==2.2.2
 discordLevelingSystem==1.2.0
 ffmpeg==1.4
 frozenlist==1.3.3
-http-requests==0.1
+http_request==1.2
 idna==3.4
 multidict==6.0.4
 mutagen==1.46.0
