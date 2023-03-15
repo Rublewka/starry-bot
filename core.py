@@ -252,10 +252,10 @@ async def on_message( message ):
  # if (response.status >= 500):
  #   genericError = "Error encountered. Please ensure that your page code and authorization key are correct."
 #    print(genericError)
-    break
-  else:
-    print("Submitted point " + str(i + 1) + " of " + str(total_points))
-    time.sleep(1)
+#    break
+#  else:
+ #   print("Submitted point " + str(i + 1) + " of " + str(total_points))
+#    time.sleep(1)
 
 
 #Не работает/в разработке
