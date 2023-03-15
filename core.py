@@ -234,24 +234,24 @@ async def on_message( message ):
 
 # need 1 data point every 5 minutes
 # submit random data for the whole day
-total_points = int((60 / 5 * 24))
-for i in range(total_points):
-  ts = int(time.time()) - (i * 5 * 60)
-  value = random.randint(0, 99)
-  params = json.dumps({
-              'data' : {
-                         'timestamp': ts,
-                          'value': value
-                        }
-            })
-  headers = {"Content-Type": "application/json", "Authorization": "OAuth " + api_key}
-  conn = http.client.HTTPSConnection(api_base)
-  conn.request("POST", "/pages/" + page_id + "/metrics/" + metric_id + "/data.json", params, headers)
-  response = conn.getresponse()
+#total_points = int((60 / 5 * 24))
+#for i in range(total_points):
+ # ts = int(time.time()) - (i * 5 * 60)
+#  value = random.randint(0, 99)
+#  params = json.dumps({
+#              'data' : {
+#                         'timestamp': #ts,
+ #                         'value': value
+ #                       }
+#            })
+#  headers = {"Content-Type": "application/json", "Authorization": "OAuth " + api_key}
+#  conn = http.client.HTTPSConnection(api_base)
+#  conn.request("POST", "/pages/" + page_id + "/metrics/" + metric_id + "/data.json", params, headers)
+#  response = conn.getresponse()
 
-  if (response.status >= 500):
-    genericError = "Error encountered. Please ensure that your page code and authorization key are correct."
-    print(genericError)
+ # if (response.status >= 500):
+ #   genericError = "Error encountered. Please ensure that your page code and authorization key are correct."
+#    print(genericError)
     break
   else:
     print("Submitted point " + str(i + 1) + " of " + str(total_points))
