@@ -73,3 +73,5 @@ names = s.split()
 # py -3 -m pip list    для requiremets.txt
 # py -3 -m pip install discord     установка библиотек Discord
 # requieremets.txt - remove setuptools, pip
+
+# trello email - theskout001+qupnxebxbykcivwrxz8g@boards.trello.com

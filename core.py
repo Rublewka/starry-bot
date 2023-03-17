@@ -225,7 +225,7 @@ async def on_message( message ):
     if msg in bad_words:
         await message.delete()
         await message.author.send(f'{message.author.name}, на сервере **Rublewka** не разрешается использовать/употреблять настоящие имена')
-        print(f'[Logs:moderation] Message {message.content} sent by {message.author.username} has been deleted due to filter violations')
+        print(f'[Logs:moderation] Message sent by {message.author.username} has been deleted due to filter violations')
 #_______________
 # level system
 
