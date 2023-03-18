@@ -199,14 +199,19 @@ async def stop(ctx):
 @client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
 async def __help (ctx):
 #    emb.add_field(name = f'{prefix}help', value = f'`Отображает эту команду`', inline=False)
-    emb = discord.Embed( title = 'Навигация по командам', description = '**ВНИМАНИЕ!** Бот ещё в разработке!', colour = teal )
+    emb = discord.Embed( title = 'Навигация по командам', description = f'**ВНИМАНИЕ!** Бот ещё в разработке! | Префикс бота : `{prefix}`', colour = teal )
     # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
     emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
     # Отображает Аватар отправителя
     emb.add_field(name = f'{prefix}help', value = f'`Отображает эту команду`', inline=False)
     # TODO - `{prefix}server` `{prefix}profile` 
     emb.add_field(name = f'{prefix}ping', value = f'`Отображает задержку бота в миллисекундах (ms)`', inline=False)
-#    emb.add_field(name = f'{prefix}join', value = f'`Подключение бота к голосовому каналу`', inline=False)
+    emb.add_field(name = f'{prefix}join', value = f'`Подключение бота к голосовому каналу`', inline=False)
+    emb.add_field(name = f'{prefix}leave', value = f'`Отключение бота от голосового канала`', inline=False)
+    emb.add_field(name = f'{prefix}play <youtube link>', value = f'`Проигрывание музыки; Использование: {prefix}play <ссылка на YouTube видеоролик>`', inline=False)
+    emb.add_field(name = f'{prefix}pause', value = f'`Приостанавливает воспроизведение музыки`', inline=False)
+    emb.add_field(name = f'{prefix}resume', value = f'`Возобновляет воспроизведение музыки`', inline=False)
+    emb.add_field(name = f'{prefix}stop', value = f'`Останавливает воспроизведение музыки`', inline=False)
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
     emb.set_thumbnail(url = client.user.avatar.url)
     emb.set_footer( icon_url = client.user.avatar.url, text = f'Rublewka BOT © Copyright 2023 | Все права защищены' )
