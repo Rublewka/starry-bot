@@ -13,22 +13,25 @@ import yt_dlp
 import http.client
 import urllib3
 import time
+from dotenv import load_dotenv
 from discord.ext import commands, tasks
 from discord.utils import get
 from config import settings
 from async_timeout import timeout
+from roblox import Client
 from discord import FFmpegPCMAudio
 from discord import TextChannel
 from yt_dlp import YoutubeDL
 prefix = settings['PREFIX']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
+load_dotenv()
+roblox = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 
 #startup
 @client.event
 async def on_ready(): 
-
     print (f"[Logs:startup] Logged on as ") # startup message in console
     print ("""
 
@@ -40,15 +43,17 @@ async def on_ready():
 ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝    ╚═╝   
 
 """)
-    print("[Logs:startup] ____=====INFO=====____")
+    print("[Logs:startup] ____=====Discord=====____")
     print(f"[Logs:startup] Bot Info: {settings['NAME BOT']}")
     print(f"[Logs:startup] Bot ID: {settings['ID']}")
-    rbs = client.get_channel(1076240177032351765)
-    await rbs.send("Successfull restart") # startup message in status channel
+#    rbs = client.get_channel(1076240177032351765)
+#    await rbs.send("Successfull restart") # startup message in status channel
     print(f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     print("[Logs:startup] Bot start success")
-    print("[Logs:startup] ____=====INFO=====____")
-
+    print("[Logs:startup] ____=====Roblox=====____")
+    user = await roblox.get_authenticated_user()
+    print("ID:", user.id)
+    print("Name:", user.name)
 # startup end
 
 # variables section
@@ -232,35 +237,6 @@ async def on_message( message ):
         await message.author.send(f'{message.author.name}, на сервере **Rublewka** не разрешается использовать/употреблять настоящие имена')
         print(f'[Logs:moderation] Message sent by {message.author.username} has been deleted due to filter violations')
 #_______________
-# level system
-
-#_______________
-
-
-# need 1 data point every 5 minutes
-# submit random data for the whole day
-#total_points = int((60 / 5 * 24))
-#for i in range(total_points):
- # ts = int(time.time()) - (i * 5 * 60)
-#  value = random.randint(0, 99)
-#  params = json.dumps({
-#              'data' : {
-#                         'timestamp': #ts,
- #                         'value': value
- #                       }
-#            })
-#  headers = {"Content-Type": "application/json", "Authorization": "OAuth " + api_key}
-#  conn = http.client.HTTPSConnection(api_base)
-#  conn.request("POST", "/pages/" + page_id + "/metrics/" + metric_id + "/data.json", params, headers)
-#  response = conn.getresponse()
-
- # if (response.status >= 500):
- #   genericError = "Error encountered. Please ensure that your page code and authorization key are correct."
-#    print(genericError)
-#    break
-#  else:
- #   print("Submitted point " + str(i + 1) + " of " + str(total_points))
-#    time.sleep(1)
 
 
 #Не работает/в разработке
