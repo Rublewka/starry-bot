@@ -27,3 +27,4 @@ websockets==10.4
 yarl==1.8.2
 yt-dlp==2023.3.4
 email-sender==1.2
+roblox=2.0.0
