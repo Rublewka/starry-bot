@@ -59,7 +59,7 @@ async def on_ready():
 
 # variables section
 
-awt_token = rvr2b087uhj4acpftd2dc32kw5z7uzcryf9rg21figqs6byvnyrky8q8q7ygc7jrea6o
+awt_token = 'rvr2b087uhj4acpftd2dc32kw5z7uzcryf9rg21figqs6byvnyrky8q8q7ygc7jrea6o'
 
 # ___________
 # colors
