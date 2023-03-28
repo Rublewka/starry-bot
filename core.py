@@ -27,7 +27,7 @@ prefix = settings['PREFIX']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
 load_dotenv()
-RoBot = Client(os.getenv("ROBLOXTOKEN"))
+RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 
 #startup
@@ -52,14 +52,14 @@ async def on_ready():
     print(f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
     print("[Logs:startup] Bot start success")
     print("[Logs:startup] ____=====Roblox=====____")
-    user = await RoBot.get_authenticated_user()
+    user = await RoClient.get_authenticated_user()
     print("ID:", user.id)
     print("Name:", user.name)
 # startup end
 
 # variables section
 
-awt_token = 'rvr2b087uhj4acpftd2dc32kw5z7uzcryf9rg21figqs6byvnyrky8q8q7ygc7jrea6o'
+rvr_token = 'rvr2b087uhj4acpftd2dc32kw5z7uzcryf9rg21figqs6byvnyrky8q8q7ygc7jrea6o'
 
 # ___________
 # colors
@@ -220,12 +220,22 @@ async def __help (ctx):
     print(f'[Logs:info] Справка по командам была успешно выведена | {prefix}help ')
     # Информация, что команда "help" была использована
 
-async def promote():
-    headers = {"Authorization": f"Bearer {awt_token}"}
-    member = commands.MemberConverter()
-    memberID = member.id
-    rid = request.get(f"https://registry.rover.link/api/guilds/1008577770097496125/discord-to-roblox/{memberID}", headers)
-    print(rid)
+@client.command(aliases = ['promote', 'Promote', ' promote'])
+async def __promote(ctx):
+    headers = {'Authorization': f'Bearer {rvr_token}'}
+#    memberID = user_mentioned.id for user_mentioned in ctx.message.mentions
+    r = requests.get(
+        f'https://registry.rover.link/api/guilds/1008577770097496125/discord-to-roblox/1006501114419630081',
+        headers={'Authorization': f'Bearer {rvr_token}'})
+    data = r.json()
+    json_str = json.dumps(data)
+    resp = json.loads(json_str)
+    user = await RoClient.get_user(resp['robloxId'])
+    print(resp['robloxId'])
+    print("Name:", user.name)
+    print("Display Name:", user.display_name)
+    print("Description:", user.description)
+
 
 # Filter
 #@client.event
