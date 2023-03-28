@@ -220,21 +220,30 @@ async def __help (ctx):
     print(f'[Logs:info] Справка по командам была успешно выведена | {prefix}help ')
     # Информация, что команда "help" была использована
 
-@client.command(aliases = ['promote', 'Promote', ' promote'])
+@client.command(aliases = ['getuser', 'GETUSER', ' Getuser'])
 async def __promote(ctx):
     headers = {'Authorization': f'Bearer {rvr_token}'}
-#    memberID = user_mentioned.id for user_mentioned in ctx.message.mentions
+    for user_mentioned in ctx.message.mentions:
+        memberID = user_mentioned.id
     r = requests.get(
-        f'https://registry.rover.link/api/guilds/1008577770097496125/discord-to-roblox/1006501114419630081',
+        f'https://registry.rover.link/api/guilds/1008577770097496125/discord-to-roblox/{memberID}',
         headers={'Authorization': f'Bearer {rvr_token}'})
     data = r.json()
     json_str = json.dumps(data)
     resp = json.loads(json_str)
     user = await RoClient.get_user(resp['robloxId'])
-    print(resp['robloxId'])
-    print("Name:", user.name)
-    print("Display Name:", user.display_name)
-    print("Description:", user.description)
+    if user.description == '':
+        desc = 'Отсутствует'
+    else:
+        desc = user.description
+
+    await ctx.reply(f"""
+**Информация о Roblox профиле <@{memberID}>**
+\_\_\_\_
+Name: `{user.name}`
+Display Name: `{user.display_name}`
+Description: `{desc}`
+        """)
 
 
 # Filter
