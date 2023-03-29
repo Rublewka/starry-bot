@@ -120,78 +120,6 @@ async def __ping(ctx):
     print(f'[Logs:utils] Пинг сервера был выведен | {prefix}ping') # Информация в консоль, что команда "ping" была использована
     print(f'[Logs:utils] На данный момент пинг == {ping * 1000:.0f}ms | {prefix}ping') # Вывод пинга в консоль
     # Ping end
-# voice
-
-# ❗ ❗ ❗ ❗ ❗ 
-@client.command(pass_context = True)
-async def join(ctx):
-    if (ctx.author.voice):
-        vchan = ctx.message.author.voice.channel
-        await vchan.connect()
-        await ctx.reply("Успешно подключился к голосовому каналу")
-    else:
-        await ctx.reply("Вы должны быть в голосовом канале, чтобы использовать эту команду")
-
-@client.command(pass_context = True)
-async def leave(ctx):
-    if (ctx.voice_client):
-        await ctx.guild.voice_client.disconnect()
-        await ctx.reply("Успешно отключился от голосового канала")
-    else:
-        await ctx.reply("Я не в голосовом канале")
-
-# music
-
-@client.command()
-async def play(ctx, url):
-    YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
-    FFMPEG_OPTIONS = {
-        'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
-    voice = get(client.voice_clients, guild=ctx.guild)
-
-    if not voice.is_playing():
-        with YoutubeDL(YDL_OPTIONS) as ydl:
-            info = ydl.extract_info(url, download=False)
-        URL = info['url']
-        voice.play(FFmpegPCMAudio(URL, **FFMPEG_OPTIONS))
-        voice.is_playing()
-#        await ctx.reply('Bot is playing')
-
-# check if the bot is already playing
-#    else:
-#        await ctx.reply("Bot is already playing")
-#        return
-
-
-# command to resume voice if it is paused
-@client.command()
-async def resume(ctx):
-    voice = get(client.voice_clients, guild=ctx.guild)
-
-    if not voice.is_playing():
-        voice.resume()
-#        await ctx.reply('Bot is resuming')
-
-
-# command to pause voice if it is playing
-@client.command()
-async def pause(ctx):
-    voice = get(client.voice_clients, guild=ctx.guild)
-
-    if voice.is_playing():
-        voice.pause()
-#        await ctx.reply('Bot has been paused')
-
-
-# command to stop voice
-@client.command()
-async def stop(ctx):
-    voice = get(client.voice_clients, guild=ctx.guild)
-
-    if voice.is_playing():
-        voice.stop()
-#        await ctx.reply('Stopping...')
-
 
 # Help
 @client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
@@ -204,12 +132,6 @@ async def __help (ctx):
     emb.add_field(name = f'{prefix}help', value = f'`Отображает эту команду`', inline=False)
     # TODO - `{prefix}server` `{prefix}profile` 
     emb.add_field(name = f'{prefix}ping', value = f'`Отображает задержку бота в миллисекундах (ms)`', inline=False)
-    emb.add_field(name = f'{prefix}join', value = f'`Подключение бота к голосовому каналу`', inline=False)
-    emb.add_field(name = f'{prefix}leave', value = f'`Отключение бота от голосового канала`', inline=False)
-    emb.add_field(name = f'{prefix}play <youtube link>', value = f'`Проигрывание музыки; Использование: {prefix}play <ссылка на YouTube видеоролик>`', inline=False)
-    emb.add_field(name = f'{prefix}pause', value = f'`Приостанавливает воспроизведение музыки`', inline=False)
-    emb.add_field(name = f'{prefix}resume', value = f'`Возобновляет воспроизведение музыки`', inline=False)
-    emb.add_field(name = f'{prefix}stop', value = f'`Останавливает воспроизведение музыки`', inline=False)
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
     emb.set_thumbnail(url = client.user.avatar.url)
     emb.set_footer( icon_url = client.user.avatar.url, text = f'Rublewka BOT © Copyright 2023 | Все права защищены' )
