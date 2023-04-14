@@ -1,28 +1,21 @@
 # setup
-import discord
-import json
-import os, os.path
 import sys
 import functools
 import itertools
 import math
 import random
 import asyncio
-import ffmpeg
-import yt_dlp
 import http.client
-import urllib3
-import time
+import json
+import os, os.path
+import discord
 import requests
 from dotenv import load_dotenv
 from discord.ext import commands, tasks
 from discord.utils import get
-from config import settings
 from async_timeout import timeout
 from roblox import Client
-from discord import FFmpegPCMAudio
-from discord import TextChannel
-from yt_dlp import YoutubeDL
+from config import settings
 prefix = settings['PREFIX']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
@@ -33,7 +26,7 @@ RoClient = Client(os.getenv("ROBLOXTOKEN"))
 #startup
 @client.event
 async def on_ready(): 
-    print (f"[Logs:startup] Logged on as ") # startup message in console
+    print (f" Logged on as ") # startup message in console
     print ("""
 
 ██████╗ ██╗   ██╗██████╗ ██╗     ███████╗██╗    ██╗██╗  ██╗ █████╗     ██████╗  ██████╗ ████████╗
@@ -44,14 +37,14 @@ async def on_ready():
 ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝    ╚═╝   
 
 """)
-    print("[Logs:startup] ____=====Discord=====____")
-    print(f"[Logs:startup] Bot Info: {settings['NAME BOT']}")
-    print(f"[Logs:startup] Bot ID: {settings['ID']}")
+    print(" ____=====Discord=====____")
+    print(f"Bot Info: {settings['NAME BOT']}")
+    print(f"Bot ID: {settings['ID']}")
 #    rbs = client.get_channel(1076240177032351765)
 #    await rbs.send("Successfull restart") # startup message in status channel
-    print(f"[Logs:startup] Successfully sent message to Rublewka Bot Status channel")
-    print("[Logs:startup] Bot start success")
-    print("[Logs:startup] ____=====Roblox=====____")
+    print("Successfully sent message to Rublewka Bot Status channel")
+    print("Bot start success")
+    print("____=====Roblox=====____")
     user = await RoClient.get_authenticated_user()
     print("ID:", user.id)
     print("Name:", user.name)
@@ -59,33 +52,33 @@ async def on_ready():
 
 # variables section
 
-rvr_token = 'rvr2b087uhj4acpftd2dc32kw5z7uzcryf9rg21figqs6byvnyrky8q8q7ygc7jrea6o'
+RVR_TOKEN = 'rvr2b087uhj4acpftd2dc32kw5z7uzcryf9rg21figqs6byvnyrky8q8q7ygc7jrea6o'
 
 # ___________
 # colors
-default = 0
-teal = 0x1abc9c
-dark_teal = 0x11806a
-green = 0x2ecc71
-dark_green = 0x1f8b4c
-blue = 0x3498db
-dark_blue = 0x206694
-purple = 0x9b59b6
-dark_purple = 0x71368a
-magenta = 0xe91e63
-dark_magenta = 0xad1457
-gold = 0xf1c40f
-dark_gold = 0xc27c0e
-orange = 0xe67e22
-dark_orange = 0xa84300
-red = 0xe74c3c
-dark_red = 0x992d22
-lighter_grey = 0x95a5a6
-dark_grey = 0x607d8b
-light_grey = 0x979c9f
-darker_grey = 0x546e7a
-blurple = 0x7289da
-greyple = 0x99aab5
+DEFAULT = 0
+TEAL = 0x1abc9c
+DARK_TEAL = 0x11806a
+GREEN = 0x2ecc71
+DARK_GREEN = 0x1f8b4c
+BLUE = 0x3498db
+DARK_BLUE = 0x206694
+PURPLE = 0x9b59b6
+DARK_PURPLE = 0x71368a
+MAGENTA = 0xe91e63
+DARK_MAGENTA = 0xad1457
+GOLD = 0xf1c40f
+DARK_GOLD = 0xc27c0e
+ORANGE = 0xe67e22
+DARK_ORANGE = 0xa84300
+RED = 0xe74c3c
+DARK_RED = 0x992d22
+LIGHTER_GREY = 0x95a5a6
+DARK_GREY = 0x607d8b
+LIGHT_GREY = 0x979c9f
+DARKER_GREY = 0x546e7a
+BLURPLE = 0x7289da
+GREYPLE = 0x99aab5
 
 # ___________
 # variables section end
@@ -125,16 +118,16 @@ async def __ping(ctx):
 @client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
 async def __help (ctx):
 #    emb.add_field(name = f'{prefix}help', value = f'`Отображает эту команду`', inline=False)
-    emb = discord.Embed( title = 'Навигация по командам', description = f'**ВНИМАНИЕ!** Бот ещё в разработке! | Префикс бота : `{prefix}`', colour = teal )
+    emb = discord.Embed( title = 'Навигация по командам', description = f'**ВНИМАНИЕ!** Бот ещё в разработке! | Префикс бота : `{prefix}`', colour = TEAL )
     # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
     emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
     # Отображает Аватар отправителя
-    emb.add_field(name = f'{prefix}help', value = f'`Отображает эту команду`', inline=False)
+    emb.add_field(name = f'{prefix}help', value = '`Отображает эту команду`', inline=False)
     # TODO - `{prefix}server` `{prefix}profile` 
-    emb.add_field(name = f'{prefix}ping', value = f'`Отображает задержку бота в миллисекундах (ms)`', inline=False)
+    emb.add_field(name = f'{prefix}ping', value = '`Отображает задержку бота в миллисекундах (ms)`', inline=False)
     # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
     emb.set_thumbnail(url = client.user.avatar.url)
-    emb.set_footer( icon_url = client.user.avatar.url, text = f'Rublewka BOT © Copyright 2023 | Все права защищены' )
+    emb.set_footer( icon_url = client.user.avatar.url, text = 'Rublewka BOT © Copyright 2023 | Все права защищены' )
 
     await ctx.reply ( embed = emb)
     # преобразование embed 
@@ -144,12 +137,12 @@ async def __help (ctx):
 
 @client.command(aliases = ['getuser', 'GETUSER', ' Getuser'])
 async def __promote(ctx):
-    headers = {'Authorization': f'Bearer {rvr_token}'}
+    headers = {'Authorization': f'Bearer {RVR_TOKEN}'}
     for user_mentioned in ctx.message.mentions:
-        memberID = user_mentioned.id
+        MEMBERID = user_mentioned.id
     r = requests.get(
-        f'https://registry.rover.link/api/guilds/1008577770097496125/discord-to-roblox/{memberID}',
-        headers={'Authorization': f'Bearer {rvr_token}'})
+        f'https://registry.rover.link/api/guilds/1008577770097496125/discord-to-roblox/{MEMBERID}',
+        headers={'Authorization': f'Bearer {RVR_TOKEN}'})
     data = r.json()
     json_str = json.dumps(data)
     resp = json.loads(json_str)
@@ -160,7 +153,7 @@ async def __promote(ctx):
         desc = user.description
 
     await ctx.reply(f"""
-**Информация о Roblox профиле <@{memberID}>**
+**Информация о Roblox профиле <@{MEMBERID}>**
 \_\_\_\_
 Name: `{user.name}`
 Display Name: `{user.display_name}`
