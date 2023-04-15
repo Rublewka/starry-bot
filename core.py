@@ -1,33 +1,27 @@
 # setup
-import sys
-import functools
-import itertools
-import math
-import random
-import asyncio
-import http.client
 import json
-import os, os.path
+import os
+import os.path
 import discord
 import requests
 from dotenv import load_dotenv
-from discord.ext import commands, tasks
-from discord.utils import get
-from async_timeout import timeout
+from discord.ext import commands
 from roblox import Client
 from config import settings
+from src import log
 prefix = settings['PREFIX']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
 load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
+logger = log.setup_logger(__name__)
 # setup end
 
 #startup
 @client.event
 async def on_ready(): 
-    print (f" Logged on as ") # startup message in console
-    print ("""
+    logger.info("Logged on as") # startup message in console
+    logger.info("""
 
 ██████╗ ██╗   ██╗██████╗ ██╗     ███████╗██╗    ██╗██╗  ██╗ █████╗     ██████╗  ██████╗ ████████╗
 ██╔══██╗██║   ██║██╔══██╗██║     ██╔════╝██║    ██║██║ ██╔╝██╔══██╗    ██╔══██╗██╔═══██╗╚══██╔══╝
@@ -37,22 +31,23 @@ async def on_ready():
 ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝    ╚═╝   
 
 """)
-    print(" ____=====Discord=====____")
-    print(f"Bot Info: {settings['NAME BOT']}")
-    print(f"Bot ID: {settings['ID']}")
+    logger.info(" ____=====Discord=====____")
+    logger.info("Bot Info: %s", settings['NAME BOT'])
+    logger.info("Bot ID: %s", settings['ID'])
 #    rbs = client.get_channel(1076240177032351765)
 #    await rbs.send("Successfull restart") # startup message in status channel
-    print("Successfully sent message to Rublewka Bot Status channel")
-    print("Bot start success")
-    print("____=====Roblox=====____")
+#    logger.info("Successfully sent message to Rublewka Bot Status channel")
+    logger.info("Bot start success")
+    logger.info("____=====Roblox=====____")
     user = await RoClient.get_authenticated_user()
-    print("ID:", user.id)
-    print("Name:", user.name)
+    logger.info("ID: %s", user.id)
+    logger.info("Name: %s", user.name)
+    logger.info("Roblox session successfully initialized")
 # startup end
 
 # variables section
 
-RVR_TOKEN = 'rvr2b087uhj4acpftd2dc32kw5z7uzcryf9rg21figqs6byvnyrky8q8q7ygc7jrea6o'
+rvr_token = 'rvr2b087uhj4acpftd4vs7dbvgyow4a5ujfz2hkvs0w4j5nzzq8gdftgcadrewulalkx'
 
 # ___________
 # colors
@@ -86,79 +81,69 @@ GREYPLE = 0x99aab5
 # Ping
 @client.command(aliases = ['Ping', 'PING', 'pING', 'ping', ' ping', ' PING', ' pING', ' Ping'])
 async def __ping(ctx): 
-    ping = client.ws.latency # Получаем пинг клиента
+    ping = client.ws.latency
 
-    ping_emoji = '🟩🔳🔳🔳🔳' # Эмоция пинга, если он меньше 100ms
+    ping_emoji = '🟩🔳🔳🔳🔳' # 100ms
 
     if ping > 0.15000000000000000:
-        ping_emoji = '🟧🟩🔳🔳🔳' # Эмоция пинга, если он больше 150ms
+        ping_emoji = '🟧🟩🔳🔳🔳' # 150ms
 
     if ping > 0.20000000000000000:
-        ping_emoji = '🟥🟧🟩🔳🔳' # Эмоция пинга, если он больше 200ms
+        ping_emoji = '🟥🟧🟩🔳🔳' # 200ms
 
     if ping > 0.25000000000000000:
-        ping_emoji = '🟥🟥🟧🟩🔳' # Эмоция пинга, если он больше 250ms
+        ping_emoji = '🟥🟥🟧🟩🔳' # 250ms
 
     if ping > 0.30000000000000000:
-        ping_emoji = '🟥🟥🟥🟧🟩' # Эмоция пинга, если он больше 300ms
+        ping_emoji = '🟥🟥🟥🟧🟩' # 300ms
 
     if ping > 0.35000000000000000:
-        ping_emoji = '🟥🟥🟥🟥🟧' # Эмоция пинга, если он больше 350ms
+        ping_emoji = '🟥🟥🟥🟥🟧' # 350ms
 
     if ping > 0.40000000000000000:
-        ping_emoji = '🟥🟥🟥🟥🟥' # Эмоция пинга, если он больше 400ms
+        ping_emoji = '🟥🟥🟥🟥🟥' # 400ms
 
-    message = await ctx.reply('Пожалуйста, подождите. . .') # Переменная message с первоначальным сообщением
-    await message.edit(content = f'Понг! {ping_emoji} `{ping * 1000:.0f}ms` :ping_pong:') # Редактирование первого сообщения на итоговое (На сам пинг)
-    print(f'[Logs:utils] Пинг сервера был выведен | {prefix}ping') # Информация в консоль, что команда "ping" была использована
-    print(f'[Logs:utils] На данный момент пинг == {ping * 1000:.0f}ms | {prefix}ping') # Вывод пинга в консоль
+    message = await ctx.reply('Please wait a little bit. . .')
+    await message.edit(content = f'Pong! {ping_emoji} `{ping * 1000:.0f}ms` :ping_pong:')
+#    print(f'[Logs:utils] Bot\'s ping was showen | {prefix}ping')
+#    print(f'[Logs:utils] Bot\'s current ping == {ping * 1000:.0f}ms | {prefix}ping')
     # Ping end
 
 # Help
 @client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
 async def __help (ctx):
 #    emb.add_field(name = f'{prefix}help', value = f'`Отображает эту команду`', inline=False)
-    emb = discord.Embed( title = 'Навигация по командам', description = f'**ВНИМАНИЕ!** Бот ещё в разработке! | Префикс бота : `{prefix}`', colour = TEAL )
+    emb = discord.Embed( title = 'Command navigaation | Help', description = f'**Attention!** Bot is still i development! | Bot\'s prefix: `{prefix}`', colour = TEAL )
     # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
     emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
     # Отображает Аватар отправителя
-    emb.add_field(name = f'{prefix}help', value = '`Отображает эту команду`', inline=False)
-    # TODO - `{prefix}server` `{prefix}profile` 
-    emb.add_field(name = f'{prefix}ping', value = '`Отображает задержку бота в миллисекундах (ms)`', inline=False)
-    # TODO - emb.add_field( name = 'Модерирование', value = f'`{prefix}mute` `{prefix}unmute` `{prefix}ban` `{prefix}kick` `{prefix}clear` ', inline=False)
+    emb.add_field(name = f'{prefix}help', value = '`Shows this command`', inline=False)
+    emb.add_field(name = f'{prefix}ping', value = '`Shows Bot\'s delay in milliseconds (ms)`', inline=False)
     emb.set_thumbnail(url = client.user.avatar.url)
     emb.set_footer( icon_url = client.user.avatar.url, text = 'Rublewka BOT © Copyright 2023 | Все права защищены' )
 
     await ctx.reply ( embed = emb)
-    # преобразование embed 
+#    print(f'[Logs:info] Help command used | {prefix}help ')
 
-    print(f'[Logs:info] Справка по командам была успешно выведена | {prefix}help ')
-    # Информация, что команда "help" была использована
 
 @client.command(aliases = ['getuser', 'GETUSER', ' Getuser'])
-async def __promote(ctx):
-    headers = {'Authorization': f'Bearer {RVR_TOKEN}'}
+async def __getuser(ctx):
     for user_mentioned in ctx.message.mentions:
-        MEMBERID = user_mentioned.id
+        discordId = user_mentioned.id
     r = requests.get(
-        f'https://registry.rover.link/api/guilds/1008577770097496125/discord-to-roblox/{MEMBERID}',
-        headers={'Authorization': f'Bearer {RVR_TOKEN}'})
+        f'https://registry.rover.link/api/guilds/1018415075255668746/discord-to-roblox/{discordId}',
+        headers={'Authorization': f'Bearer {rvr_token}'},
+        timeout=10)
     data = r.json()
     json_str = json.dumps(data)
     resp = json.loads(json_str)
-    user = await RoClient.get_user(resp['robloxId'])
-    if user.description == '':
-        desc = 'Отсутствует'
-    else:
-        desc = user.description
+    print(resp) #use if debug needed
+#    user = await RoClient.get_user(resp['robloxId'])
+#    if user.description == '':
+#        desc = '*None*'
+#    else:
+#        desc = user.description
 
-    await ctx.reply(f"""
-**Информация о Roblox профиле <@{MEMBERID}>**
-\_\_\_\_
-Name: `{user.name}`
-Display Name: `{user.display_name}`
-Description: `{desc}`
-        """)
 
 
 # Filter
