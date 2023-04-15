@@ -24,29 +24,38 @@ logger = log.setup_logger(__name__)
 #startup
 @client.event
 async def on_ready(): 
-    logger.info("Logged on as") # startup message in console
-    logger.info("""
+    RED = "\033[1;31m"
+    GREEN = "\033[1;32m"
+    YELLOW = "\033[1;33m"
+    BLUE = "\u001b[34m"
+    MAGENTA = "\033[1;35m"
+    CYAN = "\033[1;36m"
+    GRAY = "\033[1;30m"
+    PURPLE = "\033[1;35m"
+    RESET = "\033[0m"
+    logger.info(f"Logged on as") # startup message in console
+    logger.info(F"""
 
-██████╗ ██╗   ██╗██████╗ ██╗     ███████╗██╗    ██╗██╗  ██╗ █████╗     ██████╗  ██████╗ ████████╗
+{YELLOW}██████╗ ██╗   ██╗██████╗ ██╗     ███████╗██╗    ██╗██╗  ██╗ █████╗     ██████╗  ██████╗ ████████╗
 ██╔══██╗██║   ██║██╔══██╗██║     ██╔════╝██║    ██║██║ ██╔╝██╔══██╗    ██╔══██╗██╔═══██╗╚══██╔══╝
 ██████╔╝██║   ██║██████╔╝██║     █████╗  ██║ █╗ ██║█████╔╝ ███████║    ██████╔╝██║   ██║   ██║   
 ██╔══██╗██║   ██║██╔══██╗██║     ██╔══╝  ██║███╗██║██╔═██╗ ██╔══██║    ██╔══██╗██║   ██║   ██║   
 ██║  ██║╚██████╔╝██████╔╝███████╗███████╗╚███╔███╔╝██║  ██╗██║  ██║    ██████╔╝╚██████╔╝   ██║   
-╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝    ╚═╝   
+{CYAN}╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝    ╚═╝   {RESET}
 
 """)
-    logger.info(" ____=====Discord=====____")
-    logger.info("Bot Info: %s", settings['NAME BOT'])
-    logger.info("Bot ID: %s", settings['ID'])
+    logger.info(f"{PURPLE}Discord{RESET}")
+    logger.info(f"{RED}Bot Name:{RESET}  {settings['NAME BOT']}")
+    logger.info(f"{RED}Bot ID:{RESET}  {settings['ID']}")
 #    rbs = client.get_channel(1076240177032351765)
 #    await rbs.send("Successfull restart") # startup message in status channel
 #    logger.info("Successfully sent message to Rublewka Bot Status channel")
-    logger.info("Bot start success")
-    logger.info("____=====Roblox=====____")
+    logger.info(f"{YELLOW}Discord session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
+    logger.info(f"{PURPLE}Roblox{RESET}")
     user = await RoClient.get_authenticated_user()
-    logger.info("ID: %s", user.id)
-    logger.info("Name: %s", user.name)
-    logger.info("Roblox session successfully initialized")
+    logger.info(f"{RED}ID:{RESET}  {user.id}")
+    logger.info(f"{RED}Name:{RESET}  {user.name}")
+    logger.info(f"{GRAY}Roblox session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
 # startup end
 
 # variables section
@@ -237,7 +246,7 @@ async def replyall(interaction: discord.Interaction):
 #            logger.exception(f"Error while switching to the {choices.value} model: {e}")
 
 
-@client.tree.command(name="reset", description="Complete reset conversation history")
+@client.tree.command(name="reset", description="Clear ChatGPT conversation history (Please note: It does not clear message history in channel)")
 async def reset(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         if aclient.chat_model == "OFFICIAL":
@@ -265,7 +274,7 @@ async def help(interaction: discord.Interaction):
         - `/draw [prompt]` Generate an image with the Dalle2 model
         - `/private` ChatGPT switch to private mode
         - `/public` ChatGPT switch to public mode
-        - `/reset` Clear ChatGPT conversation history""")
+        - `/reset` Clear ChatGPT conversation history (Please note: It does not clear message history in channel)""")
 
         logger.info(
             "\x1b[31mSomeone needs help!\x1b[0m")
@@ -294,13 +303,13 @@ async def draw(interaction: discord.Interaction, *, prompt: str):
 
         except openai.InvalidRequestError:
             await interaction.followup.send(
-                "> **ERROR: Inappropriate request 😿**")
+                "> **ERROR: Inappropriate request**")
             logger.info(
             f"\x1b[31m{username}\x1b[0m made an inappropriate request.!")
 
         except Exception as e:
             await interaction.followup.send(
-                "> **ERROR: Something went wrong 😿**")
+                "> **ERROR: Something went wrong**")
             logger.exception(f"Error while generating image: {e}")
 
 
@@ -366,12 +375,12 @@ async def switchpersona(interaction: discord.Interaction, persona: app_commands.
                 f"> **INFO: Switched to `{persona}` persona**")
             except Exception as e:
                 await interaction.followup.send(
-                    "> **ERROR: Something went wrong, please try again later! 😿**")
+                    "> **ERROR: Something went wrong, please try again later!**")
                 logger.exception(f"Error while switching persona: {e}")
 
         else:
             await interaction.followup.send(
-                f"> **ERROR: No available persona: `{persona}` 😿**")
+                f"> **ERROR: No available persona: `{persona}` **")
             logger.info(
                 f'{username} requested an unavailable persona: `{persona}`')
 
