@@ -1,3 +1,6 @@
 start.bat
 settings.json
 .devcontainer
+images
+.vscode
+__pycache__

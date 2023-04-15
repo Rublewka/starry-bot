@@ -2,13 +2,17 @@
 import json
 import os
 import os.path
+from random import randrange
 import discord
 import requests
+import openai
+from src.aclient import client as aclient
 from dotenv import load_dotenv
 from discord.ext import commands
+from discord import app_commands
 from roblox import Client
 from config import settings
-from src import log
+from src import log, art, personas, responses
 prefix = settings['PREFIX']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
@@ -143,6 +147,248 @@ async def __getuser(ctx):
 #        desc = '*None*'
 #    else:
 #        desc = user.description
+
+@client.tree.command(name="chat", description="Have a chat with ChatGPT")
+async def chat(interaction: discord.Interaction, *, message: str):
+    if aclient.is_replying_all == "True":
+        await interaction.response.defer(ephemeral=False)
+        await interaction.followup.send(
+            "> **WARN: You already on replyAll mode. If you want to use the Slash Command, switch to normal mode by using `/replyall` again**")
+        logger.warning("\x1b[31mYou already on replyAll mode, can't use slash command!\x1b[0m")
+        return
+    if interaction.user == client.user:
+        return
+    username = str(interaction.user)
+    channel = str(interaction.channel)
+    logger.info(
+        f"\x1b[31m{username}\x1b[0m : /chat [{message}] in ({channel})")
+    await aclient.send_message(interaction, message)
+
+
+@client.tree.command(name="private", description="Toggle private access")
+async def private(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=False)
+    if not aclient.isPrivate:
+        aclient.isPrivate = not aclient.isPrivate
+        logger.warning("\x1b[31mSwitch to private mode\x1b[0m")
+        await interaction.followup.send(
+            "> **INFO: Next, the response will be sent via private reply. If you want to switch back to public mode, use `/public`**")
+    else:
+        logger.info("You already on private mode!")
+        await interaction.followup.send(
+            "> **WARN: You already on private mode. If you want to switch to public mode, use `/public`**")
+
+@client.tree.command(name="public", description="Toggle public access")
+async def public(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=False)
+    if aclient.isPrivate:
+        aclient.isPrivate = not aclient.isPrivate
+        await interaction.followup.send(
+            "> **INFO: Next, the response will be sent to the channel directly. If you want to switch back to private mode, use `/private`**")
+        logger.warning("\x1b[31mSwitch to public mode\x1b[0m")
+    else:
+        await interaction.followup.send(
+            "> **WARN: You already on public mode. If you want to switch to private mode, use `/private`**")
+        logger.info("You already on public mode!")
+
+
+@client.tree.command(name="replyall", description="Toggle replyAll access")
+async def replyall(interaction: discord.Interaction):
+    aclient.replying_all_discord_channel_id = str(interaction.channel_id)
+    await interaction.response.defer(ephemeral=False)
+    if aclient.is_replying_all == "True":
+        aclient.is_replying_all = "False"
+        await interaction.followup.send(
+            "> **INFO: Next, the bot will response to the Slash Command. If you want to switch back to replyAll mode, use `/replyAll` again**")
+        logger.warning("\x1b[31mSwitch to normal mode\x1b[0m")
+    elif aclient.is_replying_all == "False":
+        aclient.is_replying_all = "True"
+        await interaction.followup.send(
+            "> **INFO: Next, the bot will disable Slash Command and responding to all message in this channel only. If you want to switch back to normal mode, use `/replyAll` again**")
+        logger.warning("\x1b[31mSwitch to replyAll mode\x1b[0m")
+
+
+#    @client.tree.command(name="chat-model", description="Switch different chat model")
+#    @app_commands.choices(choices=[
+#        app_commands.Choice(name="Official GPT-3.5", value="OFFICIAL")
+#    ])
+
+#    async def chat_model(interaction: discord.Interaction, choices: app_commands.Choice[str]):
+#        await interaction.response.defer(ephemeral=False)
+#        original_chat_model = client.chat_model
+#        original_openAI_gpt_engine = client.openAI_gpt_engine
+
+#        try:
+#            if choices.value == "OFFICIAL":
+#                client.openAI_gpt_engine = "gpt-3.5-turbo"
+#                client.chat_model = "OFFICIAL"
+#            else:
+#                raise ValueError("Invalid choice")
+#
+#            client.chatbot = client.get_chatbot_model()
+#            await interaction.followup.send(f"> **INFO: You are now in {client.chat_model} model.**\n")
+#            logger.warning(f"\x1b[31mSwitch to {client.chat_model} model\x1b[0m")
+#
+#        except Exception as e:
+#            client.chat_model = original_chat_model
+#            client.openAI_gpt_engine = original_openAI_gpt_engine
+#            client.chatbot = client.get_chatbot_model()
+#            await interaction.followup.send(f"> **ERROR: Error while switching to the {choices.value} model, check that you've filled in the related fields in `.env`.**\n")
+#            logger.exception(f"Error while switching to the {choices.value} model: {e}")
+
+
+@client.tree.command(name="reset", description="Complete reset conversation history")
+async def reset(interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        if aclient.chat_model == "OFFICIAL":
+            aclient.chatbot = aclient.get_chatbot_model()
+        elif aclient.chat_model == "UNOFFICIAL":
+            aclient.chatbot.reset_chat()
+            await aclient.send_start_prompt()
+        elif aclient.chat_model == "Bard":
+            aclient.chatbot = aclient.get_chatbot_model()
+            await aclient.send_start_prompt()
+        elif aclient.chat_model == "Bing":
+            await aclient.chatbot.close()
+            aclient.chatbot = aclient.get_chatbot_model()
+            await aclient.send_start_prompt()
+        await interaction.followup.send("> **INFO: I have forgotten everything.**")
+        personas.current_persona = "standard"
+        logger.warning(
+            f"\x1b[31m{aclient.chat_model} bot has been successfully reset\x1b[0m")
+
+@client.tree.command(name="help", description="Show help for the bot")
+async def help(interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        await interaction.followup.send(""":star: **BASIC COMMANDS** \n
+        - `/chat [message]` Chat with ChatGPT!
+        - `/draw [prompt]` Generate an image with the Dalle2 model
+        - `/private` ChatGPT switch to private mode
+        - `/public` ChatGPT switch to public mode
+        - `/reset` Clear ChatGPT conversation history""")
+
+        logger.info(
+            "\x1b[31mSomeone needs help!\x1b[0m")
+
+@client.tree.command(name="draw", description="Generate an image with the Dalle2 model")
+async def draw(interaction: discord.Interaction, *, prompt: str):
+        if interaction.user == client.user:
+            return
+
+        username = str(interaction.user)
+        channel = str(interaction.channel)
+        logger.info(
+            f"\x1b[31m{username}\x1b[0m : /draw [{prompt}] in ({channel})")
+
+        await interaction.response.defer(thinking=True, ephemeral=aclient.isPrivate)
+        try:
+            path = await art.draw(prompt)
+
+            file = discord.File(path, filename="image.png")
+            title = f'**`{prompt}`** | Requested by {interaction.user.mention}'
+            embed = discord.Embed(title=title)
+            embed.set_image(url="attachment://image.png")
+
+            await interaction.followup.send(file=file, embed=embed)
+
+        except openai.InvalidRequestError:
+            await interaction.followup.send(
+                "> **ERROR: Inappropriate request 😿**")
+            logger.info(
+            f"\x1b[31m{username}\x1b[0m made an inappropriate request.!")
+
+        except Exception as e:
+            await interaction.followup.send(
+                "> **ERROR: Something went wrong 😿**")
+            logger.exception(f"Error while generating image: {e}")
+
+
+@client.tree.command(name="switchpersona", description="Switch between optional chatGPT jailbreaks")
+@app_commands.choices(persona=[
+        app_commands.Choice(name="Random", value="random"),
+        app_commands.Choice(name="Standard", value="standard"),
+        app_commands.Choice(name="Do Anything Now 11.0", value="dan"),
+        app_commands.Choice(name="Superior Do Anything", value="sda"),
+        app_commands.Choice(name="Evil Confidant", value="confidant"),
+        app_commands.Choice(name="BasedGPT v2", value="based"),
+        app_commands.Choice(name="OPPO", value="oppo"),
+        app_commands.Choice(name="Developer Mode v2", value="dev"),
+        app_commands.Choice(name="DUDE V3", value="dude_v3"),
+        app_commands.Choice(name="AIM", value="aim"),
+        app_commands.Choice(name="UCAR", value="ucar"),
+        app_commands.Choice(name="Jailbreak", value="jailbreak")
+    ])
+async def switchpersona(interaction: discord.Interaction, persona: app_commands.Choice[str]):
+        if interaction.user == client.user:
+            return
+
+        await interaction.response.defer(thinking=True)
+        username = str(interaction.user)
+        channel = str(interaction.channel)
+        logger.info(
+            f"\x1b[31m{username}\x1b[0m : '/switchpersona [{persona.value}]' ({channel})")
+
+        persona = persona.value
+
+        if persona == personas.current_persona:
+            await interaction.followup.send(f"> **WARN: Already set to `{persona}` persona**")
+
+        elif persona == "standard":
+            if aclient.chat_model == "OFFICIAL":
+                aclient.chatbot.reset()
+            elif aclient.chat_model == "UNOFFICIAL":
+                aclient.chatbot.reset_chat()
+            elif aclient.chat_model == "Bard":
+                aclient.chatbot = aclient.get_chatbot_model()
+            elif aclient.chat_model == "Bing":
+                aclient.chatbot = aclient.get_chatbot_model()
+
+            personas.current_persona = "standard"
+            await interaction.followup.send(
+                f"> **INFO: Switched to `{persona}` persona**")
+
+        elif persona == "random":
+            choices = list(personas.PERSONAS.keys())
+            choice = randrange(0, 6)
+            chosen_persona = choices[choice]
+            personas.current_persona = chosen_persona
+            await responses.switch_persona(chosen_persona, aclient)
+            await interaction.followup.send(
+                f"> **INFO: Switched to `{chosen_persona}` persona**")
+
+
+        elif persona in personas.PERSONAS:
+            try:
+                await responses.switch_persona(persona, aclient)
+                personas.current_persona = persona
+                await interaction.followup.send(
+                f"> **INFO: Switched to `{persona}` persona**")
+            except Exception as e:
+                await interaction.followup.send(
+                    "> **ERROR: Something went wrong, please try again later! 😿**")
+                logger.exception(f"Error while switching persona: {e}")
+
+        else:
+            await interaction.followup.send(
+                f"> **ERROR: No available persona: `{persona}` 😿**")
+            logger.info(
+                f'{username} requested an unavailable persona: `{persona}`')
+
+@client.event
+async def on_message(message):
+    if aclient.is_replying_all == "True":
+        if message.author == client.user:
+            return
+        if aclient.replying_all_discord_channel_id:
+            if message.channel.id == int(aclient.replying_all_discord_channel_id):
+                username = str(message.author)
+                user_message = str(message.content)
+                channel = str(message.channel)
+                logger.info(f"\x1b[31m{username}\x1b[0m : '{user_message}' ({channel})")
+                await aclient.send_message(message, user_message)
+#    else:
+#        logger.exception("replying_all_discord_channel_id not found, please use the commnad `/replyall` again.")
+
 
 
 
