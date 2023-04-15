@@ -285,8 +285,9 @@ async def draw(interaction: discord.Interaction, *, prompt: str):
             path = await art.draw(prompt)
 
             file = discord.File(path, filename="image.png")
-            title = f'**`{prompt}`** | Requested by {interaction.user.mention}'
-            embed = discord.Embed(title=title)
+            title = f'**Promt: `{prompt}`**'
+            desc = f'Requested by {interaction.user.mention}'
+            embed = discord.Embed(title=title, description=desc)
             embed.set_image(url="attachment://image.png")
 
             await interaction.followup.send(file=file, embed=embed)
