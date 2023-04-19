@@ -4,10 +4,9 @@ from typing import Union
 from src import log, responses
 from dotenv import load_dotenv
 from discord import app_commands
-from Bard import Chatbot as BardChatbot
 from revChatGPT.V3 import Chatbot
 from revChatGPT.V1 import AsyncChatbot
-from EdgeGPT import Chatbot as EdgeChatbot
+
 
 logger = log.setup_logger(__name__)
 load_dotenv()

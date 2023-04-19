@@ -5,6 +5,7 @@ import os.path
 from random import randrange
 import discord
 import requests
+import urllib.request
 import openai
 from src.aclient import client as aclient
 from dotenv import load_dotenv
@@ -44,18 +45,43 @@ async def on_ready():
 {CYAN}╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝    ╚═╝   {RESET}
 
 """)
-    logger.info(f"{PURPLE}Discord{RESET}")
+    logger.info(f"--{PURPLE}Discord{RESET}--")
     logger.info(f"{RED}Bot Name:{RESET}  {settings['NAME BOT']}")
     logger.info(f"{RED}Bot ID:{RESET}  {settings['ID']}")
+    logger.info(f"{RED}Bot Owner:{RESET}  {settings['OWNER']}")
+#    logger.info(f"{RED}Bot Version:{RESET}  {settings['VERSION']}")
+    await client.tree.sync()
+    logger.info(f"{YELLOW}Discord{RESET} application commands {CYAN}synced{RESET} {GREEN}successfully{RESET}")
 #    rbs = client.get_channel(1076240177032351765)
 #    await rbs.send("Successfull restart") # startup message in status channel
 #    logger.info("Successfully sent message to Rublewka Bot Status channel")
     logger.info(f"{YELLOW}Discord session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
-    logger.info(f"{PURPLE}Roblox{RESET}")
-    user = await RoClient.get_authenticated_user()
-    logger.info(f"{RED}ID:{RESET}  {user.id}")
-    logger.info(f"{RED}Name:{RESET}  {user.name}")
-    logger.info(f"{GRAY}Roblox session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
+    logger.info(f"--{MAGENTA}Roblox{RESET}--")
+
+#    user = await RoClient.get_authenticated_user()
+    
+    host1 = 'https://roblox.com'
+    def connect(host=host1):
+        try:
+            urllib.request.urlopen(host1) #Python 3.x
+            return True
+        except urllib.error.URLError:
+            return False
+    if connect():
+        user = await RoClient.get_authenticated_user()
+        logger.info(f"{RED}Roblox ID:{RESET}  {user.id}")
+        logger.info(f"{RED}Roblox Name:{RESET} {user.name}")
+        logger.info(f"{YELLOW}Roblox session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
+    else:
+        logger.error(f"{YELLOW}Roblox session{RESET} {RED}could not initialize{RESET}")
+        global RoConnected
+        RoConnected = False
+
+    
+#    logger.info(f"{RED}ID:{RESET}  {user.id}")
+#    logger.info(f"{RED}Name:{RESET}  {user.name}")
+#    logger.info(f"{GRAY}Roblox session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
+
 # startup end
 
 # variables section
@@ -92,70 +118,103 @@ GREYPLE = 0x99aab5
 # variables section end
 
 # Ping
-@client.command(aliases = ['Ping', 'PING', 'pING', 'ping', ' ping', ' PING', ' pING', ' Ping'])
-async def __ping(ctx): 
+@client.tree.command(name="ping", description='Gets bot\'s latency')
+async def ping(interaction: discord.Interaction):
+    # Get the websocket latency
     ping = client.ws.latency
 
+    # Define the green bar emoji as the default
     ping_emoji = '🟩🔳🔳🔳🔳' # 100ms
 
+    # Check if ping is greater than 150ms and if so, update the emoji to show an orange bar
     if ping > 0.15000000000000000:
         ping_emoji = '🟧🟩🔳🔳🔳' # 150ms
 
+    # Check if ping is greater than 200ms and if so, update the emoji to show a red bar
     if ping > 0.20000000000000000:
         ping_emoji = '🟥🟧🟩🔳🔳' # 200ms
 
+    # Check if ping is greater than 250ms and if so, update the emoji to show two red bars
     if ping > 0.25000000000000000:
         ping_emoji = '🟥🟥🟧🟩🔳' # 250ms
 
+    # Check if ping is greater than 300ms and if so, update the emoji to show three red bars
     if ping > 0.30000000000000000:
         ping_emoji = '🟥🟥🟥🟧🟩' # 300ms
 
+    # Check if ping is greater than 350ms and if so, update the emoji to show four red bars
     if ping > 0.35000000000000000:
         ping_emoji = '🟥🟥🟥🟥🟧' # 350ms
 
+    # Check if ping is greater than 400ms and if so, update the emoji to show five red bars
     if ping > 0.40000000000000000:
         ping_emoji = '🟥🟥🟥🟥🟥' # 400ms
 
-    message = await ctx.reply('Please wait a little bit. . .')
-    await message.edit(content = f'Pong! {ping_emoji} `{ping * 1000:.0f}ms` :ping_pong:')
+    # Send a message back to the user with the ping emoji and the ping time in milliseconds
+    await interaction.response.defer(ephemeral=False, thinking=True)
+    await interaction.followup.send(f'Pong! {ping_emoji} `{ping * 1000:.0f}ms` :ping_pong:')
+#    await message.edit(content = f'Pong! {ping_emoji} `{ping * 1000:.0f}ms` :ping_pong:')
 #    print(f'[Logs:utils] Bot\'s ping was showen | {prefix}ping')
 #    print(f'[Logs:utils] Bot\'s current ping == {ping * 1000:.0f}ms | {prefix}ping')
     # Ping end
 
 # Help
-@client.command(aliases = ['Help', 'help', 'HELP', 'hELP', 'хелп', 'Хелп', 'ХЕЛП', 'хЕЛП'])
-async def __help (ctx):
-#    emb.add_field(name = f'{prefix}help', value = f'`Отображает эту команду`', inline=False)
-    emb = discord.Embed( title = 'Command navigaation | Help', description = f'**Attention!** Bot is still i development! | Bot\'s prefix: `{prefix}`', colour = TEAL )
-    # title - Жирный крупный текст (Заголовок) | description - Текст под заголовком | colour - Цвет полоски
-    emb.set_author(name=f"{ctx.author}",icon_url=ctx.author.avatar.url)
-    # Отображает Аватар отправителя
-    emb.add_field(name = f'{prefix}help', value = '`Shows this command`', inline=False)
-    emb.add_field(name = f'{prefix}ping', value = '`Shows Bot\'s delay in milliseconds (ms)`', inline=False)
-    emb.set_thumbnail(url = client.user.avatar.url)
-    emb.set_footer( icon_url = client.user.avatar.url, text = 'Rublewka BOT © Copyright 2023 | Все права защищены' )
 
-    await ctx.reply ( embed = emb)
 #    print(f'[Logs:info] Help command used | {prefix}help ')
+@client.tree.command(name="help", description="Show help for the bot", guild=discord.Object(1018415075255668746))
+async def help(interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        await interaction.followup.send("""
+
+<:icons_colorstaff:869554761840603196> **Basic** 
+> - `/ping` Shows the bot's latency
+> - `/help` Shows this message
+> - `/version` Shows the bot's version
+> - `/status` Shows the bot's status
+
+<:roblox:1023778640145694740> **Roblox** 
+> - `/getuser` Get user info from Roblox
+
+<:icons_activities:949635040021721138> **ChatGPT** 
+> - `/chat [message]` Chat with ChatGPT!
+> - `/draw [prompt]` Generate an image with the Dalle2 model
+> - `/private` ChatGPT switch to private mode
+> - `/public` ChatGPT switch to public mode
+> - `/reset` Clear ChatGPT conversation history (Please note: It does not clear message history in channel)""")
 
 
-@client.command(aliases = ['getuser', 'GETUSER', ' Getuser'])
-async def __getuser(ctx):
-    for user_mentioned in ctx.message.mentions:
-        discordId = user_mentioned.id
-    r = requests.get(
-        f'https://registry.rover.link/api/guilds/1018415075255668746/discord-to-roblox/{discordId}',
-        headers={'Authorization': f'Bearer {rvr_token}'},
-        timeout=10)
-    data = r.json()
-    json_str = json.dumps(data)
-    resp = json.loads(json_str)
-    print(resp) #use if debug needed
-#    user = await RoClient.get_user(resp['robloxId'])
-#    if user.description == '':
-#        desc = '*None*'
-#    else:
-#        desc = user.description
+@client.tree.command(name="rouser", description="Get user info from Roblox", guild=discord.Object(1018415075255668746))
+async def getuser(interaction: discord.Interaction):
+    if RoConnected == True:
+        await interaction.response.defer(ephemeral=False, thinking=True)
+        for user_mentioned in interaction.command.get_parameters():
+            discordId = user_mentioned.id
+        r = requests.get(
+            f'https://registry.rover.link/api/guilds/1018415075255668746/discord-to-roblox/{discordId}',
+            headers={'Authorization': f'Bearer {rvr_token}'},
+            timeout=10)
+        data = r.json()
+        json_str = json.dumps(data)
+        resp = json.loads(json_str)
+        print(resp) #use if debug needed
+        user = await RoClient.get_user(resp['robloxId'])
+        if user.description == '':
+           desc = '*None*'
+        else:
+           desc = user.description
+        await interaction.followup.send(
+            f"Roblox ID: `{resp['robloxId']}`\n"
+            f"Roblox Username: `{resp['username']}`\n"
+            f"Roblox Display Name: `{resp['displayName']}`\n"
+            f"Roblox Description: `{desc}`\n")
+    else:
+        await interaction.response.defer(ephemeral=True)
+        await interaction.followup.send("The bot couldn'n connect to Roblox. Please contact bot developer.")
+
+
+
+
+
 
 @client.tree.command(name="chat", description="Have a chat with ChatGPT")
 async def chat(interaction: discord.Interaction, *, message: str):
@@ -265,19 +324,7 @@ async def reset(interaction: discord.Interaction):
         personas.current_persona = "standard"
         logger.warning(
             f"\x1b[31m{aclient.chat_model} bot has been successfully reset\x1b[0m")
-
-@client.tree.command(name="help", description="Show help for the bot")
-async def help(interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=False)
-        await interaction.followup.send(""":star: **BASIC COMMANDS** \n
-        - `/chat [message]` Chat with ChatGPT!
-        - `/draw [prompt]` Generate an image with the Dalle2 model
-        - `/private` ChatGPT switch to private mode
-        - `/public` ChatGPT switch to public mode
-        - `/reset` Clear ChatGPT conversation history (Please note: It does not clear message history in channel)""")
-
-        logger.info(
-            "\x1b[31mSomeone needs help!\x1b[0m")
+        
 
 @client.tree.command(name="draw", description="Generate an image with the Dalle2 model")
 async def draw(interaction: discord.Interaction, *, prompt: str):

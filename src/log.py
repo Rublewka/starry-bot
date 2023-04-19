@@ -8,7 +8,7 @@ class CustomFormatter(logging.Formatter):
         (logging.DEBUG, '\x1b[40;1m'),
         (logging.INFO, '\x1b[36;1m'),
         (logging.WARNING, '\x1b[33;1m'),
-        (logging.ERROR, '\x1b[31m'),
+        (logging.ERROR, '\x1b[1;37;43m'),
         (logging.CRITICAL, '\x1b[41m'),
     ]
     FORMATS = {
