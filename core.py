@@ -183,7 +183,7 @@ async def help(interaction: discord.Interaction):
 > - `/reset` Clear ChatGPT conversation history (Please note: It does not clear message history in channel)""")
 
 
-@client.tree.command(name="rouser", description="Get user info from Roblox", guild=discord.Object(1018415075255668746))
+@client.tree.command(name="rouser", description="Get user info from Roblox")
 async def getuser(interaction: discord.Interaction):
     if RoConnected == True:
         await interaction.response.defer(ephemeral=False, thinking=True)
