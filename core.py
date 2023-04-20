@@ -2,6 +2,7 @@
 import json
 import os
 import os.path
+import asyncio, time
 from random import randrange
 import discord
 import requests
@@ -11,6 +12,7 @@ from src.aclient import client as aclient
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord import app_commands
+from discord.ext import tasks
 from roblox import Client
 from config import settings
 from src import log, art, personas, responses
@@ -22,9 +24,26 @@ RoClient = Client(os.getenv("ROBLOXTOKEN"))
 logger = log.setup_logger(__name__)
 # setup end
 
+RoConnected = None
+
+
+
+async def status_swap():
+    while True:
+        await client.change_presence(status=discord.Status.online, activity=discord.Game(name=f"v{settings['VERSION']}"))
+        await asyncio.sleep(15)
+        await client.change_presence(status=discord.Status.online, activity=discord.Game(name=f"with my friends"))
+        await asyncio.sleep(15)
+        await client.change_presence(status=discord.Status.online, activity=discord.Game(name=f"with {settings['OWNER']}"))
+        await asyncio.sleep(15)
+        await client.change_presence(status=discord.Status.online, activity=discord.Game(name=f"Roblox"))
+        await asyncio.sleep(15)
+        await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=f"to /help"))
+        await asyncio.sleep(15)
 #startup
 @client.event
 async def on_ready(): 
+    client.loop.create_task(status_swap())
     RED = "\033[1;31m"
     GREEN = "\033[1;32m"
     YELLOW = "\033[1;33m"
@@ -34,31 +53,15 @@ async def on_ready():
     GRAY = "\033[1;30m"
     PURPLE = "\033[1;35m"
     RESET = "\033[0m"
-    logger.info(f"Logged on as") # startup message in console
-    logger.info(F"""
-
-{YELLOW}██████╗ ██╗   ██╗██████╗ ██╗     ███████╗██╗    ██╗██╗  ██╗ █████╗     ██████╗  ██████╗ ████████╗
-██╔══██╗██║   ██║██╔══██╗██║     ██╔════╝██║    ██║██║ ██╔╝██╔══██╗    ██╔══██╗██╔═══██╗╚══██╔══╝
-██████╔╝██║   ██║██████╔╝██║     █████╗  ██║ █╗ ██║█████╔╝ ███████║    ██████╔╝██║   ██║   ██║   
-██╔══██╗██║   ██║██╔══██╗██║     ██╔══╝  ██║███╗██║██╔═██╗ ██╔══██║    ██╔══██╗██║   ██║   ██║   
-██║  ██║╚██████╔╝██████╔╝███████╗███████╗╚███╔███╔╝██║  ██╗██║  ██║    ██████╔╝╚██████╔╝   ██║   
-{CYAN}╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝    ╚═╝   {RESET}
-
-""")
+    logger.info(f"Starting up {client.user.name}#{client.user.discriminator}")
     logger.info(f"--{PURPLE}Discord{RESET}--")
-    logger.info(f"{RED}Bot Name:{RESET}  {settings['NAME BOT']}")
-    logger.info(f"{RED}Bot ID:{RESET}  {settings['ID']}")
-    logger.info(f"{RED}Bot Owner:{RESET}  {settings['OWNER']}")
-#    logger.info(f"{RED}Bot Version:{RESET}  {settings['VERSION']}")
+    logger.info(f"{RED}Bot Name:{RESET}  {client.user.name}")
+    logger.info(f"{RED}Bot ID:{RESET}  {client.user.id}")
+    logger.info(f"{RED}Bot Version:{RESET}  {settings['VERSION']}")
     await client.tree.sync()
     logger.info(f"{YELLOW}Discord{RESET} application commands {CYAN}synced{RESET} {GREEN}successfully{RESET}")
-#    rbs = client.get_channel(1076240177032351765)
-#    await rbs.send("Successfull restart") # startup message in status channel
-#    logger.info("Successfully sent message to Rublewka Bot Status channel")
     logger.info(f"{YELLOW}Discord session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
     logger.info(f"--{MAGENTA}Roblox{RESET}--")
-
-#    user = await RoClient.get_authenticated_user()
     
     host1 = 'https://roblox.com'
     def connect(host=host1):
@@ -68,13 +71,14 @@ async def on_ready():
         except urllib.error.URLError:
             return False
     if connect():
+        global RoConnected
+        RoConnected = True
         user = await RoClient.get_authenticated_user()
         logger.info(f"{RED}Roblox ID:{RESET}  {user.id}")
         logger.info(f"{RED}Roblox Name:{RESET} {user.name}")
         logger.info(f"{YELLOW}Roblox session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
     else:
         logger.error(f"{YELLOW}Roblox session{RESET} {RED}could not initialize{RESET}")
-        global RoConnected
         RoConnected = False
 
     
@@ -159,9 +163,9 @@ async def ping(interaction: discord.Interaction):
     # Ping end
 
 # Help
-
-#    print(f'[Logs:info] Help command used | {prefix}help ')
-@client.tree.command(name="help", description="Show help for the bot", guild=discord.Object(1018415075255668746))
+#TODO> - `/status` Shows the bot's status
+#TODO    print(f'[Logs:info] Help command used | {prefix}help ')
+@client.tree.command(name="help", description="Show help for the bot")
 async def help(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         await interaction.followup.send("""
@@ -169,8 +173,7 @@ async def help(interaction: discord.Interaction):
 <:icons_colorstaff:869554761840603196> **Basic** 
 > - `/ping` Shows the bot's latency
 > - `/help` Shows this message
-> - `/version` Shows the bot's version
-> - `/status` Shows the bot's status
+
 
 <:roblox:1023778640145694740> **Roblox** 
 > - `/getuser` Get user info from Roblox
@@ -180,15 +183,22 @@ async def help(interaction: discord.Interaction):
 > - `/draw [prompt]` Generate an image with the Dalle2 model
 > - `/private` ChatGPT switch to private mode
 > - `/public` ChatGPT switch to public mode
-> - `/reset` Clear ChatGPT conversation history (Please note: It does not clear message history in channel)""")
+> - `/reset` Clear ChatGPT conversation history (Please note: It does not clear message history in channel)
 
+
+:warning: *The Bot is still in heavy development, more commands and functions are coming in future* :warning:
+""")
+        
+@client.tree.command(name="version", description="Shows the bot's version")
+async def version(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=False, thinking=True)
+    await interaction.followup.send(f"{client.user.mention} current version: `{settings['VERSION']}`")
 
 @client.tree.command(name="rouser", description="Get user info from Roblox")
-async def getuser(interaction: discord.Interaction):
+async def getuser(interaction: discord.Interaction, user: discord.User):
     if RoConnected == True:
         await interaction.response.defer(ephemeral=False, thinking=True)
-        for user_mentioned in interaction.command.get_parameters():
-            discordId = user_mentioned.id
+        discordId = user.id
         r = requests.get(
             f'https://registry.rover.link/api/guilds/1018415075255668746/discord-to-roblox/{discordId}',
             headers={'Authorization': f'Bearer {rvr_token}'},
@@ -196,20 +206,21 @@ async def getuser(interaction: discord.Interaction):
         data = r.json()
         json_str = json.dumps(data)
         resp = json.loads(json_str)
-        print(resp) #use if debug needed
-        user = await RoClient.get_user(resp['robloxId'])
-        if user.description == '':
+#        print(resp) #use if debug needed
+        ruser = await RoClient.get_user(resp['robloxId'])
+        if ruser.description == '':
            desc = '*None*'
         else:
-           desc = user.description
-        await interaction.followup.send(
-            f"Roblox ID: `{resp['robloxId']}`\n"
-            f"Roblox Username: `{resp['username']}`\n"
-            f"Roblox Display Name: `{resp['displayName']}`\n"
-            f"Roblox Description: `{desc}`\n")
+           desc = ruser.description
+        emb = discord.Embed(title=None, description=f"{user.mention} Roblox Profile", colour=GREYPLE)
+        emb.add_field(name="Roblox ID", value=ruser.id, inline=False)
+        emb.add_field(name="Roblox Username", value=ruser.name, inline=False)
+        emb.add_field(name="Roblox Display Name", value=ruser.display_name, inline=False)
+        emb.add_field(name="Roblox Description", value=desc, inline=False)
+        await interaction.followup.send(embed=emb)
     else:
         await interaction.response.defer(ephemeral=True)
-        await interaction.followup.send("The bot couldn'n connect to Roblox. Please contact bot developer.")
+        await interaction.followup.send("The bot couldn't connect to Roblox. Please contact bot developer.")
 
 
 
@@ -276,35 +287,6 @@ async def replyall(interaction: discord.Interaction):
         logger.warning("\x1b[31mSwitch to replyAll mode\x1b[0m")
 
 
-#    @client.tree.command(name="chat-model", description="Switch different chat model")
-#    @app_commands.choices(choices=[
-#        app_commands.Choice(name="Official GPT-3.5", value="OFFICIAL")
-#    ])
-
-#    async def chat_model(interaction: discord.Interaction, choices: app_commands.Choice[str]):
-#        await interaction.response.defer(ephemeral=False)
-#        original_chat_model = client.chat_model
-#        original_openAI_gpt_engine = client.openAI_gpt_engine
-
-#        try:
-#            if choices.value == "OFFICIAL":
-#                client.openAI_gpt_engine = "gpt-3.5-turbo"
-#                client.chat_model = "OFFICIAL"
-#            else:
-#                raise ValueError("Invalid choice")
-#
-#            client.chatbot = client.get_chatbot_model()
-#            await interaction.followup.send(f"> **INFO: You are now in {client.chat_model} model.**\n")
-#            logger.warning(f"\x1b[31mSwitch to {client.chat_model} model\x1b[0m")
-#
-#        except Exception as e:
-#            client.chat_model = original_chat_model
-#            client.openAI_gpt_engine = original_openAI_gpt_engine
-#            client.chatbot = client.get_chatbot_model()
-#            await interaction.followup.send(f"> **ERROR: Error while switching to the {choices.value} model, check that you've filled in the related fields in `.env`.**\n")
-#            logger.exception(f"Error while switching to the {choices.value} model: {e}")
-
-
 @client.tree.command(name="reset", description="Clear ChatGPT conversation history (Please note: It does not clear message history in channel)")
 async def reset(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
@@ -360,7 +342,7 @@ async def draw(interaction: discord.Interaction, *, prompt: str):
             logger.exception(f"Error while generating image: {e}")
 
 
-@client.tree.command(name="switchpersona", description="Switch between optional chatGPT jailbreaks")
+@client.tree.command(name="switchpersona", description="Switch between optional ChatGPT personas")
 @app_commands.choices(persona=[
         app_commands.Choice(name="Random", value="random"),
         app_commands.Choice(name="Standard", value="standard"),
@@ -431,18 +413,6 @@ async def switchpersona(interaction: discord.Interaction, persona: app_commands.
             logger.info(
                 f'{username} requested an unavailable persona: `{persona}`')
 
-@client.event
-async def on_message(message):
-    if aclient.is_replying_all == "True":
-        if message.author == client.user:
-            return
-        if aclient.replying_all_discord_channel_id:
-            if message.channel.id == int(aclient.replying_all_discord_channel_id):
-                username = str(message.author)
-                user_message = str(message.content)
-                channel = str(message.channel)
-                logger.info(f"\x1b[31m{username}\x1b[0m : '{user_message}' ({channel})")
-                await aclient.send_message(message, user_message)
 #    else:
 #        logger.exception("replying_all_discord_channel_id not found, please use the commnad `/replyall` again.")
 

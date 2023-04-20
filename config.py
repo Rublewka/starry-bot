@@ -4,5 +4,6 @@ settings = {
 	'ID': '1081662995639308369', # BOT ID
 	'PREFIX': ';', # PREFIX
 	'OWNER':'TheSkout#8213',    # OWNER USERNAME
-	'OWNER NAME':'TheSkout' # OWNER NAME
+	'OWNER NAME':'TheSkout', # OWNER NAME
+    'VERSION':'0.0.6.1' # BOT VERSION
 }
