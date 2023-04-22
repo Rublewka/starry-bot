@@ -2,7 +2,8 @@
 import json
 import os
 import os.path
-import asyncio, time
+import asyncio
+import datetime
 from random import randrange
 import discord
 import requests
@@ -12,7 +13,6 @@ from src.aclient import client as aclient
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord import app_commands
-from discord.ext import tasks
 from roblox import Client
 from config import settings
 from src import log, art, personas, responses
@@ -38,8 +38,9 @@ async def status_swap():
         await asyncio.sleep(15)
         await client.change_presence(status=discord.Status.online, activity=discord.Game(name=f"Roblox"))
         await asyncio.sleep(15)
-        await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=f"to /help"))
+        await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=f"/help"))
         await asyncio.sleep(15)
+
 #startup
 @client.event
 async def on_ready(): 
@@ -62,29 +63,32 @@ async def on_ready():
     logger.info(f"{YELLOW}Discord{RESET} application commands {CYAN}synced{RESET} {GREEN}successfully{RESET}")
     logger.info(f"{YELLOW}Discord session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
     logger.info(f"--{MAGENTA}Roblox{RESET}--")
-    
+    global start_time
+    start_time = datetime.datetime.now()
+
     host1 = 'https://roblox.com'
-    def connect(host=host1):
+    def roconnect(host=host1):
         try:
             urllib.request.urlopen(host1) #Python 3.x
             return True
         except urllib.error.URLError:
             return False
-    if connect():
+    if roconnect():
         global RoConnected
-        RoConnected = True
         user = await RoClient.get_authenticated_user()
         logger.info(f"{RED}Roblox ID:{RESET}  {user.id}")
         logger.info(f"{RED}Roblox Name:{RESET} {user.name}")
         logger.info(f"{YELLOW}Roblox session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
+        RoConnected = True
     else:
         logger.error(f"{YELLOW}Roblox session{RESET} {RED}could not initialize{RESET}")
         RoConnected = False
 
     
-#    logger.info(f"{RED}ID:{RESET}  {user.id}")
-#    logger.info(f"{RED}Name:{RESET}  {user.name}")
-#    logger.info(f"{GRAY}Roblox session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
+
+
+
+
 
 # startup end
 
@@ -122,63 +126,79 @@ GREYPLE = 0x99aab5
 # variables section end
 
 # Ping
-@client.tree.command(name="ping", description='Gets bot\'s latency')
-async def ping(interaction: discord.Interaction):
+@client.tree.command(name="status", description='Shows bot\'s status')
+async def status(interaction: discord.Interaction):
     # Get the websocket latency
     ping = client.ws.latency
 
     # Define the green bar emoji as the default
-    ping_emoji = '🟩🔳🔳🔳🔳' # 100ms
+#    ping_emoji = '🟩🔳🔳🔳🔳' # 100ms
+    ping_emoji = '<:icons_goodping:880113406915538995>' # 100ms
 
     # Check if ping is greater than 150ms and if so, update the emoji to show an orange bar
-    if ping > 0.15000000000000000:
-        ping_emoji = '🟧🟩🔳🔳🔳' # 150ms
+#    if ping > 0.15000000000000000:
+#        ping_emoji = '🟧🟩🔳🔳🔳' # 150ms
 
     # Check if ping is greater than 200ms and if so, update the emoji to show a red bar
-    if ping > 0.20000000000000000:
-        ping_emoji = '🟥🟧🟩🔳🔳' # 200ms
+#    if ping > 0.20000000000000000:
+#        ping_emoji = '🟥🟧🟩🔳🔳' # 200ms
 
     # Check if ping is greater than 250ms and if so, update the emoji to show two red bars
     if ping > 0.25000000000000000:
-        ping_emoji = '🟥🟥🟧🟩🔳' # 250ms
+#        ping_emoji = '🟥🟥🟧🟩🔳' # 250ms
+        ping_emoji = '<:icons_idelping:880113405720145990>' # 250ms
 
     # Check if ping is greater than 300ms and if so, update the emoji to show three red bars
-    if ping > 0.30000000000000000:
-        ping_emoji = '🟥🟥🟥🟧🟩' # 300ms
+#    if ping > 0.30000000000000000:
+#        ping_emoji = '🟥🟥🟥🟧🟩' # 300ms
 
     # Check if ping is greater than 350ms and if so, update the emoji to show four red bars
-    if ping > 0.35000000000000000:
-        ping_emoji = '🟥🟥🟥🟥🟧' # 350ms
+#    if ping > 0.35000000000000000:
+#        ping_emoji = '🟥🟥🟥🟥🟧' # 350ms
 
     # Check if ping is greater than 400ms and if so, update the emoji to show five red bars
     if ping > 0.40000000000000000:
-        ping_emoji = '🟥🟥🟥🟥🟥' # 400ms
+#        ping_emoji = '🟥🟥🟥🟥🟥' # 400ms
+        ping_emoji = '<:icons_badping:880113405007114271>' # 400ms
 
     # Send a message back to the user with the ping emoji and the ping time in milliseconds
     await interaction.response.defer(ephemeral=False, thinking=True)
-    await interaction.followup.send(f'Pong! {ping_emoji} `{ping * 1000:.0f}ms` :ping_pong:')
+    delta_uptime = datetime.datetime.now() - start_time
+    hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    days, hours = divmod(hours, 24)
+    if RoConnected == True:
+        con = "<:icons_online:860123643395571713> Connected to Roblox"
+    else:
+        con = "<:icons_outage:868122243845206087> Roblox connection not established"
+    emb = discord.Embed(title="Bot Status", description=None, color=BLUE)
+    emb.add_field(name="Latency", value=f"{ping_emoji} `{ping * 1000:.0f}ms`", inline=False)
+    emb.add_field(name="Roblox", value=f"{con}", inline=False)
+    emb.add_field(name="Uptime", value=f"<:icons_clock:964491800465276940> I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`", inline=False)
+    emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
+    await interaction.followup.send(embed=emb)
 #    await message.edit(content = f'Pong! {ping_emoji} `{ping * 1000:.0f}ms` :ping_pong:')
 #    print(f'[Logs:utils] Bot\'s ping was showen | {prefix}ping')
 #    print(f'[Logs:utils] Bot\'s current ping == {ping * 1000:.0f}ms | {prefix}ping')
     # Ping end
 
 # Help
-#TODO> - `/status` Shows the bot's status
-#TODO    print(f'[Logs:info] Help command used | {prefix}help ')
 @client.tree.command(name="help", description="Show help for the bot")
 async def help(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         await interaction.followup.send("""
 
-<:icons_colorstaff:869554761840603196> **Basic** 
+<:icons_generalinfo:866599434098835486> **Basic** 
 > - `/ping` Shows the bot's latency
 > - `/help` Shows this message
+> - `/version` Shows the bot's version
+> - `/status` Shows the bot's status
 
 
 <:roblox:1023778640145694740> **Roblox** 
 > - `/getuser` Get user info from Roblox
 
-<:icons_activities:949635040021721138> **ChatGPT** 
+<:gpt:1099041860971933767> **ChatGPT** 
 > - `/chat [message]` Chat with ChatGPT!
 > - `/draw [prompt]` Generate an image with the Dalle2 model
 > - `/private` ChatGPT switch to private mode
@@ -186,9 +206,10 @@ async def help(interaction: discord.Interaction):
 > - `/reset` Clear ChatGPT conversation history (Please note: It does not clear message history in channel)
 
 
-:warning: *The Bot is still in heavy development, more commands and functions are coming in future* :warning:
+<a:warningbug:905560995886411806> *The Bot is still in heavy development, more commands and functions are coming in future* <a:warningbug:905560995886411806>
 """)
-        
+
+
 @client.tree.command(name="version", description="Shows the bot's version")
 async def version(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=False, thinking=True)
