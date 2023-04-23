@@ -214,7 +214,7 @@ async def version(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=False, thinking=True)
     await interaction.followup.send(f"{client.user.mention} current version: `{settings['VERSION']}`")
 
-@client.tree.command(name="rouser", description="Get user info from Roblox")
+@client.tree.command(name="getuser", description="Get user info from Roblox")
 async def getuser(interaction: discord.Interaction, user: discord.User):
     if RoConnected == True:
         await interaction.response.defer(ephemeral=False, thinking=True)
