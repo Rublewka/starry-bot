@@ -189,7 +189,6 @@ async def help(interaction: discord.Interaction):
         await interaction.followup.send("""
 
 <:icons_generalinfo:866599434098835486> **Basic** 
-> - `/ping` Shows the bot's latency
 > - `/help` Shows this message
 > - `/version` Shows the bot's version
 > - `/status` Shows the bot's status
