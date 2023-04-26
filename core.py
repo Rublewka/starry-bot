@@ -54,12 +54,13 @@ async def on_ready():
     GRAY = "\033[1;30m"
     PURPLE = "\033[1;35m"
     RESET = "\033[0m"
+    dsc_err_channel = client.get_channel(1094687676151648286)
     logger.info(f"Starting up {client.user.name}#{client.user.discriminator}")
     logger.info(f"--{PURPLE}Discord{RESET}--")
     logger.info(f"{RED}Bot Name:{RESET}  {client.user.name}")
     logger.info(f"{RED}Bot ID:{RESET}  {client.user.id}")
     logger.info(f"{RED}Bot Version:{RESET}  {settings['VERSION']}")
-    await client.tree.sync()
+#    await client.tree.sync()
     logger.info(f"{YELLOW}Discord{RESET} application commands {CYAN}synced{RESET} {GREEN}successfully{RESET}")
     logger.info(f"{YELLOW}Discord session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
     logger.info(f"--{MAGENTA}Roblox{RESET}--")
@@ -69,7 +70,7 @@ async def on_ready():
     host1 = 'https://roblox.com'
     def roconnect(host=host1):
         try:
-            urllib.request.urlopen(host1) #Python 3.x
+            urllib.request.urlopen(host1)
             return True
         except urllib.error.URLError:
             return False
@@ -81,8 +82,11 @@ async def on_ready():
         logger.info(f"{YELLOW}Roblox session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
         RoConnected = True
     else:
+        message = f'`Could not connect to Roblox Gateway. Please check your internet connection and try again.`'
+        await dsc_err_channel.send(message)
         logger.error(f"{YELLOW}Roblox session{RESET} {RED}could not initialize{RESET}")
         RoConnected = False
+        
 
     
 
@@ -132,33 +136,15 @@ async def status(interaction: discord.Interaction):
     ping = client.ws.latency
 
     # Define the green bar emoji as the default
-#    ping_emoji = '🟩🔳🔳🔳🔳' # 100ms
     ping_emoji = '<:icons_goodping:880113406915538995>' # 100ms
 
-    # Check if ping is greater than 150ms and if so, update the emoji to show an orange bar
-#    if ping > 0.15000000000000000:
-#        ping_emoji = '🟧🟩🔳🔳🔳' # 150ms
 
-    # Check if ping is greater than 200ms and if so, update the emoji to show a red bar
-#    if ping > 0.20000000000000000:
-#        ping_emoji = '🟥🟧🟩🔳🔳' # 200ms
-
-    # Check if ping is greater than 250ms and if so, update the emoji to show two red bars
+    # Check if ping is greater than 250ms and if so, update the emoji
     if ping > 0.25000000000000000:
-#        ping_emoji = '🟥🟥🟧🟩🔳' # 250ms
         ping_emoji = '<:icons_idelping:880113405720145990>' # 250ms
 
-    # Check if ping is greater than 300ms and if so, update the emoji to show three red bars
-#    if ping > 0.30000000000000000:
-#        ping_emoji = '🟥🟥🟥🟧🟩' # 300ms
-
-    # Check if ping is greater than 350ms and if so, update the emoji to show four red bars
-#    if ping > 0.35000000000000000:
-#        ping_emoji = '🟥🟥🟥🟥🟧' # 350ms
-
-    # Check if ping is greater than 400ms and if so, update the emoji to show five red bars
+    # Check if ping is greater than 400ms and if so, update the emoji
     if ping > 0.40000000000000000:
-#        ping_emoji = '🟥🟥🟥🟥🟥' # 400ms
         ping_emoji = '<:icons_badping:880113405007114271>' # 400ms
 
     # Send a message back to the user with the ping emoji and the ping time in milliseconds
@@ -177,10 +163,6 @@ async def status(interaction: discord.Interaction):
     emb.add_field(name="Uptime", value=f"<:icons_clock:964491800465276940> I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
     await interaction.followup.send(embed=emb)
-#    await message.edit(content = f'Pong! {ping_emoji} `{ping * 1000:.0f}ms` :ping_pong:')
-#    print(f'[Logs:utils] Bot\'s ping was showen | {prefix}ping')
-#    print(f'[Logs:utils] Bot\'s current ping == {ping * 1000:.0f}ms | {prefix}ping')
-    # Ping end
 
 # Help
 @client.tree.command(name="help", description="Show help for the bot")
