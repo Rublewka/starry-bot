@@ -60,7 +60,7 @@ async def on_ready():
     logger.info(f"{RED}Bot Name:{RESET}  {client.user.name}")
     logger.info(f"{RED}Bot ID:{RESET}  {client.user.id}")
     logger.info(f"{RED}Bot Version:{RESET}  {settings['VERSION']}")
-#    await client.tree.sync()
+    await client.tree.sync()
     logger.info(f"{YELLOW}Discord{RESET} application commands {CYAN}synced{RESET} {GREEN}successfully{RESET}")
     logger.info(f"{YELLOW}Discord session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
     logger.info(f"--{MAGENTA}Roblox{RESET}--")
