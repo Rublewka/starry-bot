@@ -4,14 +4,18 @@ import os
 import os.path
 import asyncio
 import datetime
+import random
 from random import randrange
 import discord
 import requests
 import urllib.request
 import openai
+from src.verif_words import verification_words
 from src.aclient import client as aclient
 from dotenv import load_dotenv
 from discord.ext import commands
+from discord.abc import PrivateChannel
+from discord.utils import get
 from discord import app_commands
 from roblox import Client
 from config import settings
@@ -44,7 +48,6 @@ async def status_swap():
 #startup
 @client.event
 async def on_ready(): 
-    client.loop.create_task(status_swap())
     RED = "\033[1;31m"
     GREEN = "\033[1;32m"
     YELLOW = "\033[1;33m"
@@ -54,14 +57,14 @@ async def on_ready():
     GRAY = "\033[1;30m"
     PURPLE = "\033[1;35m"
     RESET = "\033[0m"
+    client.loop.create_task(status_swap())
     dsc_err_channel = client.get_channel(1094687676151648286)
     logger.info(f"Starting up {client.user.name}#{client.user.discriminator}")
     logger.info(f"--{PURPLE}Discord{RESET}--")
     logger.info(f"{RED}Bot Name:{RESET}  {client.user.name}")
     logger.info(f"{RED}Bot ID:{RESET}  {client.user.id}")
     logger.info(f"{RED}Bot Version:{RESET}  {settings['VERSION']}")
-    await client.tree.sync()
-    logger.info(f"{YELLOW}Discord{RESET} application commands {CYAN}synced{RESET} {GREEN}successfully{RESET}")
+#    await client.tree.sync()
     logger.info(f"{YELLOW}Discord session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
     logger.info(f"--{MAGENTA}Roblox{RESET}--")
     global start_time
@@ -128,6 +131,32 @@ GREYPLE = 0x99aab5
 
 # ___________
 # variables section end
+
+@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
+async def verify(interaction: discord.Interaction):
+    user = client.get_user(interaction.user)
+    channel = client.get_channel(1094704112144228452)
+    thread = await channel.create_thread(name=f"{interaction.user.name} Verification", auto_archive_duration=60, type='private_thread4')
+    await thread.add_user(user)
+    await thread.send(f"{interaction.user.mention} has started the verification process")
+    
+    words = verification_words()
+    random_words = []
+    for i in range(5):
+        word = random.choice(words)
+        random_words.append(word)
+
+@client.tree.command(name="commands-sync", description="force tree commands sync")
+async def sync(interaction: discord.Interaction):
+    GREEN = "\033[1;32m"
+    YELLOW = "\033[1;33m"
+    CYAN = "\033[1;36m"
+    RESET = "\033[0m"
+    await interaction.response.defer(ephemeral=True, thinking=True)
+    await client.tree.sync()
+    await interaction.followup.send(f"Slash commands synced")
+    logger.info(f"{YELLOW}Discord{RESET} application commands {CYAN}synced{RESET} {GREEN}successfully{RESET}")
+
 
 # Ping
 @client.tree.command(name="status", description='Shows bot\'s status')
