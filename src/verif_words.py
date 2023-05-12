@@ -1,0 +1,5 @@
+verification_words = ['Spoon', 'Guitar', 'Cow', 'Bag', 'Ink', 'Window',
+                    'Earthquake', 'Mango', 'Bookshelf', 'Cocoon', 'Vinegar', 'Chair', 'Pillow', 'Acorn', 'Glove', 'Lipstick', 'Cabbage', 'Parrot', 'Rug', 'Tablecloth', 'Sofa', 'Currency', 'Glasses', 'Microphone', 'Camcorder', 'Skirt', 'Plant', 'Pumpkin', 'Wig', 'Bicycle', 'Toaster',
+                    'Tractor', 'Rug', 'Ladder', 'Castle', 'Ocean', 'Sunflower', 'Thread', 'Honey', 'Bathtub', 'Bread', 'Ant', 'Sailboat', 'Refrigerator', 'Jacket', 'Ice cream', 'Mountain', 'Postcard', 'Bee', 'Ball', 'Fruit', 'Jeans', 'Rainbow', 'Sand', 'Pineapple', 'Mushroom', 'Hat', 'Lighthouse',
+                    'Corn', 'Snail', 'Snow', 'Butterfly', 'Feather', 'Cake', 'Bus', 'Stapler', 'Daffodil', 'Clock', 'Piano', 'Zipper', 'Dragonfly', 'Scissors', 'Lobster', 'Oven', 'Boy', 'Girl', 'River', 'Fish', 'Telephone', 'Computer', 'Toothbrush', 'Necklace', 'Suitcase', 'Typewriter', 'Grass', 'Dawn', 'Night',
+                    'Building', 'Ruler', 'Squash', 'Tangerine', 'Scrunchie', 'Rabbit', 'Elephant', 'Moon', 'Sunglasses', 'Strawberry', 'Squirrel', 'Chair', 'Keyboard']
