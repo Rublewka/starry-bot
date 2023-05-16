@@ -10,13 +10,14 @@ import discord
 import requests
 import urllib.request
 import openai
+from roblox import AvatarThumbnailType
 from src.verif_words import verification_words
 from src.aclient import client as aclient
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord.abc import PrivateChannel
 from discord.utils import get
-from discord import app_commands
+from discord import app_commands, ChannelType
 from roblox import Client
 from config import settings
 from src import log, art, personas, responses
@@ -129,22 +130,100 @@ DARKER_GREY = 0x546e7a
 BLURPLE = 0x7289da
 GREYPLE = 0x99aab5
 
-# ___________
-# variables section end
+
 
 @client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
-async def verify(interaction: discord.Interaction):
-    user = client.get_user(interaction.user)
+async def verify(interaction: discord.Interaction, member: discord.Member):
+    await interaction.response.defer(ephemeral=True, thinking=True)
+    user = client.get_user(interaction.user.id)
     channel = client.get_channel(1094704112144228452)
-    thread = await channel.create_thread(name=f"{interaction.user.name} Verification", auto_archive_duration=60, type='private_thread4')
+    thread = await channel.create_thread(name=f"{interaction.user.name} Verification", auto_archive_duration=1440, type=ChannelType.private_thread, invitable=False)
     await thread.add_user(user)
-    await thread.send(f"{interaction.user.mention} has started the verification process")
+    await interaction.followup.send(f"Opened new verification thread for you - {thread.mention}")
+#    await thread.send(f"{interaction.user.mention} has started the verification process")
+    await thread.send(f"{interaction.user.mention} please type in your Roblox Username to verify")
+    def check(message):
+        return message.author == user
     
-    words = verification_words()
-    random_words = []
-    for i in range(5):
-        word = random.choice(words)
-        random_words.append(word)
+    user_message = await client.wait_for('message', check=check)
+
+    
+    roblox_username = user_message.content
+    rouser = await RoClient.get_user_by_username(roblox_username)
+    emb = discord.Embed(title=f"Check your account info", description="""
+    If this is your account - type `Continue` to continue; 
+    If not - type `Back` to go back.""")
+    emb.add_field(name="Username", value=rouser.name, inline=False)
+    emb.add_field(name="Display Name", value=rouser.display_name, inline=False)
+    emb.add_field(name="ID", value=rouser.id, inline=False)
+    if rouser.description == '':
+        desc = '*None*'
+    else:
+        desc = rouser.description
+    emb.add_field(name="Description", value=desc, inline=False)
+    emb.add_field(name="Created At", value=rouser.created, inline=False)
+    user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(users=[rouser], type=AvatarThumbnailType.full_body, size=(420, 420))
+    if len(user_thumbnails) > 0:
+        user_thumbnail = user_thumbnails[0]
+    emb.set_thumbnail(url=user_thumbnail.image_url)
+    await thread.send(embed=emb)
+    await thread.send(f"If this is your account - type `Continue` to continue; If not - type `Back` to go back.")
+
+    def check(message):
+        return message.author == user
+    
+    con = await client.wait_for('message', check=check)
+
+    if con.content.lower() == 'continue':
+        words = verification_words
+        random_words = []
+        for i in range(5):
+            word = random.choice(words)
+            random_words.append(word)
+        verif_words = ", ".join(random_words)
+        emb = discord.Embed(title=f"Verification words for {interaction.user.name}", description='Please paste these verification words into your Roblox Profile Description')
+        emb.add_field(name="Verification words", value=f'`{verif_words}`', inline=False)
+        emb.set_footer(text="If Roblox Filtered these verification words, type \"New words\" to get a new ones")
+        await thread.send(embed=emb)
+        await thread.send(f"Type `Done` when you are done")
+        def check(message):
+            return message.author == user
+        done = await client.wait_for('message', check=check)
+        if done.content.lower() == 'done':
+#            await member.edit(name=rouser.name)
+            await thread.send("Verification process complete, enjoy your stay!")
+            await thread.edit(name=f"{interaction.user.name} Verification (Completed)")
+        else:
+            await thread.send("Couldn't verify your account, please try again later")
+            await thread.edit(name=f"{interaction.user.name} Verification (Failed)")        
+
+        def check(message):
+            return message.author == user
+        
+        new_words = await client.wait_for('message', check=check)
+        if new_words.content.lower() == 'new words':
+            words = verification_words
+            random_words = []
+            for i in range(5):
+                word = random.choice(words)
+                random_words.append(word)
+            verif_words = ", ".join(random_words)
+            emb = discord.Embed(title=f"New verification words for {interaction.user.name}", description='Please paste these verification words into your Roblox Profile Description')
+            emb.add_field(name="Verification words", value=f'`{verif_words}`', inline=False)
+            emb.set_footer(text="If Roblox Filtered these verification words, type \"New words\" to get a new ones")
+            await thread.send(embed=emb)
+            await thread.send(f"Type `Done` when you are done")
+            def check(message):
+                return message.author == user
+            done = await client.wait_for('message', check=check)
+            if done.content.lower() == 'done':
+#                await member.edit(name=rouser.name)
+                await thread.send("Verification process complete, enjoy your stay!")
+                await thread.edit(name=f"{interaction.user.name} Verification (Completed)")
+            else:
+                await thread.send("Couldn't verify your account, please try again later")
+                await thread.edit(name=f"{interaction.user.name} Verification (Failed)")
+
 
 @client.tree.command(name="commands-sync", description="force tree commands sync")
 async def sync(interaction: discord.Interaction):
