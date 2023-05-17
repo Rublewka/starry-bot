@@ -133,7 +133,7 @@ GREYPLE = 0x99aab5
 
 
 @client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
-async def verify(interaction: discord.Interaction, member: discord.Member):
+async def verify(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True, thinking=True)
     user = client.get_user(interaction.user.id)
     channel = client.get_channel(1094704112144228452)
