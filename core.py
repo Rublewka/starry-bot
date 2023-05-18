@@ -65,7 +65,7 @@ async def on_ready():
     logger.info(f"{RED}Bot Name:{RESET}  {client.user.name}")
     logger.info(f"{RED}Bot ID:{RESET}  {client.user.id}")
     logger.info(f"{RED}Bot Version:{RESET}  {settings['VERSION']}")
-#    await client.tree.sync()
+    await client.tree.sync()
     logger.info(f"{YELLOW}Discord session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
     logger.info(f"--{MAGENTA}Roblox{RESET}--")
     global start_time
@@ -133,8 +133,8 @@ GREYPLE = 0x99aab5
 
 
 @client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
-async def verify(interaction: discord.Interaction):
-    await interaction.response.defer(ephemeral=True, thinking=True)
+async def verify(interaction: discord.Interaction, member: discord.Member):
+    await interaction.response.defer(ephemeral=True, thinking=True)   
     user = client.get_user(interaction.user.id)
     channel = client.get_channel(1094704112144228452)
     thread = await channel.create_thread(name=f"{interaction.user.name} Verification", auto_archive_duration=1440, type=ChannelType.private_thread, invitable=False)
@@ -190,12 +190,13 @@ async def verify(interaction: discord.Interaction):
             return message.author == user
         done = await client.wait_for('message', check=check)
         if done.content.lower() == 'done':
-#            await member.edit(name=rouser.name)
+            await member.add_roles('Members')
+            await member.edit(name=rouser.name)
             await thread.send("Verification process complete, enjoy your stay!")
-            await thread.edit(name=f"{interaction.user.name} Verification (Completed)")
+            await thread.edit(name=f"{interaction.user.name} Verification (Completed)", locked=True)
         else:
             await thread.send("Couldn't verify your account, please try again later")
-            await thread.edit(name=f"{interaction.user.name} Verification (Failed)")        
+            await thread.edit(name=f"{interaction.user.name} Verification (Failed)", locked=True)        
 
         def check(message):
             return message.author == user
@@ -217,7 +218,7 @@ async def verify(interaction: discord.Interaction):
                 return message.author == user
             done = await client.wait_for('message', check=check)
             if done.content.lower() == 'done':
-#                await member.edit(name=rouser.name)
+                await member.edit(name=rouser.name)
                 await thread.send("Verification process complete, enjoy your stay!")
                 await thread.edit(name=f"{interaction.user.name} Verification (Completed)")
             else:
@@ -236,6 +237,11 @@ async def sync(interaction: discord.Interaction):
     await interaction.followup.send(f"Slash commands synced")
     logger.info(f"{YELLOW}Discord{RESET} application commands {CYAN}synced{RESET} {GREEN}successfully{RESET}")
 
+@client.tree.command(name='rename', description='Rename Bot')
+async def rename(interaction: discord.Interaction, name: str):
+    await interaction.response.defer(ephemeral=True, thinking=True)
+    await client.user.edit(username=name)
+    await interaction.followup.send(f'Renamed bot to {name}')
 
 # Ping
 @client.tree.command(name="status", description='Shows bot\'s status')
