@@ -85,6 +85,9 @@ async def on_ready():
         logger.info(f"{RED}Roblox Name:{RESET} {user.name}")
         logger.info(f"{YELLOW}Roblox session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
         RoConnected = True
+    elif roconnect() == None:
+        logger.error(f"{YELLOW}Bot inizialize{RESET} {RED}incomplete{RESET}")
+        RoConnected = None
     else:
         message = f'`Could not connect to Roblox Gateway. Please check your internet connection and try again.`'
         await dsc_err_channel.send(message)
@@ -132,27 +135,39 @@ GREYPLE = 0x99aab5
 
 
 
-@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
-async def verify(interaction: discord.Interaction, member: discord.Member):
-    await interaction.response.defer(ephemeral=True, thinking=True)   
-    user = client.get_user(interaction.user.id)
-    channel = client.get_channel(1094704112144228452)
-    thread = await channel.create_thread(name=f"{interaction.user.name} Verification", auto_archive_duration=1440, type=ChannelType.private_thread, invitable=False)
+
+async def get_verification_thread(interaction: discord.Interaction) -> discord.Thread:
+    user = interaction.user
+    channel = interaction.channel
+    thread_name = f"{user.name} Verification"
+    thread = await channel.create_thread(
+        name=thread_name,
+        auto_archive_duration=1440,
+        type=discord.ChannelType.private_thread,
+        invitable=False
+    )
     await thread.add_user(user)
-    await interaction.followup.send(f"Opened new verification thread for you - {thread.mention}")
-#    await thread.send(f"{interaction.user.mention} has started the verification process")
-    await thread.send(f"{interaction.user.mention} please type in your Roblox Username to verify")
+    return thread
+
+
+async def get_roblox_username(interaction: discord.Interaction, thread: discord.Thread) -> str:
+    user = interaction.user
+
     def check(message):
         return message.author == user
-    
-    user_message = await client.wait_for('message', check=check)
 
-    
-    roblox_username = user_message.content
+    await thread.send(f"{interaction.user.mention} please type in your Roblox Username to verify")
+    user_message = await client.wait_for('message', check=check)
+    return user_message.content
+
+
+async def get_rouser_info(roblox_username: str, thread: discord.Thread) -> dict:
     rouser = await RoClient.get_user_by_username(roblox_username)
-    emb = discord.Embed(title=f"Check your account info", description="""
-    If this is your account - type `Continue` to continue; 
-    If not - type `Back` to go back.""")
+    emb = discord.Embed(
+        title="Check your account info",
+        description="""If this is your account - type `Continue` to continue; 
+        If not - type `Back` to go back."""
+    )
     emb.add_field(name="Username", value=rouser.name, inline=False)
     emb.add_field(name="Display Name", value=rouser.display_name, inline=False)
     emb.add_field(name="ID", value=rouser.id, inline=False)
@@ -162,69 +177,73 @@ async def verify(interaction: discord.Interaction, member: discord.Member):
         desc = rouser.description
     emb.add_field(name="Description", value=desc, inline=False)
     emb.add_field(name="Created At", value=rouser.created, inline=False)
-    user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(users=[rouser], type=AvatarThumbnailType.full_body, size=(420, 420))
+    user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(
+        users=[rouser],
+        type=AvatarThumbnailType.full_body,
+        size=(420, 420)
+    )
     if len(user_thumbnails) > 0:
         user_thumbnail = user_thumbnails[0]
-    emb.set_thumbnail(url=user_thumbnail.image_url)
+        emb.set_thumbnail(url=user_thumbnail.image_url)
     await thread.send(embed=emb)
-    await thread.send(f"If this is your account - type `Continue` to continue; If not - type `Back` to go back.")
+    return rouser
+
+@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
+async def verify_member(interaction: discord.Interaction, member: discord.Member):
+    thread = await get_verification_thread(interaction)
+
+    roblox_username = await get_roblox_username(interaction, thread)
+    rouser = await get_rouser_info(roblox_username, thread)
 
     def check(message):
-        return message.author == user
+        return message.author == interaction.user
+
+    while True:
+        await thread.send("If this is your account - type `Continue` to continue; If not - type `Back` to go back.")
+        con = await client.wait_for('message', check=check)
+        if con.content.lower() == 'continue':
+            break
     
-    con = await client.wait_for('message', check=check)
+    words = verification_words
+    random_words = []
+    for i in range(5):
+        word = random.choice(words)
+        random_words.append(word)
+    verif_words = ", ".join(random_words)
+    emb = discord.Embed(
+        title=f"Verification words for {interaction.user.name}",
+        description='Please paste these verification words into your Roblox Profile Description'
+    )
+    emb.add_field(name="Verification words", value=f'`{verif_words}`', inline=False)
+    emb.set_footer(text="If Roblox Filtered these verification words, type \"New words\" to get a new ones")
+    await thread.send(embed=emb)
 
-    if con.content.lower() == 'continue':
-        words = verification_words
-        random_words = []
-        for i in range(5):
-            word = random.choice(words)
-            random_words.append(word)
-        verif_words = ", ".join(random_words)
-        emb = discord.Embed(title=f"Verification words for {interaction.user.name}", description='Please paste these verification words into your Roblox Profile Description')
-        emb.add_field(name="Verification words", value=f'`{verif_words}`', inline=False)
-        emb.set_footer(text="If Roblox Filtered these verification words, type \"New words\" to get a new ones")
-        await thread.send(embed=emb)
+    while True:
         await thread.send(f"Type `Done` when you are done")
-        def check(message):
-            return message.author == user
         done = await client.wait_for('message', check=check)
-        if done.content.lower() == 'done':
-            await member.add_roles(discord.utils.get(member.guild.roles, name="Members"))
-            await member.edit(nick=rouser.name)
-            await thread.send("Verification process complete, enjoy your stay!")
-            await thread.edit(name=f"{interaction.user.name} Verification (Completed)", locked=True)
-        else:
-            await thread.send("Couldn't verify your account, please try again later")
-            await thread.edit(name=f"{interaction.user.name} Verification (Failed)", locked=True)        
-
-        def check(message):
-            return message.author == user
-        
-        new_words = await client.wait_for('message', check=check)
-        if new_words.content.lower() == 'new words':
-            words = verification_words
-            random_words = []
-            for i in range(5):
-                word = random.choice(words)
-                random_words.append(word)
-            verif_words = ", ".join(random_words)
-            emb = discord.Embed(title=f"New verification words for {interaction.user.name}", description='Please paste these verification words into your Roblox Profile Description')
-            emb.add_field(name="Verification words", value=f'`{verif_words}`', inline=False)
-            emb.set_footer(text="If Roblox Filtered these verification words, type \"New words\" to get a new ones")
-            await thread.send(embed=emb)
-            await thread.send(f"Type `Done` when you are done")
-            def check(message):
-                return message.author == user
-            done = await client.wait_for('message', check=check)
-        if done.content.lower() == 'done':
-            await member.add_roles(discord.utils.get(member.guild.roles, name="Members"))
-            await member.edit(nick=rouser.name)
-            await thread.send("Verification process complete, enjoy your stay!")
-            await thread.edit(name=f"{interaction.user.name} Verification (Completed)", locked=True)
+        if done.content.lower() == 'done' and rouser.description == verif_words:
+            try:
+                await member.add_roles(discord.utils.get(member.guild.roles, name="Members"))
+                await member.edit(nick=rouser.name)
+                await thread.send("Verification process complete, enjoy your stay!")
+                await thread.edit(name=f"{interaction.user.name} Verification (Completed)", locked=True)
+                break
+            except discord.Forbidden:
+                await thread.send("Couldn't verify your account, contact bot developer `(Error code: 403)`")
+                await thread.edit(name=f"{interaction.user.name} Verification (Error)", locked=True)
+                await thread.send("@TheSkout#8213")
+                break
+            except discord.HTTPException:
+                await thread.send("Couldn't verify your account, contact bot developer `(Error code: 500)`")
+                await thread.edit(name=f"{interaction.user.name} Verification (Error)", locked=True)
+                await thread.send("@TheSkout#8213")
+                break
+        elif done.content.lower() == 'new words':
+            continue
         else:
             await thread.send("Couldn't verify your account, please try again later")
             await thread.edit(name=f"{interaction.user.name} Verification (Failed)", locked=True)
+            break
 
 
 @client.tree.command(name="commands-sync", description="force tree commands sync")
@@ -270,6 +289,8 @@ async def status(interaction: discord.Interaction):
     days, hours = divmod(hours, 24)
     if RoConnected == True:
         con = "<:icons_online:860123643395571713> Connected to Roblox"
+    elif RoConnected == None:
+        con = "<:icons_warning:908958943466893323> The bot haven\'t properly initialized, please contact bot developer"
     else:
         con = "<:icons_outage:868122243845206087> Roblox connection not established"
     emb = discord.Embed(title="Bot Status", description=None, color=BLUE)
