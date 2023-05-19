@@ -190,8 +190,8 @@ async def verify(interaction: discord.Interaction, member: discord.Member):
             return message.author == user
         done = await client.wait_for('message', check=check)
         if done.content.lower() == 'done':
-            await member.add_roles('Members')
-            await member.edit(name=rouser.name)
+            await member.add_roles(discord.utils.get(member.guild.roles, name="Members"))
+            await member.edit(nick=rouser.name)
             await thread.send("Verification process complete, enjoy your stay!")
             await thread.edit(name=f"{interaction.user.name} Verification (Completed)", locked=True)
         else:
@@ -217,13 +217,14 @@ async def verify(interaction: discord.Interaction, member: discord.Member):
             def check(message):
                 return message.author == user
             done = await client.wait_for('message', check=check)
-            if done.content.lower() == 'done':
-                await member.edit(name=rouser.name)
-                await thread.send("Verification process complete, enjoy your stay!")
-                await thread.edit(name=f"{interaction.user.name} Verification (Completed)")
-            else:
-                await thread.send("Couldn't verify your account, please try again later")
-                await thread.edit(name=f"{interaction.user.name} Verification (Failed)")
+        if done.content.lower() == 'done':
+            await member.add_roles(discord.utils.get(member.guild.roles, name="Members"))
+            await member.edit(nick=rouser.name)
+            await thread.send("Verification process complete, enjoy your stay!")
+            await thread.edit(name=f"{interaction.user.name} Verification (Completed)", locked=True)
+        else:
+            await thread.send("Couldn't verify your account, please try again later")
+            await thread.edit(name=f"{interaction.user.name} Verification (Failed)", locked=True)
 
 
 @client.tree.command(name="commands-sync", description="force tree commands sync")
