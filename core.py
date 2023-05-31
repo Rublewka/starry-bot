@@ -296,7 +296,7 @@ async def status(interaction: discord.Interaction):
     emb = discord.Embed(title="Bot Status", description=None, color=BLUE)
     emb.add_field(name="Latency", value=f"{ping_emoji} `{ping * 1000:.0f}ms`", inline=False)
     emb.add_field(name="Roblox", value=f"{con}", inline=False)
-    emb.add_field(name="Uptime", value=f"<:trelloClock:632444546348744717> I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`", inline=False)
+    emb.add_field(name="Uptime", value=f"<:clock:1113391359274000394> I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
     await interaction.followup.send(embed=emb)
 
