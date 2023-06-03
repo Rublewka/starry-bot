@@ -188,7 +188,7 @@ async def get_rouser_info(roblox_username: str, thread: discord.Thread) -> dict:
     await thread.send(embed=emb)
     return rouser
 
-@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
+#@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
 async def verify_member(interaction: discord.Interaction, member: discord.Member):
     thread = await get_verification_thread(interaction)
 
