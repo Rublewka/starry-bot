@@ -246,7 +246,7 @@ async def verify_member(interaction: discord.Interaction, member: discord.Member
             break
 
 
-@client.tree.command(name="commands-sync", description="force tree commands sync")
+#@client.tree.command(name="commands-sync", description="force tree commands sync")
 async def sync(interaction: discord.Interaction):
     GREEN = "\033[1;32m"
     YELLOW = "\033[1;33m"
@@ -257,7 +257,7 @@ async def sync(interaction: discord.Interaction):
     await interaction.followup.send(f"Slash commands synced")
     logger.info(f"{YELLOW}Discord{RESET} application commands {CYAN}synced{RESET} {GREEN}successfully{RESET}")
 
-@client.tree.command(name='rename', description='Rename Bot')
+#@client.tree.command(name='rename', description='Rename Bot')
 async def rename(interaction: discord.Interaction, name: str):
     await interaction.response.defer(ephemeral=True, thinking=True)
     await client.user.edit(username=name)
@@ -301,7 +301,7 @@ async def status(interaction: discord.Interaction):
     await interaction.followup.send(embed=emb)
 
 # Help
-@client.tree.command(name="help", description="Show help for the bot")
+#@client.tree.command(name="help", description="Show help for the bot")
 async def help(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         await interaction.followup.send("""
@@ -332,7 +332,7 @@ async def version(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=False, thinking=True)
     await interaction.followup.send(f"{client.user.mention} current version: `{settings['VERSION']}`")
 
-@client.tree.command(name="getuser", description="Get user info from Roblox")
+#@client.tree.command(name="getuser", description="Get user info from Roblox")
 async def getuser(interaction: discord.Interaction, user: discord.User):
     if RoConnected == True:
         await interaction.response.defer(ephemeral=False, thinking=True)
