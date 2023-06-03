@@ -338,7 +338,7 @@ async def getuser(interaction: discord.Interaction, user: discord.User):
         await interaction.response.defer(ephemeral=False, thinking=True)
         discordId = user.id
         r = requests.get(
-            f'https://registry.rover.link/api/guilds/1018415075255668746/discord-to-roblox/{discordId}',
+            f'https://registry.rover.link/api/guilds/1114512962842021908/discord-to-roblox/{discordId}',
             headers={'Authorization': f'Bearer {rvr_token}'},
             timeout=10)
         data = r.json()
