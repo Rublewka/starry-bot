@@ -208,7 +208,7 @@ async def get_rouser_info(roblox_username: str, thread: discord.Thread) -> dict:
     await thread.send(embed=emb)
     return rouser
 
-@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
+#@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
 async def verify_member(interaction: discord.Interaction, member: discord.Member):
     thread = await get_verification_thread(interaction)
 
@@ -266,7 +266,7 @@ async def verify_member(interaction: discord.Interaction, member: discord.Member
             break
 
 
-@client.tree.command(name="commands-sync", description="force tree commands sync")
+#@client.tree.command(name="commands-sync", description="force tree commands sync")
 async def sync(interaction: discord.Interaction):
     GREEN = "\033[1;32m"
     YELLOW = "\033[1;33m"
@@ -331,12 +331,12 @@ async def status(interaction: discord.Interaction):
     emb = discord.Embed(title="Bot Status", description=None, color=BLUE)
     emb.add_field(name="Latency", value=f"{ping_emoji} `{ping * 1000:.0f}ms`", inline=False)
     emb.add_field(name="Roblox", value=f"{con}", inline=False)
-    emb.add_field(name="Uptime", value=f"<:icons_clock:964491800465276940> I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`", inline=False)
+    emb.add_field(name="Uptime", value=f"<:clock:1113391359274000394> I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
     await interaction.followup.send(embed=emb)
 
 # Help
-@client.tree.command(name="help", description="Show help for the bot")
+#@client.tree.command(name="help", description="Show help for the bot")
 async def help(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         await interaction.followup.send("""
@@ -373,7 +373,7 @@ async def getuser(interaction: discord.Interaction, user: discord.User):
         await interaction.response.defer(ephemeral=False, thinking=True)
         discordId = user.id
         r = requests.get(
-            f'https://registry.rover.link/api/guilds/1018415075255668746/discord-to-roblox/{discordId}',
+            f'https://registry.rover.link/api/guilds/1114512962842021908/discord-to-roblox/{discordId}',
             headers={'Authorization': f'Bearer {rvr_token}'},
             timeout=10)
         data = r.json()
