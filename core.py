@@ -44,6 +44,26 @@ async def status_swap():
         await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=f"/help"))
         await asyncio.sleep(15)
 
+
+async def monitor():
+    while True:
+        ping = client.ws.latency
+        url = 'https://api.instatus.com/v3/integrations/webhook/cliehlm797489b4n847c3cv2m'
+        if ping > 0.40000000000000000:
+            data = {"trigger": "down"}
+            response = requests.post(url, data)
+        else:
+            data = {"trigger": "up"}
+            response = requests.post(url, data)
+        inccrt = '{"message":"Incident created"}'    
+        incupd = '{"message":"Incident updated"}'
+        if response == inccrt:
+            pass
+        elif response == incupd:
+            pass
+        else:
+            pass
+        await asyncio.sleep(60)
 #startup
 @client.event
 async def on_ready(): 
@@ -57,6 +77,7 @@ async def on_ready():
     PURPLE = "\033[1;35m"
     RESET = "\033[0m"
     client.loop.create_task(status_swap())
+    client.loop.create_task(monitor())
     dsc_err_channel = client.get_channel(1094687676151648286)
     logger.info(f"Starting up {client.user.name}#{client.user.discriminator}")
     logger.info(f"--{PURPLE}Discord{RESET}--")
@@ -91,6 +112,7 @@ async def on_ready():
         await dsc_err_channel.send(message)
         logger.error(f"{YELLOW}Roblox session{RESET} {RED}could not initialize{RESET}")
         RoConnected = False
+
         
 
     
@@ -186,7 +208,7 @@ async def get_rouser_info(roblox_username: str, thread: discord.Thread) -> dict:
     await thread.send(embed=emb)
     return rouser
 
-@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
+#@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
 async def verify_member(interaction: discord.Interaction, member: discord.Member):
     thread = await get_verification_thread(interaction)
     await interaction.response.defer(ephemeral=True, thinking=True)
@@ -246,7 +268,7 @@ async def verify_member(interaction: discord.Interaction, member: discord.Member
             break
 
 
-@client.tree.command(name="commands-sync", description="force tree commands sync")
+#@client.tree.command(name="commands-sync", description="force tree commands sync")
 async def sync(interaction: discord.Interaction):
     GREEN = "\033[1;32m"
     YELLOW = "\033[1;33m"
@@ -256,6 +278,21 @@ async def sync(interaction: discord.Interaction):
     await client.tree.sync()
     await interaction.followup.send(f"Slash commands synced")
     logger.info(f"{YELLOW}Discord{RESET} application commands {CYAN}synced{RESET} {GREEN}successfully{RESET}")
+
+@client.tree.command(name="group-shout", description="Set new group shout")
+async def group_shout(interaction: discord.Interaction, shout: str):
+    group = await RoClient.get_group(16965138)
+    prev_shout = group.shout.body
+    await group.update_shout(message=shout)
+    new_shout = group.shout.body
+    emb = discord.Embed(title="Updated group shout")
+    emb.add_field(name="Previous shout:", value=f"{prev_shout}")
+    emb.add_field(name="New shout:", value=f"{new_shout}")
+    await interaction.response.defer(ephemeral=True, thinking=True)
+    await interaction.followup.send(embed=emb)
+
+
+
 
 @client.tree.command(name='rename', description='Rename Bot')
 async def rename(interaction: discord.Interaction, name: str):
@@ -302,7 +339,7 @@ async def status(interaction: discord.Interaction):
     await interaction.followup.send(embed=emb)
 
 # Help
-@client.tree.command(name="help", description="Show help for the bot")
+#@client.tree.command(name="help", description="Show help for the bot")
 async def help(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         await interaction.followup.send("""
@@ -340,7 +377,7 @@ async def getuser(interaction: discord.Interaction, user: discord.User):
         await interaction.response.defer(ephemeral=False, thinking=True)
         discordId = user.id
         r = requests.get(
-            f'https://registry.rover.link/api/guilds/1018415075255668746/discord-to-roblox/{discordId}',
+            f'https://registry.rover.link/api/guilds/1114512962842021908/discord-to-roblox/{discordId}',
             headers={'Authorization': f'Bearer {rvr_token}'},
             timeout=10)
         data = r.json()
