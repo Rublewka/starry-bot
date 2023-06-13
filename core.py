@@ -15,9 +15,7 @@ from src.verif_words import verification_words
 from src.aclient import client as aclient
 from dotenv import load_dotenv
 from discord.ext import commands
-from discord.abc import PrivateChannel
-from discord.utils import get
-from discord import app_commands, ChannelType
+from discord import app_commands
 from roblox import Client
 from config import settings
 from src import log, art, personas, responses
@@ -86,7 +84,7 @@ async def on_ready():
         logger.info(f"{YELLOW}Roblox session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
         RoConnected = True
     elif roconnect() == None:
-        logger.error(f"{YELLOW}Bot inizialize{RESET} {RED}incomplete{RESET}")
+        logger.error(f"{YELLOW}Bot inizializition{RESET} {RED}incomplete{RESET}")
         RoConnected = None
     else:
         message = f'`Could not connect to Roblox Gateway. Please check your internet connection and try again.`'
@@ -191,6 +189,8 @@ async def get_rouser_info(roblox_username: str, thread: discord.Thread) -> dict:
 @client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
 async def verify_member(interaction: discord.Interaction, member: discord.Member):
     thread = await get_verification_thread(interaction)
+    await interaction.response.defer(ephemeral=True, thinking=True)
+    await interaction.response.send_message('Opened new verification thread for you')
 
     roblox_username = await get_roblox_username(interaction, thread)
     rouser = await get_rouser_info(roblox_username, thread)
@@ -263,7 +263,8 @@ async def rename(interaction: discord.Interaction, name: str):
     await client.user.edit(username=name)
     await interaction.followup.send(f'Renamed bot to {name}')
 
-# Ping
+
+
 @client.tree.command(name="status", description='Shows bot\'s status')
 async def status(interaction: discord.Interaction):
     # Get the websocket latency
@@ -288,14 +289,14 @@ async def status(interaction: discord.Interaction):
     minutes, seconds = divmod(remainder, 60)
     days, hours = divmod(hours, 24)
     if RoConnected == True:
-        con = "<:icons_online:860123643395571713> Connected to Roblox"
+        con = "<:icons_online:860123643395571713> Connected to Roblox API"
     elif RoConnected == None:
         con = "<:icons_warning:908958943466893323> The bot haven\'t properly initialized, please contact bot developer"
     else:
-        con = "<:icons_outage:868122243845206087> Roblox connection not established"
+        con = "<:icons_outage:868122243845206087> Not connected to Roblox API"
     emb = discord.Embed(title="Bot Status", description=None, color=BLUE)
     emb.add_field(name="Latency", value=f"{ping_emoji} `{ping * 1000:.0f}ms`", inline=False)
-    emb.add_field(name="Roblox", value=f"{con}", inline=False)
+    emb.add_field(name="Roblox API", value=f"{con}", inline=False)
     emb.add_field(name="Uptime", value=f"<:clock:1113391359274000394> I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
     await interaction.followup.send(embed=emb)
@@ -314,6 +315,7 @@ async def help(interaction: discord.Interaction):
 
 <:roblox:1023778640145694740> **Roblox** 
 > - `/getuser` Get user info from Roblox
+> - `/verify` Verify yourself with Roblox account
 
 <:gpt:1099041860971933767> **ChatGPT** 
 > - `/chat [message]` Chat with ChatGPT!
@@ -323,7 +325,7 @@ async def help(interaction: discord.Interaction):
 > - `/reset` Clear ChatGPT conversation history (Please note: It does not clear message history in channel)
 
 
-<a:warningbug:905560995886411806> *The Bot is still in heavy development, more commands and functions are coming in future* <a:warningbug:905560995886411806>
+<:icons_warning:908958943466893323> *The Bot is still in heavy development, more commands and functions are coming in future* <:icons_warning:908958943466893323>
 """)
 
 
