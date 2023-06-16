@@ -45,7 +45,7 @@ async def status_swap():
         await asyncio.sleep(15)
 
 
-async def monitor():
+#async def monitor():
     while True:
         ping = client.ws.latency
         url = 'https://api.instatus.com/v3/integrations/webhook/cliehlm797489b4n847c3cv2m'
@@ -77,7 +77,7 @@ async def on_ready():
     PURPLE = "\033[1;35m"
     RESET = "\033[0m"
     client.loop.create_task(status_swap())
-    client.loop.create_task(monitor())
+#    client.loop.create_task(monitor())
     dsc_err_channel = client.get_channel(1094687676151648286)
     logger.info(f"Starting up {client.user.name}#{client.user.discriminator}")
     logger.info(f"--{PURPLE}Discord{RESET}--")
@@ -290,6 +290,14 @@ async def group_shout(interaction: discord.Interaction, shout: str):
     emb.add_field(name="New shout:", value=f"{new_shout}")
     await interaction.response.defer(ephemeral=True, thinking=True)
     await interaction.followup.send(embed=emb)
+
+
+
+@client.tree.command(name="set-rank", description="Set new rank")
+async def setrank(interaction: discord.Interaction, user: str, rank: str):
+    group = RoClient.get_group(16965138)
+    target_user = RoClient.get_user_by_username(user)
+    
 
 
 
