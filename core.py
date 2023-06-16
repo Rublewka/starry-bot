@@ -84,7 +84,11 @@ async def on_ready():
     logger.info(f"{RED}Bot Name:{RESET}  {client.user.name}")
     logger.info(f"{RED}Bot ID:{RESET}  {client.user.id}")
     logger.info(f"{RED}Bot Version:{RESET}  {settings['VERSION']}")
-    await client.tree.sync()
+    try:
+        await client.tree.sync()
+        logger.info(f"{YELLOW}Discord client tree commands{RESET} {CYAN}synced{RESET} {GREEN}successfully{RESET}")
+    except:
+        logger.warning("not synced")
     logger.info(f"{YELLOW}Discord session{RESET} {GREEN}successfully{RESET} {CYAN}initialized{RESET}")
     logger.info(f"--{MAGENTA}Roblox{RESET}--")
     global start_time
@@ -208,7 +212,7 @@ async def get_rouser_info(roblox_username: str, thread: discord.Thread) -> dict:
     await thread.send(embed=emb)
     return rouser
 
-#@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
+@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
 async def verify_member(interaction: discord.Interaction, member: discord.Member):
     thread = await get_verification_thread(interaction)
     await interaction.response.defer(ephemeral=True, thinking=True)
@@ -347,7 +351,7 @@ async def status(interaction: discord.Interaction):
     await interaction.followup.send(embed=emb)
 
 # Help
-#@client.tree.command(name="help", description="Show help for the bot")
+@client.tree.command(name="help", description="Show help for the bot")
 async def help(interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         await interaction.followup.send("""
@@ -361,10 +365,10 @@ async def help(interaction: discord.Interaction):
 <:roblox:1023778640145694740> **Roblox** 
 > - `/getuser` Get user info from Roblox
 > - `/verify` Verify yourself with Roblox account
+> - `/group-shout` Updates Roblox group shout
 
 <:gpt:1099041860971933767> **ChatGPT** 
-> - `/chat [message]` Chat with ChatGPT!
-> - `/draw [prompt]` Generate an image with the Dalle2 model
+> - `/chat [prompt]` Chat with ChatGPT!
 > - `/private` ChatGPT switch to private mode
 > - `/public` ChatGPT switch to public mode
 > - `/reset` Clear ChatGPT conversation history (Please note: It does not clear message history in channel)
