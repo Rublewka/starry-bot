@@ -350,6 +350,7 @@ async def status(interaction: discord.Interaction):
     emb.add_field(name="Roblox API", value=f"{con}", inline=False)
     emb.add_field(name="Uptime", value=f"<:clock:1113391359274000394> I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
+    emb.add_field(name="Commands ran this session", value=f"I've ran `{command_ran}` this session")
     await interaction.followup.send(embed=emb)
     command_ran + 1
 
