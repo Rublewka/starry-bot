@@ -129,6 +129,8 @@ async def on_ready():
 
 # variables section
 
+command_ran = 0
+
 rvr_token = 'rvr2b087uhj4acpftd4vs7dbvgyow4a5ujfz2hkvs0w4j5nzzq8gdftgcadrewulalkx'
 
 # ___________
@@ -297,7 +299,7 @@ async def group_shout(interaction: discord.Interaction, shout: str):
 
 
 
-@client.tree.command(name="set-rank", description="Set new rank")
+#@client.tree.command(name="set-rank", description="Set new rank")
 async def setrank(interaction: discord.Interaction, user: str, rank: str):
     group = RoClient.get_group(16965138)
     target_user = RoClient.get_user_by_username(user)
@@ -349,6 +351,7 @@ async def status(interaction: discord.Interaction):
     emb.add_field(name="Uptime", value=f"<:clock:1113391359274000394> I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
     await interaction.followup.send(embed=emb)
+    command_ran + 1
 
 # Help
 @client.tree.command(name="help", description="Show help for the bot")
