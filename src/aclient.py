@@ -8,7 +8,7 @@ from revChatGPT.V3 import Chatbot
 from revChatGPT.V1 import AsyncChatbot
 
 
-logger = log.setup_logger(__name__)
+#logger = log.setup_logger(__name__)
 load_dotenv()
 
 config_dir = os.path.abspath(f"{__file__}/../../")
@@ -111,7 +111,7 @@ class aclient(discord.Client):
                 await message.channel.send("> **ERROR: Something went wrong, please try again later!**")
             else:
                 await message.followup.send("> **ERROR: Something went wrong, please try again later!**")
-            logger.exception(f"Error while sending message: {e}")
+#            logger.exception(f"Error while sending message: {e}")
 
 #    async def send_start_prompt(self):
 #        import os.path

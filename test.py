@@ -1,13 +1,14 @@
-import random
+import sqlite3 as sql
 
-words = ['apple', 'banana', 'orange', 'pear', 'grape', 'pineapple', 'mango']
+db = sql.connect('test.db')
 
-random_words = []
+cursor = db.cursor()
 
-for i in range(5):
-    word = random.choice(words)
-    random_words.append(word)
-
-print(random_words)
-
+cursor.execute('''CREATE TABLE IF NOT EXISTS users (discordid TEXT, robloxid TEXT, username TEXT)''')               
+cursor.execute('''INSERT INTO users VALUES ('123456789', '987654321', 'TheSkout001')''')
+cursor.execute('''SELECT * FROM users''')
+rows = cursor.fetchall()
+for row in rows:
+    print(row)
+db.commit()
 

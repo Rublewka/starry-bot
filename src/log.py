@@ -13,7 +13,7 @@ class CustomFormatter(logging.Formatter):
     ]
     FORMATS = {
         level: logging.Formatter(
-            f'\x1b[30;1m%(asctime)s\x1b[0m {color}%(levelname)-4s\x1b[0m \x1b[35m%(name)s\x1b[0m -> %(message)s',
+            f'\x1b[30;1m%(asctime)s\x1b[0m {color}%(levelname)-4s\x1b[0m     \x1b[35m%(name)s\x1b[0m -> %(message)s',
             '%Y-%m-%d %H:%M:%S'
         )
         for level, color in LEVEL_COLORS
@@ -38,7 +38,7 @@ class CustomFormatter(logging.Formatter):
 
 def setup_logger(module_name:str) -> logging.Logger:
     # create logger
-    library, _, _ = module_name.partition('.py')
+    library = module_name.partition('.py')[0]
     logger = logging.getLogger(library)
     logger.setLevel(logging.INFO)
 
