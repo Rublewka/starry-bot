@@ -26,3 +26,6 @@ yarl==1.8.2
 email-sender==1.2
 roblox==2.0.0
 python_dotenv==1.0.0
+openai==0.27.8
+revChatGPT==6.8.6
+asgiref==3.7.2
