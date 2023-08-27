@@ -14,7 +14,7 @@ import openai
 import logging
 from roblox import AvatarThumbnailType
 from src.verif_words import verification_words
-from src.aclient import client as aclient
+#from src.aclient import client as aclient
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord import app_commands
@@ -30,23 +30,24 @@ RoClient = Client(os.getenv("ROBLOXTOKEN"))
 logger = log.setup_logger(__name__)
 # setup end
 
+run_nightly = False
 
 RoConnected = None
 
-webhook_url = 'https://discord.com/api/webhooks/1121071054664781844/ANWk7zM02ZnXvDZibg-uNvxTtHKi6sdG5GteFLKW8k53Cuxigfd3BtCtR4J7NgEznrWe'
-webhook = DiscordWebhook(url=webhook_url)
-class DiscordHandler(logging.Handler):
-    def emit(self, record):
-        log_entry = self.format(record)  # Format the log message
-        webhook.content = log_entry      # Set the webhook content to the log message
-        response = webhook.execute()     # Send the webhook to Discord
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#webhook_url = 'https://discord.com/api/webhooks/1121071054664781844/ANWk7zM02ZnXvDZibg-uNvxTtHKi6sdG5GteFLKW8k53Cuxigfd3BtCtR4J7NgEznrWe'
+#webhook = DiscordWebhook(url=webhook_url)
+#class DiscordHandler(logging.Handler):
+#    def emit(self, record):
+#        log_entry = self.format(record)  # Format the log message
+#        webhook.content = log_entry      # Set the webhook content to the log message
+#        response = webhook.execute()     # Send the webhook to Discord
+#logger = logging.getLogger(__name__)
+#logger.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter('%(levelname)s - `%(message)s`')
-handler = DiscordHandler()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+#formatter = logging.Formatter('%(levelname)s - `%(message)s`')
+#handler = DiscordHandler()
+#handler.setFormatter(formatter)
+#logger.addHandler(handler)
 
 #logger.debug('This is a debug message')
 #logger.info('This is an info message')
@@ -417,7 +418,7 @@ async def version(interaction: discord.Interaction):
     global commands_ran
     commands_ran += 1
     await interaction.response.defer(ephemeral=False, thinking=True)
-    await interaction.followup.send(f"{client.user.mention} current version: `{settings['VERSION']}`")
+    await interaction.followup.send(f"I'm running `{settings['VERSION']}` version")
 
 @client.tree.command(name="getuser", description="Get user info from Roblox")
 async def getuser(interaction: discord.Interaction, user: discord.User):
@@ -897,6 +898,10 @@ async def switchpersona(interaction: discord.Interaction, persona: app_commands.
 
 
 
+if run_nightly == True:
+				  DISTOKEN = settings['NIGHTLY_TOKEN']
+else:
+				  DISTOKEN = settings['TOKEN']
 
 
 
@@ -921,5 +926,4 @@ async def switchpersona(interaction: discord.Interaction, persona: app_commands.
 
 
 
-
-client.run (settings['TOKEN']) #DON'T TOUCH IT
+client.run (DISTOKEN) #DON'T TOUCH IT
