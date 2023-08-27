@@ -11,7 +11,8 @@ import discord
 import requests
 import urllib.request
 import openai
-import logging
+from logging import *
+from dislog import DiscordWebhookHandler
 from roblox import AvatarThumbnailType
 from src.verif_words import verification_words
 #from src.aclient import client as aclient
@@ -34,26 +35,16 @@ run_nightly = False
 
 RoConnected = None
 
-#webhook_url = 'https://discord.com/api/webhooks/1121071054664781844/ANWk7zM02ZnXvDZibg-uNvxTtHKi6sdG5GteFLKW8k53Cuxigfd3BtCtR4J7NgEznrWe'
-#webhook = DiscordWebhook(url=webhook_url)
-#class DiscordHandler(logging.Handler):
-#    def emit(self, record):
-#        log_entry = self.format(record)  # Format the log message
-#        webhook.content = log_entry      # Set the webhook content to the log message
-#        response = webhook.execute()     # Send the webhook to Discord
-#logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
+webhook_url = "https://discord.com/api/webhooks/1121071054664781844/ANWk7zM02ZnXvDZibg-uNvxTtHKi6sdG5GteFLKW8k53Cuxigfd3BtCtR4J7NgEznrWe"
 
-#formatter = logging.Formatter('%(levelname)s - `%(message)s`')
-#handler = DiscordHandler()
-#handler.setFormatter(formatter)
-#logger.addHandler(handler)
+
+basicConfig(level=ERROR, handlers=[StreamHandler(), DiscordWebhookHandler(webhook_url, text_send_on_error="<@1006501114419630081>")])
 
 #logger.debug('This is a debug message')
 #logger.info('This is an info message')
 #logger.warning('This is a warning message')
-#logger.error('This is an error message')
-#logger.critical('This is a critical message')
+#error('hi')
+#critical('This is a critical message')
 
 async def status_swap():
     while True:
@@ -103,18 +94,18 @@ async def on_ready():
     client.loop.create_task(status_swap())
 #    client.loop.create_task(monitor())
     dsc_err_channel = client.get_channel(1094687676151648286)
-    logger.info(f"Starting up {client.user.name}#{client.user.discriminator}")
-    logger.info(f"--Discord--")
-    logger.info(f"Bot Name:  {client.user.name}")
-    logger.info(f"Bot ID:  {client.user.id}")
-    logger.info(f"Bot Version:  {settings['VERSION']}")
+    print(f"Starting up {client.user.name}#{client.user.discriminator}")
+    print(f"--Discord--")
+    print(f"Bot Name:  {client.user.name}")
+    print(f"Bot ID:  {client.user.id}")
+    print(f"Bot Version:  {settings['VERSION']}")
     try:
         await client.tree.sync()
-        logger.info(f"Discord client tree commands synced successfully")
+        print(f"Discord client tree commands synced successfully")
     except:
-        logger.warning("not synced")
-    logger.info(f"Discord session successfully initialized")
-    logger.info(f"--Roblox--")
+        error("Discord slash commands not synced")
+    print(f"Discord session successfully initialized")
+    print(f"--Roblox--")
     global start_time
     start_time = datetime.datetime.now()
 
@@ -128,17 +119,17 @@ async def on_ready():
     if roconnect():
         global RoConnected
         user = await RoClient.get_authenticated_user()
-        logger.info(f"Roblox ID:  {user.id}")
-        logger.info(f"Roblox Name: {user.name}")
-        logger.info(f"Roblox session successfully initialized")
+        print(f"Roblox ID:  {user.id}")
+        print(f"Roblox Name: {user.name}")
+        print(f"Roblox session successfully initialized")
         RoConnected = True
     elif roconnect() == None:
-        logger.error(f"Bot inizializition incomplete")
+        error(f"Bot inizializition incomplete")
         RoConnected = None
     else:
         message = f'`Could not connect to Roblox API Services. Please check your internet connection and try again.`'
         await dsc_err_channel.send(message)
-        logger.error(f"Roblox session could not initialize")
+        error(f"Roblox session could not initialize")
         RoConnected = False
 
         
@@ -309,7 +300,7 @@ async def sync(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True, thinking=True)
     await client.tree.sync()
     await interaction.followup.send(f"Slash commands synced")
-    logger.info(f"Discord application commands synced successfully")
+    print(f"Discord application commands synced successfully")
 
 @client.tree.command(name="group-shout", description="Set new group shout")
 async def group_shout(interaction: discord.Interaction, shout: str):
