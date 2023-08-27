@@ -30,4 +30,4 @@ openai==0.27.9
 revChatGPT==6.8.6
 asgiref==3.7.2
 discord-webhook==1.3.0
-discord-webhook-logger==1.2.0
+dislog[discordpy]==3.0.0
