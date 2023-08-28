@@ -15,7 +15,7 @@ from logging import *
 from dislog import DiscordWebhookHandler
 from roblox import AvatarThumbnailType
 from src.verif_words import verification_words
-#from src.aclient import client as aclient
+from src.aclient import client as aclient
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord import app_commands
