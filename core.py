@@ -15,15 +15,17 @@ from logging import *
 from dislog import DiscordWebhookHandler
 from roblox import AvatarThumbnailType
 from src.verif_words import verification_words
-from src.aclient import client as aclient
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord import app_commands
 from discord_webhook import DiscordWebhook
 from roblox import Client
 from config import settings
-from src import log, art, personas, responses
+
+
+
 prefix = settings['PREFIX']
+
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
 load_dotenv()
