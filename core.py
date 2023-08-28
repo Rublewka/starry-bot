@@ -30,7 +30,6 @@ client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREF
 client.remove_command('help') 
 load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
-logger = log.setup_logger(__name__)
 # setup end
 
 run_nightly = False
