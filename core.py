@@ -395,7 +395,7 @@ async def getuser(interaction: discord.Interaction, user: discord.User):
         data = r.json()
         json_str = json.dumps(data)
         resp = json.loads(json_str)
-        debug(resp) #use if debug needed
+        print(resp)
         ruser = await RoClient.get_user(resp['robloxId'])
         if ruser.description == '':
            desc = '*None*'
