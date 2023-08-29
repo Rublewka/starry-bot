@@ -23,5 +23,5 @@ jobs:
             - name: execute py script # run file
               run: |
                 python 
-                ./.github/actions/auto_restart.py
+                .github/workflows/Actions/auto_restart.py
           
