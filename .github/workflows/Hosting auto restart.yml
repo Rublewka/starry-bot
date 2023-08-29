@@ -21,7 +21,5 @@ jobs:
                   python -m pip install --upgrade pip
                   python -m pip install requests
             - name: execute py script # run file
-              run: |
-                python 
-                auto_restart.py
+              run: python auto_restart.py
           
