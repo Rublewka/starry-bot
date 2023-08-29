@@ -3,7 +3,7 @@ name: Hosting auto restart
 on:
   push:
     branches:
-      - production
+      - main
 
 jobs:
   build:
