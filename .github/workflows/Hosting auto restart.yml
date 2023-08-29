@@ -23,5 +23,5 @@ jobs:
             - name: execute py script # run file
               run: |
                 python 
-                auto_restart.py
+                ./.github/actions/auto_restart.py
           
