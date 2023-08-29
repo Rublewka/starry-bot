@@ -1,0 +1,27 @@
+name: Hosting auto restart
+
+on:
+  push:
+    branches:
+      - min
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  send:
+    name: Send POST request from GitHub Actions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send post request
+        uses: satak/webrequest-action@v1.2.4
+        with:
+          url: wss://control.bot-hosting.net/api/server/723d4729/ws
+          method: POST
+          payload: '{"event":"auth","args":["ptlc_XXfLM4wlfgG6GvZ35VjdhLpvAy2Fs5lrgj839DsIsSZ"]}'
+      - name: Send post request
+        uses: satak/webrequest-action@v1.2.4
+        with:
+          url: wss://control.bot-hosting.net/api/server/723d4729/ws
+          method: POST
+          payload: {"event":"set state","args":["restart"]}
