@@ -28,7 +28,7 @@ load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 
-run_nightly = True
+run_nightly = False
 
 RoConnected = None
 
@@ -57,30 +57,10 @@ async def status_swap():
         await asyncio.sleep(15)
 
 
-#async def monitor():
-    while True:
-        ping = client.ws.latency
-        url = 'https://api.instatus.com/v3/integrations/webhook/cliehlm797489b4n847c3cv2m'
-        if ping > 0.40000000000000000:
-            data = {"trigger": "down"}
-            response = requests.post(url, data)
-        else:
-            data = {"trigger": "up"}
-            response = requests.post(url, data)
-        inccrt = '{"message":"Incident created"}'    
-        incupd = '{"message":"Incident updated"}'
-        if response == inccrt:
-            pass
-        elif response == incupd:
-            pass
-        else:
-            pass
-        await asyncio.sleep(500)
 #startup
 @client.event
 async def on_ready(): 
     client.loop.create_task(status_swap())
-#    client.loop.create_task(monitor())
     dsc_err_channel = client.get_channel(1094687676151648286)
     print(f"Starting up {client.user.name}#{client.user.discriminator}")
     print(f"--Discord--")
