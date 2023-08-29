@@ -3,9 +3,6 @@ name: Hosting auto restart
 on:
   push:
     branches:
-      - min
-  pull_request:
-    branches:
       - main
 
 jobs:
