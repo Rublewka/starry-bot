@@ -5,20 +5,16 @@ import os.path
 import asyncio
 import datetime
 import random
-import sqlite3 as sql
-from random import randrange
 import discord
 import requests
 import urllib.request
-import openai
+import logging
 from logging import *
 from dislog import DiscordWebhookHandler
 from roblox import AvatarThumbnailType
 from src.verif_words import verification_words
 from dotenv import load_dotenv
 from discord.ext import commands
-from discord import app_commands
-from discord_webhook import DiscordWebhook
 from roblox import Client
 from config import settings
 
@@ -32,14 +28,14 @@ load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 
-run_nightly = False
+run_nightly = True
 
 RoConnected = None
 
-webhook_url = "https://discord.com/api/webhooks/1121071054664781844/ANWk7zM02ZnXvDZibg-uNvxTtHKi6sdG5GteFLKW8k53Cuxigfd3BtCtR4J7NgEznrWe"
+bot_logs_webhook_url = "https://discord.com/api/webhooks/1121071054664781844/ANWk7zM02ZnXvDZibg-uNvxTtHKi6sdG5GteFLKW8k53Cuxigfd3BtCtR4J7NgEznrWe"
 
 
-basicConfig(level=ERROR, handlers=[StreamHandler(), DiscordWebhookHandler(webhook_url, text_send_on_error="<@1006501114419630081>")])
+basicConfig(level=INFO, handlers=[StreamHandler(), DiscordWebhookHandler(bot_logs_webhook_url, text_send_on_error="<@1006501114419630081>")])
 
 #logger.debug('This is a debug message')
 #logger.info('This is an info message')
@@ -79,19 +75,10 @@ async def status_swap():
             pass
         else:
             pass
-        await asyncio.sleep(60)
+        await asyncio.sleep(500)
 #startup
 @client.event
 async def on_ready(): 
-    RED = "\033[1;31m"
-    GREEN = "\033[1;32m"
-    YELLOW = "\033[1;33m"
-    BLUE = "\u001b[34m"
-    MAGENTA = "\033[1;35m"
-    CYAN = "\033[1;36m"
-    GRAY = "\033[1;30m"
-    PURPLE = "\033[1;35m"
-    RESET = "\033[0m"
     client.loop.create_task(status_swap())
 #    client.loop.create_task(monitor())
     dsc_err_channel = client.get_channel(1094687676151648286)
@@ -102,9 +89,9 @@ async def on_ready():
     print(f"Bot Version:  {settings['VERSION']}")
     try:
         await client.tree.sync()
-        print(f"Discord client tree commands synced successfully")
+        info(f"Discord client tree commands synced successfully")
     except:
-        error("Discord slash commands not synced")
+        warn("Discord slash commands not synced")
     print(f"Discord session successfully initialized")
     print(f"--Roblox--")
     global start_time
@@ -128,9 +115,8 @@ async def on_ready():
         error(f"Bot inizializition incomplete")
         RoConnected = None
     else:
-        message = f'`Could not connect to Roblox API Services. Please check your internet connection and try again.`'
-        await dsc_err_channel.send(message)
-        error(f"Roblox session could not initialize")
+        warn(f'`Could not connect to Roblox API. Try again later`')
+        warn(f"Roblox session could not fully initialize")
         RoConnected = False
 
         
@@ -290,50 +276,35 @@ async def verify_member(interaction: discord.Interaction, member: discord.Member
             break
 
 
-#@client.tree.command(name="commands-sync", description="force tree commands sync")
-async def sync(interaction: discord.Interaction):
-    GREEN = "\033[1;32m"
-    YELLOW = "\033[1;33m"
-    CYAN = "\033[1;36m"
-    RESET = "\033[0m"
-    await interaction.response.defer(ephemeral=True, thinking=True)
-    await client.tree.sync()
-    await interaction.followup.send(f"Slash commands synced")
-    print(f"Discord application commands synced successfully")
-
 @client.tree.command(name="group-shout", description="Set new group shout")
 async def group_shout(interaction: discord.Interaction, shout: str):
-    global commands_ran
-    commands_ran += 1
-    group = await RoClient.get_group(16965138)
-    prev_shout = group.shout.body
-    await group.update_shout(message=shout)
-    new_shout = group.shout.body
-    emb = discord.Embed(title="Updated group shout")
-    emb.add_field(name="Previous shout:", value=f"{prev_shout}")
-    emb.add_field(name="New shout:", value=f"{new_shout}")
-    await interaction.response.defer(ephemeral=False, thinking=True)
-    await interaction.followup.send(embed=emb)
+    if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in interaction.user.roles):
+        global commands_ran
+        commands_ran += 1
+        group = await RoClient.get_group(16965138)
+        prev_shout = group.shout.body
+        await group.update_shout(message=shout)
+        new_shout = group.shout.body
+        emb = discord.Embed(title="Updated group shout", colour=GREEN)
+        emb.add_field(name="Previous shout:", value=f"`{prev_shout}`")
+        emb.add_field(name="New shout:", value=f"`{new_shout}`")
+        await interaction.response.defer(ephemeral=False, thinking=True)
+        await interaction.followup.send(embed=emb)
+        logging.info(f"@{interaction.user.name} changed group shout to `{new_shout}` (Previous group shout - `{prev_shout}`)")
+    else:
+        emb = discord.Embed(title="Uh-uh", colour=RED)
+        emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687621411786772>")
+        await interaction.response.defer(ephemeral=True, thinking=False)
+        await interaction.followup.send(embed=emb)
+        logging.info(f"@{interaction.user.name} tried to run `/group-shout` command, but they had no sufficient perms")
 
 
-
+#TODO
 #@client.tree.command(name="set-rank", description="Set new rank")
 async def setrank(interaction: discord.Interaction, user: str, rank: str):
     group = RoClient.get_group(16965138)
     target_user = RoClient.get_user_by_username(user)
     
-
-
-
-
-#@client.tree.command(name='rename', description='Rename Bot')
-async def rename(interaction: discord.Interaction, name: str):
-    await interaction.response.defer(ephemeral=True, thinking=True)
-    await client.user.edit(username=name)
-    await interaction.followup.send(f'Renamed bot to {name}')
-
-
-
 @client.tree.command(name="status", description='Shows bot\'s status')
 async def status(interaction: discord.Interaction):
     # Get the websocket latency
@@ -424,7 +395,7 @@ async def getuser(interaction: discord.Interaction, user: discord.User):
         data = r.json()
         json_str = json.dumps(data)
         resp = json.loads(json_str)
-        print(resp) #use if debug needed
+        debug(resp) #use if debug needed
         ruser = await RoClient.get_user(resp['robloxId'])
         if ruser.description == '':
            desc = '*None*'
