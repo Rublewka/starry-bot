@@ -21,4 +21,4 @@ jobs:
         with:
           url: wss://control.bot-hosting.net/api/server/723d4729/ws
           method: POST
-          payload: {"event":"set state","args":["restart"]}
+          payload: '{"event":"set state","args":["restart"]}'
