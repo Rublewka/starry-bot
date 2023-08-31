@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from roblox import Client
 from config import settings
+from config import roles
 
 
 
@@ -28,7 +29,7 @@ load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 
-run_nightly = False
+run_nightly = True
 
 RoConnected = None
 
@@ -278,7 +279,6 @@ async def group_shout(interaction: discord.Interaction, shout: str):
         await interaction.followup.send(embed=emb)
         logging.info(f"@{interaction.user.name} tried to run `/group-shout` command, but they had no sufficient perms")
 
-
 #TODO
 #@client.tree.command(name="set-rank", description="Set new rank")
 async def setrank(interaction: discord.Interaction, user: str, rank: str):
@@ -333,21 +333,15 @@ async def help(interaction: discord.Interaction):
         await interaction.followup.send("""
 
 <:icons_generalinfo:866599434098835486> **Basic** 
-> - `/help` Shows this message
-> - `/version` Shows the bot's version
-> - `/status` Shows the bot's status
+> - </help:1119362371710898308> - Shows this message
+> - </version:1098672847469150248> - Shows the bot's version
+> - </status:1145344954936332291> Shows the bot's status
 
 
 <:roblox:1023778640145694740> **Roblox** 
-> - `/getuser` Get user info from Roblox
-> - `/verify` Verify yourself with Roblox account
-> - `/group-shout` Updates Roblox group shout
-
-<:gpt:1099041860971933767> **ChatGPT** 
-> - `/chat [prompt]` Chat with ChatGPT!
-> - `/private` ChatGPT switch to private mode
-> - `/public` ChatGPT switch to public mode
-> - `/reset` Clear ChatGPT conversation history (Please note: It does not clear message history in channel)
+> - </getuser:1114578145157320876> Get user info from Roblox
+> - </verify:1119362371710898307> Verify yourself with Roblox account
+> - </group-shout:1115625318238142486> Updates Roblox group shout
 
 
 <:icons_warning:908958943466893323> *The Bot is still in heavy development, more commands and functions are coming in future* <:icons_warning:908958943466893323>
