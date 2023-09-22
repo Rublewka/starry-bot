@@ -29,7 +29,7 @@ load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 
-run_nightly = False
+run_nightly = True
 
 RoConnected = None
 
