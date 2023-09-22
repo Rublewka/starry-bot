@@ -10,6 +10,7 @@ import requests
 import urllib.request
 import logging
 from logging import *
+from discord import app_commands
 from dislog import DiscordWebhookHandler
 from roblox import AvatarThumbnailType
 from src.verif_words import verification_words
@@ -17,6 +18,7 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from roblox import Client
 from config import settings
+from typing import List
 #from config import roles
 
 
@@ -280,11 +282,27 @@ async def group_shout(interaction: discord.Interaction, shout: str):
         logging.info(f"@{interaction.user.name} tried to run `/group-shout` command, but they had no sufficient perms")
 
 #TODO
-#@client.tree.command(name="set-rank", description="Set new rank")
-async def setrank(interaction: discord.Interaction, user: str, rank: str):
-    group = RoClient.get_group(16965138)
-    target_user = RoClient.get_user_by_username(user)
-    
+@client.tree.command(name="set-rank", description="Promote or Demote user")
+@app_commands.choices(choices=[
+    app_commands.Choice(name="Member", value="Member"),
+    app_commands.Choice(name="Admin", value="Admin")
+    ])
+async def set_rank(interaction: discord.Interaction, user: str, choices: app_commands.Choice[str]):
+    if (choices.value == "Member"):
+        rank_raw = 1
+    elif (choices.value == "Admin"):
+        rank_raw = 150
+    if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in interaction.user.roles):
+        global commands_ran
+        commands_ran += 1
+        await interaction.response.defer(ephemeral=False, thinking=True)
+        group = await RoClient.get_group(16965138)
+        target_user = await RoClient.get_user_by_username(user)
+        new_rank = await group.set_rank(user=f'{target_user.id}', rank=rank_raw)
+        emb=discord.Embed(title="Rank update", colour=GREEN)
+        emb.add_field(name="Success!", value=f"Updated `{target_user.name}` rank to {choices.value}")
+        await interaction.followup.send(embed=emb)
+        
 @client.tree.command(name="status", description='Shows bot\'s status')
 async def status(interaction: discord.Interaction):
     # Get the websocket latency
