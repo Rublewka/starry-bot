@@ -1,4 +1,4 @@
-name: Update Python Line by Line Number
+name: Staging for Deploy
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
         
-      - name: Update Python File
+      - name: run_nightly = False
         run: |
           LINE_NUMBER=34  # Replace with the desired line number
           NEW_LINE="run_nightly = False"  # Replace with the new content
@@ -29,5 +29,5 @@ jobs:
         continue-on-error: true
 
       - name: Deploy
-        run: hosting-deploy.yml
+        uses: ./.github/workflows/hosting-deploy.yml
         
