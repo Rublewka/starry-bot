@@ -16,7 +16,14 @@ jobs:
           find: "run_nightly = True"
           replace: "run_nightly = False"
           include: "**core.py"
-
+      - uses: EndBug/add-and-commit@v9
+      - name: commit
+        with:
+          message: Show GitHub Actions logo
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
+          add: "**core.py"
+   
     Deploy:
           runs-on: ubuntu-latest
           steps:
