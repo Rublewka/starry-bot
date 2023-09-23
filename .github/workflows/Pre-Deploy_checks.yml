@@ -29,5 +29,5 @@ jobs:
         continue-on-error: true
 
       - name: Deploy
-        run: hosting deploy.yml
+        run: hosting-deploy.yml
         
