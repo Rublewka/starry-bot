@@ -3,7 +3,7 @@ name: Hosting deploy
 
 on:
   workflow_run:
-    workflows: ["Pre-Deploy checks"]  # Replace with the name of your first workflow
+    workflows: ["Pre-Deploy_checks"]  # Replace with the name of your first workflow
     types:
       - completed
 
