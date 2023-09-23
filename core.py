@@ -31,7 +31,7 @@ load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 
-run_nightly = False
+run_nightly = True
 
 RoConnected = None
 
@@ -281,7 +281,33 @@ async def group_shout(interaction: discord.Interaction, shout: str):
         await interaction.followup.send(embed=emb)
         logging.info(f"@{interaction.user.name} tried to run `/group-shout` command, but they had no sufficient perms")
 
-#TODO
+@client.tree.command(name="host-restart", description="Restarts the bot, pulls latest from GitHub")
+async def host_restart(interaction: discord.Interaction):
+    if any(role.id in [1094687620564529283, 1137847962186289184] for role in interaction.user.roles):
+        req_client = requests.session()
+        url = 'https://control.bot-hosting.net/api/client/servers/723d4729/power'
+        req_client.get(url)  # sets cookie
+
+        url = 'https://control.bot-hosting.net/api/client/servers/723d4729/power'
+        headers = {
+            "Authorization": "Bearer ptlc_XXfLM4wlfgG6GvZ35VjdhLpvAy2Fs5lrgj839DsIsSZ",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "cookie": "eyJpdiI6ImRCejZqZU1ZYUwzRnVNQXl3c213bUE9PSIsInZhbHVlIjoiMy9rODRHV3V5MGsrenQrNTY0UEI0NSt4dVBHczBtZlV3YXo4Zk5FKytRWk0xbnRpcjdWME1mdG1tQ2s0ajVPdGwvaCs0UXNhSnU5S2grVjNadkgyaWpjZE1jQ3lFaUFBdVI5bThtVzNGbmREbDdZam9vMVVRS1VmbDExM0lZN3AiLCJtYWMiOiJkZTdmMzQ5OWU2Zjk4YjhkYzhhYzkzYzFhODYzOTU0MTIwMzEyNGFhZGNjNGI5ZmQ0N2FiZDBjN2Q1ZWVhOGZhIiwidGFnIjoiIn0%3D"
+        }
+        payload = '{"signal": "restart"}'
+        await interaction.response.defer(ephemeral=False, thinking=True)
+        await interaction.followup.send("Sending **Restart** signal to hosting...")
+        response = req_client.request('POST', url, data=payload, headers=headers)
+        logging.debug(f"{response.text}")
+    else:
+        emb = discord.Embed(title="Uh-uh", colour=RED)
+        emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687620564529283>")
+        await interaction.response.defer(ephemeral=True, thinking=False)
+        await interaction.followup.send(embed=emb)
+        logging.info(f"@{interaction.user.name} tried to run `/host-restart` command, but they had no sufficient perms")
+
+
 @client.tree.command(name="set-rank", description="Promote or Demote user")
 @app_commands.choices(choices=[
     app_commands.Choice(name="Member", value="Member"),
@@ -300,8 +326,15 @@ async def set_rank(interaction: discord.Interaction, user: str, choices: app_com
         target_user = await RoClient.get_user_by_username(user)
         new_rank = await group.set_rank(user=f'{target_user.id}', rank=rank_raw)
         emb=discord.Embed(title="Rank update", colour=GREEN)
-        emb.add_field(name="Success!", value=f"Updated `{target_user.name}` rank to {choices.value}")
+        emb.add_field(name="Success!", value=f"Updated **`{target_user.name}`** rank to **{choices.value}**")
         await interaction.followup.send(embed=emb)
+    else:
+        emb = discord.Embed(title="Uh-uh", colour=RED)
+        emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687621411786772>")
+        await interaction.response.defer(ephemeral=True, thinking=False)
+        await interaction.followup.send(embed=emb)
+        logging.info(f"@{interaction.user.name} tried to run `/set-rank` command, but they had no sufficient perms")
+
         
 @client.tree.command(name="status", description='Shows bot\'s status')
 async def status(interaction: discord.Interaction):
