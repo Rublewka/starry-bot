@@ -16,7 +16,6 @@ jobs:
           find: "run_nightly = True"
           replace: "run_nightly = False"
           include: "**core.py"
-          regex: false
 
     Deploy:
           runs-on: ubuntu-latest
