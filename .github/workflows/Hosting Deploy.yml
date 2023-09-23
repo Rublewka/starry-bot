@@ -3,9 +3,8 @@ name: Hosting deploy
 
 on:
   workflow_run:
-    workflows: ["Pre-Deploy_checks"]  # Replace with the name of your first workflow
-    types:
-      - completed
+    workflows: [Pre-Deploy_checks]  # Replace with the name of your first workflow
+    types: [completed]
 
 jobs:
   second_job:
