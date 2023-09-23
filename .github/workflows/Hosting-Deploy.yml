@@ -1,12 +1,10 @@
 name: Hosting deploy
 
 on:
-  workflow_run:
-    workflows: [Pre-Deploy_checks]  # Replace with the name of your first workflow
-    types: [completed]
+  workflow_call:
 
 jobs:
-  second_job:
+  Deploy_to_hosting:
     runs-on: ubuntu-latest
 
     steps:
