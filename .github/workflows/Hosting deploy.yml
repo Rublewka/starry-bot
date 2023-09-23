@@ -6,9 +6,9 @@ on:
       - main
 
 jobs:
-    Pre-Deploy_checks:
-      runs-on: ubuntu-latest
-      steps:
+  Pre-Deploy_checks:
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v2
       - name: Pre-Deploy checks
         uses: jacobtomlinson/gha-find-replace@v3
@@ -17,30 +17,29 @@ jobs:
           replace: "run_nightly = False"
           include: "**core.py"
 
-    commit:
-        runs-on: ubuntu-latest
-        steps:
-        - uses: EndBug/add-and-commit@v9
-        - name: commit
-          with:
-            message: Show GitHub Actions logo
-            committer_name: GitHub Actions
-            committer_email: actions@github.com
-            add: "core.py"
-   
-    Deploy:
-          runs-on: ubuntu-latest
-          steps:
-            - name: checkout repo content
-              uses: actions/checkout@v2 # checkout the repository content to github runner.
-            - name: setup python
-              uses: actions/setup-python@v2
-              with:
-                python-version: 3.11 #install the python needed
-            - name: Install dependencies
-              run: |
-                  python -m pip install --upgrade pip
-                  python -m pip install requests
-            - name: execute py script # run file
-              run: python auto_restart.py
-          
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: EndBug/add-and-commit@v9
+      - name: commit
+        with:
+          message: Show GitHub Actions logo
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
+          add: "core.py"
+
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content to github runner.
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11 #install the python needed
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install requests
+      - name: execute py script # run file
+        run: python auto_restart.py
