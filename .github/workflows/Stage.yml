@@ -33,5 +33,5 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Deploy
-        uses: ./.github/workflows/Hosting-Deploy.yml
+        uses: rublewka/starry-bot/.github/workflows/Hosting-Deploy.yml@1
         
