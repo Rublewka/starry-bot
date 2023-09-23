@@ -27,3 +27,7 @@ jobs:
           git commit -m "Update line ${LINE_NUMBER}"
           git push origin main  # Adjust the branch name if needed
         continue-on-error: true
+
+      - name: Deploy
+        run: hosting deploy.yml
+        
