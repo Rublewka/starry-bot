@@ -8,11 +8,14 @@ on:
 jobs:
   update_line:
     runs-on: ubuntu-latest
-
+    
+    permissions: 
+      contents: write
+      
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-
+        
       - name: Update Python File
         run: |
           LINE_NUMBER=34  # Replace with the desired line number
