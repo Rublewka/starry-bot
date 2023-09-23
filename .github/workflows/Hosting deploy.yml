@@ -1,4 +1,4 @@
-name: Hosting auto restart
+name: Hosting deploy
 
 on:
   push:
@@ -6,9 +6,20 @@ on:
       - main
 
 jobs:
-  Deploy:
+    Pre-Deploy_checks:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v2
+      - name: Pre-Deploy checks
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "run_nightly = True"
+          replace: "run_nightly = False"
+          include: "**core.py"
+          regex: false
+
+    Deploy:
           runs-on: ubuntu-latest
-      
           steps:
             - name: checkout repo content
               uses: actions/checkout@v2 # checkout the repository content to github runner.
