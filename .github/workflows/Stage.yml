@@ -1,9 +1,7 @@
 name: Staging for Deploy
 
 on:
-  push:
-    branches:
-      - main  # Adjust the branch name as needed
+  workflow_dispatch
 
 jobs:
   update_line:
