@@ -31,7 +31,7 @@ client.remove_command('help')
 load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
-run_nightly = False
+
 run_nightly = True
 
 RoConnected = None
@@ -339,7 +339,6 @@ async def restart(ctx):
         await ctx.reply("Sending **Restart** signal to hosting...")
         response = req_client.request('POST', url, data=payload, headers=headers)
         print(f"{response.text}")
-        ctx.reply("Sending **Restart** signal to hosting...")
     else:
         emb = discord.Embed(title="Uh-uh", colour=RED)
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687620564529283>")
