@@ -22,6 +22,7 @@ from config import settings
 from typing import List
 #from config import roles
 
+
 prefix = settings['PREFIX']
 
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
@@ -30,16 +31,14 @@ load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 
-
-run_nightly = False
-
+run_nightly = True
 
 RoConnected = None
 
 bot_logs_webhook_url = "https://discord.com/api/webhooks/1121071054664781844/ANWk7zM02ZnXvDZibg-uNvxTtHKi6sdG5GteFLKW8k53Cuxigfd3BtCtR4J7NgEznrWe"
 
 
-basicConfig(level=INFO, handlers=[StreamHandler()]) # DiscordWebhookHandler(bot_logs_webhook_url, text_send_on_error="<@1006501114419630081>")])
+basicConfig(level=ERROR, handlers=[StreamHandler(), DiscordWebhookHandler(bot_logs_webhook_url, text_send_on_error="<@1006501114419630081>")])
 
 #logger.debug('This is a debug message')
 #logger.info('This is an info message')
@@ -353,30 +352,39 @@ async def get_rank(interaction: discord.Interaction, user: str):
     group = await RoClient.get_group(16965138)
     GROUP_ID = 16965138
     target_user = await RoClient.get_user_by_username(user)
-#    target_base_user = RoClient.get_base_user(target_user.id)
-#    target_user_roles = await target_base_user.get_group_roles()
-#    target_user_role = await target_user_roles.get_role_in_group(group)
-    user = await RoClient.get_user(target_user.id)
+    try:        
+        user = await RoClient.get_user(target_user.id)
+    except UserNotFound:
+        user = None
     roles = await user.get_group_roles()
     role = None
     for test_role in roles:
         if test_role.group.id == GROUP_ID:
             role = test_role
             break
-    emb = discord.Embed(title="Member Info", colour=BLUE)
-    emb.add_field(name=f"{user.name}'s current rank is", value=f"`{role.name}`")
-    await interaction.response.defer(ephemeral=False, thinking=True)
-    await interaction.followup.send(embed=emb)
+    if role == None:
+        emb = discord.Embed(title="Member Info", colour=RED)
+        emb.add_field(name=f"Not found", value=f"`{user.name} is not in group!`")
+        await interaction.response.defer(ephemeral=False, thinking=True)
+        await interaction.followup.send(embed=emb)
+    else:
+        emb = discord.Embed(title="Member Info", colour=BLUE)
+        emb.add_field(name=f"{user.name}'s current rank is", value=f"`{role.name}`")
+        await interaction.response.defer(ephemeral=False, thinking=True)
+        await interaction.followup.send(embed=emb)
 
 
 @client.tree.command(name="set-rank", description="Promote or Demote user")
 @app_commands.choices(choices=[
-    app_commands.Choice(name="Member", value="Member"),
+    app_commands.Choice(name="Casuals", value="Casuals"),
+    app_commands.Choice(name="Above Noobs", value="Above Noobs"),
     app_commands.Choice(name="Admin", value="Admin")
     ])
 async def set_rank(interaction: discord.Interaction, user: str, choices: app_commands.Choice[str]):
-    if (choices.value == "Member"):
+    if (choices.value == "Casuals"):
         rank_raw = 1
+    elif (choices.value == "Above Noobs"):
+        rank_raw = 75
     elif (choices.value == "Admin"):
         rank_raw = 150
     if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in interaction.user.roles):
@@ -384,11 +392,28 @@ async def set_rank(interaction: discord.Interaction, user: str, choices: app_com
         commands_ran += 1
         await interaction.response.defer(ephemeral=False, thinking=True)
         group = await RoClient.get_group(16965138)
+        GROUP_ID = 16965138
         target_user = await RoClient.get_user_by_username(user)
-        new_rank = await group.set_rank(user=f'{target_user.id}', rank=rank_raw)
-        emb=discord.Embed(title="Rank update", colour=GREEN)
-        emb.add_field(name="Success!", value=f"Updated **`{target_user.name}`** rank to **{choices.value}**")
-        await interaction.followup.send(embed=emb)
+        roles = await target_user.get_group_roles()
+        role = None
+        for test_role in roles:
+            if test_role.group.id == GROUP_ID:
+                role = test_role
+                break
+        if role == None:
+            emb=discord.Embed(title="Rank update", colour=RED)
+            emb.add_field(name="Not found", value=f"**`{target_user.name}`** is not in group!")
+            emb.set_footer(text="Try checking nickname spelling!")
+            await interaction.followup.send(embed=emb)
+        elif role.rank == rank_raw:
+            emb=discord.Embed(title="Rank update", colour=GOLD)
+            emb.add_field(name="No changes were made...", value=f"**`{target_user.name}`** already have this rank!")
+            await interaction.followup.send(embed=emb)
+        else:
+            new_rank = await group.set_rank(user=f'{target_user.id}', rank=rank_raw)
+            emb=discord.Embed(title="Rank update", colour=GREEN)
+            emb.add_field(name="Success!", value=f"Updated **`{target_user.name}`** rank to **{choices.value}**")
+            await interaction.followup.send(embed=emb)
     else:
         emb = discord.Embed(title="Uh-uh", colour=RED)
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687621411786772>")
