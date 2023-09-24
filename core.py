@@ -22,8 +22,6 @@ from config import settings
 from typing import List
 #from config import roles
 
-
-
 prefix = settings['PREFIX']
 
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
@@ -31,8 +29,10 @@ client.remove_command('help')
 load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
+
+
 run_nightly = False
-run_nightly = True
+
 
 RoConnected = None
 
