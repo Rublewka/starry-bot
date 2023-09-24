@@ -321,7 +321,7 @@ async def deploy(ctx):
         await ctx.reply(embed=emb)
         logging.info(f"@{ctx.author.name} tried to run `;deploy` command, but they had no sufficient perms")
 
-@client.command(name=restart)
+@client.command(name="restart")
 async def restart(ctx):
     if any(role.id in [1094687620564529283, 1137847962186289184] for role in ctx.author.roles):
         req_client = requests.session()
