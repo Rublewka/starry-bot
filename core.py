@@ -31,7 +31,7 @@ client.remove_command('help')
 load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
-run_nightly = False
+
 run_nightly = True
 
 RoConnected = None
@@ -319,7 +319,33 @@ async def deploy(ctx):
         emb = discord.Embed(title="Uh-uh", colour=RED)
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687620564529283>")
         await ctx.reply(embed=emb)
-        logging.info(f"@{ctx.author.name} tried to run `/host-restart` command, but they had no sufficient perms")
+        logging.info(f"@{ctx.author.name} tried to run `;deploy` command, but they had no sufficient perms")
+
+@client.command(name=restart)
+async def restart(ctx):
+    if any(role.id in [1094687620564529283, 1137847962186289184] for role in ctx.author.roles):
+        req_client = requests.session()
+        url = 'https://control.bot-hosting.net/api/client/servers/723d4729/power'
+        req_client.get(url)  # sets cookie
+
+        url = 'https://control.bot-hosting.net/api/client/servers/723d4729/power'
+        headers = {
+            "Authorization": "Bearer ptlc_XXfLM4wlfgG6GvZ35VjdhLpvAy2Fs5lrgj839DsIsSZ",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "cookie": "eyJpdiI6ImRCejZqZU1ZYUwzRnVNQXl3c213bUE9PSIsInZhbHVlIjoiMy9rODRHV3V5MGsrenQrNTY0UEI0NSt4dVBHczBtZlV3YXo4Zk5FKytRWk0xbnRpcjdWME1mdG1tQ2s0ajVPdGwvaCs0UXNhSnU5S2grVjNadkgyaWpjZE1jQ3lFaUFBdVI5bThtVzNGbmREbDdZam9vMVVRS1VmbDExM0lZN3AiLCJtYWMiOiJkZTdmMzQ5OWU2Zjk4YjhkYzhhYzkzYzFhODYzOTU0MTIwMzEyNGFhZGNjNGI5ZmQ0N2FiZDBjN2Q1ZWVhOGZhIiwidGFnIjoiIn0%3D"
+        }
+        payload = '{"signal": "restart"}'
+        await ctx.reply("Sending **Restart** signal to hosting...")
+        response = req_client.request('POST', url, data=payload, headers=headers)
+        print(f"{response.text}")
+        ctx.reply("Sending **Restart** signal to hosting...")
+    else:
+        emb = discord.Embed(title="Uh-uh", colour=RED)
+        emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687620564529283>")
+        await ctx.reply(embed=emb)
+        logging.info(f"@{ctx.author.name} tried to run `;restart` command, but they had no sufficient perms")
+
 
 @client.tree.command(name="get-rank", description="Get member's current rank")
 async def get_rank(interaction: discord.Interaction, user: str):
