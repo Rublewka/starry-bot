@@ -350,26 +350,33 @@ async def get_rank(interaction: discord.Interaction, user: str):
     global commands_ran
     commands_ran += 1
     group = await RoClient.get_group(16965138)
-    GROUP_ID = 16965138
-    target_user = await RoClient.get_user_by_username(user)
-    try:        
-        user = await RoClient.get_user(target_user.id)
+    try:
+        target_user = await RoClient.get_user_by_username(user)
     except UserNotFound:
-        user = None
-    roles = await user.get_group_roles()
-    role = None
-    for test_role in roles:
-        if test_role.group.id == GROUP_ID:
-            role = test_role
-            break
-    if role == None:
-        emb = discord.Embed(title="Member Info", colour=RED)
-        emb.add_field(name=f"Not found", value=f"`{user.name} is not in group!`")
-        await interaction.response.defer(ephemeral=False, thinking=True)
-        await interaction.followup.send(embed=emb)
+        target_user = None 
+    if target_user != None:
+        user = await RoClient.get_user(target_user.id)
+        roles = await user.get_group_roles()
+        role = None
+        for test_role in roles:
+            if test_role.group.id == group.id:
+                role = test_role
+                break
+        if role == None:
+            emb = discord.Embed(title="Member Info", colour=RED)
+            emb.add_field(name=f"Not found", value=f"`{user.name}` is not in group!")
+            emb.set_footer(text="Try checking username spelling!")
+            await interaction.response.defer(ephemeral=False, thinking=True)
+            await interaction.followup.send(embed=emb)
+        else:
+            emb = discord.Embed(title="Member Info", colour=BLUE)
+            emb.add_field(name=f"{user.name}'s current rank is", value=f"`{role.name}`")
+            await interaction.response.defer(ephemeral=False, thinking=True)
+            await interaction.followup.send(embed=emb)
     else:
-        emb = discord.Embed(title="Member Info", colour=BLUE)
-        emb.add_field(name=f"{user.name}'s current rank is", value=f"`{role.name}`")
+        emb = discord.Embed(title="Member Info", colour=DARK_RED)
+        emb.add_field(name="Not found", value=f"Couln't find user with specified username (`{user}`)")
+        emb.set_footer(text="Try checking username spelling!")
         await interaction.response.defer(ephemeral=False, thinking=True)
         await interaction.followup.send(embed=emb)
 
@@ -393,26 +400,36 @@ async def set_rank(interaction: discord.Interaction, user: str, choices: app_com
         await interaction.response.defer(ephemeral=False, thinking=True)
         group = await RoClient.get_group(16965138)
         GROUP_ID = 16965138
-        target_user = await RoClient.get_user_by_username(user)
-        roles = await target_user.get_group_roles()
-        role = None
-        for test_role in roles:
-            if test_role.group.id == GROUP_ID:
-                role = test_role
-                break
-        if role == None:
-            emb=discord.Embed(title="Rank update", colour=RED)
-            emb.add_field(name="Not found", value=f"**`{target_user.name}`** is not in group!")
-            emb.set_footer(text="Try checking nickname spelling!")
-            await interaction.followup.send(embed=emb)
-        elif role.rank == rank_raw:
-            emb=discord.Embed(title="Rank update", colour=GOLD)
-            emb.add_field(name="No changes were made...", value=f"**`{target_user.name}`** already have this rank!")
-            await interaction.followup.send(embed=emb)
-        else:
-            new_rank = await group.set_rank(user=f'{target_user.id}', rank=rank_raw)
-            emb=discord.Embed(title="Rank update", colour=GREEN)
-            emb.add_field(name="Success!", value=f"Updated **`{target_user.name}`** rank to **{choices.value}**")
+        try: 
+            target_user = await RoClient.get_user_by_username(user)
+        except UserNotFound:
+            target_user = None
+        if target_user != None:
+            roles = await target_user.get_group_roles()
+            role = None
+            for test_role in roles:
+                if test_role.group.id == GROUP_ID:
+                    role = test_role
+                    break
+            if role == None:
+                emb=discord.Embed(title="Rank update", colour=RED)
+                emb.add_field(name="Not found", value=f"**`{target_user.name}`** is not in group!")
+                emb.set_footer(text="Try checking username spelling!")
+                await interaction.followup.send(embed=emb)
+            elif role.rank == rank_raw:
+                emb=discord.Embed(title="Rank update", colour=GOLD)
+                emb.add_field(name="No changes were made...", value=f"**`{target_user.name}`** already have this rank!")
+                await interaction.followup.send(embed=emb)
+            else:
+                new_rank = await group.set_rank(user=f'{target_user.id}', rank=rank_raw)
+                emb=discord.Embed(title="Rank update", colour=GREEN)
+                emb.add_field(name="Success!", value=f"Updated **`{target_user.name}`** rank to **{choices.value}**")
+                await interaction.followup.send(embed=emb)
+        else:  
+            emb = discord.Embed(title="Member Info", colour=DARK_RED)
+            emb.add_field(name="Not found", value=f"Couln't find user with specified username (`{user}`)")
+            emb.set_footer(text="Try checking username spelling!")
+            await interaction.response.defer(ephemeral=False, thinking=True)
             await interaction.followup.send(embed=emb)
     else:
         emb = discord.Embed(title="Uh-uh", colour=RED)
