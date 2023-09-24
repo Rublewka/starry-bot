@@ -31,7 +31,7 @@ client.remove_command('help')
 load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
-
+run_nightly = False
 run_nightly = False
 
 RoConnected = None
