@@ -19,10 +19,8 @@ from discord.ext import commands
 from roblox import Client
 from roblox.utilities.exceptions import *
 from config import settings
-from typing import List
 #from config import roles
 
-start_time = None
 
 prefix = settings['PREFIX']
 
@@ -31,8 +29,10 @@ client.remove_command('help')
 load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
-run_nightly = False
-run_nightly = False
+
+
+run_nightly = True
+
 
 RoConnected = None
 
@@ -71,11 +71,6 @@ async def on_ready():
     print(f"Bot Name:  {client.user.name}")
     print(f"Bot ID:  {client.user.id}")
     print(f"Bot Version:  {settings['VERSION']}")
-    try:
-        await client.tree.sync()
-        info(f"Discord client tree commands synced successfully")
-    except TimeoutError:
-        warn("Discord slash commands not synced")
     print(f"Discord session successfully initialized")
     print(f"--Roblox--")
     global start_time
@@ -515,6 +510,9 @@ async def version(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=False, thinking=True)
     await interaction.followup.send(f"I'm running `{settings['VERSION']}` version")
 
+
+
+
 @client.tree.command(name="get-user", description="Get user info from Roblox")
 async def get_user(interaction: discord.Interaction, user: str):
     global commands_ran
@@ -532,16 +530,45 @@ async def get_user(interaction: discord.Interaction, user: str):
             else:
                 desc = rouser.description
         
-            emb = discord.Embed(title=None, description=f"{rouser.name} Roblox Profile", colour=GREYPLE)
+            emb = discord.Embed(title=None, description=f"[{rouser.name} Roblox Profile](https://www.roblox.com/users/{rouser.id}/profile)", colour=GREYPLE)
             emb.add_field(name="Username", value=rouser.name, inline=False)
             emb.add_field(name="Display Name", value=rouser.display_name, inline=False)
-            emb.add_field(name="ID", value=rouser.id, inline=False)
+            emb.add_field(name="ID", value=rouser.id, inline=True)
+            dt_str = f'{rouser.created}'
+            dt_obj = str(datetime.datetime.strptime(dt_str[0:19], '%Y-%m-%d %H:%M:%S').timestamp())
+            created = dt_obj[0:10]
+            emb.add_field(name="Join date", value=f"<t:{created}>", inline=True)
+
             if rouser.description == '':
                 desc = '*None*'
             else:
                 desc = rouser.description
+            if rouser.is_banned == True:
+                is_banned = 'Yes'
+            elif rouser.is_banned == False:
+                is_banned = 'No'
             emb.add_field(name="Description", value=desc, inline=False)
-#            emb.add_field(name="Created At", value=rouser.created, inline=False)
+            emb.add_field(name="Is banned?", value=is_banned, inline=True)
+            presence = await rouser.get_presence()
+            print(presence)
+            if presence.user_presence_type == 0:
+                 status = 'Offline'
+            elif presence.user_presence_type == 1:
+                 status = 'Online'
+            elif presence.user_presence_type == 2:
+                 status = 'In Game'
+            elif presence.user_presence_type == 3:
+                 status = 'In Studio'
+            else:
+                 status = '*Unknown*'
+            followers = await rouser.get_follower_count()
+            emb.add_field(name="Followers", value=followers, inline=True)
+            emb.add_field(name="Status", value=status, inline=True)
+            if presence.user_presence_type > 0:
+                last_online = "Right now"
+            else:
+                last_online = f'<t:{str(presence.last_online.timestamp())[0:10]}>'
+            emb.add_field(name="Last online", value=f"{last_online}", inline=True)
             user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(
                 users=[rouser],
                 type=AvatarThumbnailType.full_body,
@@ -556,7 +583,7 @@ async def get_user(interaction: discord.Interaction, user: str):
             return
     else:
         await interaction.response.defer(ephemeral=True)
-        await interaction.followup.send("The bot couldn't connect to Roblox. Please contact bot developer.")
+        await interaction.followup.send("I could not connect to Roblox. Please contact my developer. (<@1006501114419630081>)")
 
 
 
