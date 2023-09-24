@@ -25,11 +25,3 @@ jobs:
           git commit -m "Update line ${LINE_NUMBER}"
           git push origin main  # Adjust the branch name if needed
         continue-on-error: true
-
-
-      - name: Checkout repo
-        uses: actions/checkout@v2
-        
-  Deploy:
-    uses: ./.github/workflows/Hosting-Deploy.yml
-        
