@@ -17,6 +17,7 @@ from src.verif_words import verification_words
 from dotenv import load_dotenv
 from discord.ext import commands
 from roblox import Client
+from roblox.utilities.exceptions import *
 from config import settings
 from typing import List
 #from config import roles
@@ -31,14 +32,14 @@ load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 
-run_nightly = False
+run_nightly = True
 
 RoConnected = None
 
 bot_logs_webhook_url = "https://discord.com/api/webhooks/1121071054664781844/ANWk7zM02ZnXvDZibg-uNvxTtHKi6sdG5GteFLKW8k53Cuxigfd3BtCtR4J7NgEznrWe"
 
 
-basicConfig(level=INFO, handlers=[StreamHandler(), DiscordWebhookHandler(bot_logs_webhook_url, text_send_on_error="<@1006501114419630081>")])
+basicConfig(level=INFO, handlers=[StreamHandler()]) # DiscordWebhookHandler(bot_logs_webhook_url, text_send_on_error="<@1006501114419630081>")])
 
 #logger.debug('This is a debug message')
 #logger.info('This is an info message')
@@ -281,9 +282,24 @@ async def group_shout(interaction: discord.Interaction, shout: str):
         await interaction.followup.send(embed=emb)
         logging.info(f"@{interaction.user.name} tried to run `/group-shout` command, but they had no sufficient perms")
 
-@client.tree.command(name="host-restart", description="Restarts the bot, pulls latest from GitHub")
-async def host_restart(interaction: discord.Interaction):
-    if any(role.id in [1094687620564529283, 1137847962186289184] for role in interaction.user.roles):
+@client.command(name="deploy", description="Restarts the bot, pulls latest from GitHub")
+async def deploy(ctx):
+    if any(role.id in [1094687620564529283, 1137847962186289184] for role in ctx.author.roles):
+        await ctx.reply("Sending **Stage** command to GitHub Actions...")
+        url = 'https://api.github.com/repos/rublewka/starry-bot/actions/workflows/Stage.yml/dispatches'
+        headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": "Bearer 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",
+        "X-GitHub-Api-Version": "2022-11-28"
+        }
+        payload = {
+        "ref":"main"
+            }
+        response = requests.post(url=url, headers=headers, data=json.dumps(payload))
+        print(f"{response.text}")
+        await asyncio.sleep(5)
+        await ctx.reply("Deploying...")
+        await asyncio.sleep(10)        
         req_client = requests.session()
         url = 'https://control.bot-hosting.net/api/client/servers/723d4729/power'
         req_client.get(url)  # sets cookie
@@ -296,16 +312,36 @@ async def host_restart(interaction: discord.Interaction):
             "cookie": "eyJpdiI6ImRCejZqZU1ZYUwzRnVNQXl3c213bUE9PSIsInZhbHVlIjoiMy9rODRHV3V5MGsrenQrNTY0UEI0NSt4dVBHczBtZlV3YXo4Zk5FKytRWk0xbnRpcjdWME1mdG1tQ2s0ajVPdGwvaCs0UXNhSnU5S2grVjNadkgyaWpjZE1jQ3lFaUFBdVI5bThtVzNGbmREbDdZam9vMVVRS1VmbDExM0lZN3AiLCJtYWMiOiJkZTdmMzQ5OWU2Zjk4YjhkYzhhYzkzYzFhODYzOTU0MTIwMzEyNGFhZGNjNGI5ZmQ0N2FiZDBjN2Q1ZWVhOGZhIiwidGFnIjoiIn0%3D"
         }
         payload = '{"signal": "restart"}'
-        await interaction.response.defer(ephemeral=False, thinking=True)
-        await interaction.followup.send("Sending **Restart** signal to hosting...")
+        await ctx.reply("Sending **Restart** signal to hosting...")
         response = req_client.request('POST', url, data=payload, headers=headers)
-        logging.debug(f"{response.text}")
+        print(f"{response.text}")
     else:
         emb = discord.Embed(title="Uh-uh", colour=RED)
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687620564529283>")
-        await interaction.response.defer(ephemeral=True, thinking=False)
-        await interaction.followup.send(embed=emb)
-        logging.info(f"@{interaction.user.name} tried to run `/host-restart` command, but they had no sufficient perms")
+        await ctx.reply(embed=emb)
+        logging.info(f"@{ctx.author.name} tried to run `/host-restart` command, but they had no sufficient perms")
+
+@client.tree.command(name="get-rank", description="Get member's current rank")
+async def get_rank(interaction: discord.Interaction, user: str):
+    global commands_ran
+    commands_ran += 1
+    group = await RoClient.get_group(16965138)
+    GROUP_ID = 16965138
+    target_user = await RoClient.get_user_by_username(user)
+#    target_base_user = RoClient.get_base_user(target_user.id)
+#    target_user_roles = await target_base_user.get_group_roles()
+#    target_user_role = await target_user_roles.get_role_in_group(group)
+    user = await RoClient.get_user(target_user.id)
+    roles = await user.get_group_roles()
+    role = None
+    for test_role in roles:
+        if test_role.group.id == GROUP_ID:
+            role = test_role
+            break
+    emb = discord.Embed(title="Member Info", colour=BLUE)
+    emb.add_field(name=f"{user.name}'s current rank is", value=f"`{role.name}`")
+    await interaction.response.defer(ephemeral=False, thinking=True)
+    await interaction.followup.send(embed=emb)
 
 
 @client.tree.command(name="set-rank", description="Promote or Demote user")
@@ -406,32 +442,45 @@ async def version(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=False, thinking=True)
     await interaction.followup.send(f"I'm running `{settings['VERSION']}` version")
 
-@client.tree.command(name="getuser", description="Get user info from Roblox")
-async def getuser(interaction: discord.Interaction, user: discord.User):
+@client.tree.command(name="get-user", description="Get user info from Roblox")
+async def get_user(interaction: discord.Interaction, user: str):
     global commands_ran
     commands_ran += 1
     if RoConnected == True:
-        await interaction.response.defer(ephemeral=False, thinking=True)
-        discordId = user.id
-        r = requests.get(
-            f'https://registry.rover.link/api/guilds/1018415075255668746/discord-to-roblox/{discordId}',
-            headers={'Authorization': f'Bearer {rvr_token}'},
-            timeout=10)
-        data = r.json()
-        json_str = json.dumps(data)
-        resp = json.loads(json_str)
-        print(resp)
-        ruser = await RoClient.get_user(resp['robloxId'])
-        if ruser.description == '':
-           desc = '*None*'
+        try:
+            rouser = await RoClient.get_user_by_username(user)
+        except UserNotFound:
+            await interaction.response.defer(ephemeral=True)
+            await interaction.followup.send("User not found")
+            rouser = NotFound
+        if rouser != NotFound: 
+            if rouser.description == '':
+               desc = '*None*'
+            else:
+                desc = rouser.description
+        
+            emb = discord.Embed(title=None, description=f"{rouser.name} Roblox Profile", colour=GREYPLE)
+            emb.add_field(name="Username", value=rouser.name, inline=False)
+            emb.add_field(name="Display Name", value=rouser.display_name, inline=False)
+            emb.add_field(name="ID", value=rouser.id, inline=False)
+            if rouser.description == '':
+                desc = '*None*'
+            else:
+                desc = rouser.description
+            emb.add_field(name="Description", value=desc, inline=False)
+#            emb.add_field(name="Created At", value=rouser.created, inline=False)
+            user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(
+                users=[rouser],
+                type=AvatarThumbnailType.full_body,
+                size=(720, 720)
+            )
+            if len(user_thumbnails) > 0:
+                user_thumbnail = user_thumbnails[0]
+                emb.set_image(url=user_thumbnail.image_url)
+                await interaction.response.defer(ephemeral=False, thinking=True)
+                await interaction.followup.send(embed=emb)
         else:
-           desc = ruser.description
-        emb = discord.Embed(title=None, description=f"{user.mention} Roblox Profile", colour=GREYPLE)
-        emb.add_field(name="Roblox ID", value=ruser.id, inline=False)
-        emb.add_field(name="Roblox Username", value=ruser.name, inline=False)
-        emb.add_field(name="Roblox Display Name", value=ruser.display_name, inline=False)
-        emb.add_field(name="Roblox Description", value=desc, inline=False)
-        await interaction.followup.send(embed=emb)
+            return
     else:
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send("The bot couldn't connect to Roblox. Please contact bot developer.")
