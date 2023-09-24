@@ -299,7 +299,7 @@ async def deploy(ctx):
         print(f"{response.text}")
         await asyncio.sleep(5)
         await ctx.reply("Deploying...")
-        await asyncio.sleep(10)        
+        await asyncio.sleep(15)        
         req_client = requests.session()
         url = 'https://control.bot-hosting.net/api/client/servers/723d4729/power'
         req_client.get(url)  # sets cookie
