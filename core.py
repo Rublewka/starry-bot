@@ -22,6 +22,7 @@ from config import settings
 from typing import List
 #from config import roles
 
+start_time = None
 
 prefix = settings['PREFIX']
 
@@ -73,7 +74,7 @@ async def on_ready():
     try:
         await client.tree.sync()
         info(f"Discord client tree commands synced successfully")
-    except:
+    except TimeoutError:
         warn("Discord slash commands not synced")
     print(f"Discord session successfully initialized")
     print(f"--Roblox--")
@@ -459,20 +460,25 @@ async def status(interaction: discord.Interaction):
 
     # Send a message back to the user with the ping emoji and the ping time in milliseconds
     await interaction.response.defer(ephemeral=False, thinking=True)
-    delta_uptime = datetime.datetime.now() - start_time
-    hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
-    minutes, seconds = divmod(remainder, 60)
-    days, hours = divmod(hours, 24)
+    if start_time == None:
+         clock = '*not defined*'
+    else:
+        delta_uptime = datetime.datetime.now() - start_time
+        hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        days, hours = divmod(hours, 24)
+        clock = f"I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`"
     if RoConnected == True:
         con = "<:icons_online:860123643395571713> Connected to Roblox API"
     elif RoConnected == None:
         con = "<:icons_warning:908958943466893323> The bot haven\'t properly initialized, please contact bot developer"
     else:
         con = "<:icons_outage:868122243845206087> Not connected to Roblox API"
+        
     emb = discord.Embed(title="Bot Status", description=None, color=BLUE)
     emb.add_field(name="Latency", value=f"{ping_emoji} `{ping * 1000:.0f}ms`", inline=False)
     emb.add_field(name="Roblox API", value=f"{con}", inline=False)
-    emb.add_field(name="Uptime", value=f"<:clock:1113391359274000394> I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`", inline=False)
+    emb.add_field(name="Uptime", value=f"<:clock:1113391359274000394> {clock}", inline=False)
     emb.add_field(name="Commands ran this session", value=f"<:icons_slashcmd:860133546315218944> I've ran `{commands_ran}` command(s) this session.", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
     await interaction.followup.send(embed=emb)
