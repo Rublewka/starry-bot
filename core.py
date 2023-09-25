@@ -510,7 +510,11 @@ async def version(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=False, thinking=True)
     await interaction.followup.send(f"I'm running `{settings['VERSION']}` version")
 
-
+@client.command(name='dsc-cmds-sync')
+async def dsc_cmds_sync(ctx):
+     await ctx.reply('Syncing...')
+     await client.tree.sync()
+     await ctx.reply('<:checkmark:1155750377178804286> Synced!')
 
 
 @client.tree.command(name="get-user", description="Get user info from Roblox")
@@ -530,27 +534,21 @@ async def get_user(interaction: discord.Interaction, user: str):
             else:
                 desc = rouser.description
         
-            emb = discord.Embed(title=None, description=f"[{rouser.name} Roblox Profile](https://www.roblox.com/users/{rouser.id}/profile)", colour=GREYPLE)
+            emb = discord.Embed(title='User Info', description=f"[{rouser.name} Roblox Profile](https://www.roblox.com/users/{rouser.id}/profile)", colour=GREYPLE)
+            if rouser.is_banned == True:
+                emb.add_field(name="Account Terminated", value=' ', inline=True)
             emb.add_field(name="Username", value=rouser.name, inline=False)
             emb.add_field(name="Display Name", value=rouser.display_name, inline=False)
             emb.add_field(name="ID", value=rouser.id, inline=True)
-            dt_str = f'{rouser.created}'
-            dt_obj = str(datetime.datetime.strptime(dt_str[0:19], '%Y-%m-%d %H:%M:%S').timestamp())
-            created = dt_obj[0:10]
-            emb.add_field(name="Join date", value=f"<t:{created}>", inline=True)
+            created = f'<t:{str(rouser.created.timestamp())[0:10]}>'
+            emb.add_field(name="Join date", value=f"{created}", inline=True)
 
             if rouser.description == '':
                 desc = '*None*'
             else:
                 desc = rouser.description
-            if rouser.is_banned == True:
-                is_banned = 'Yes'
-            elif rouser.is_banned == False:
-                is_banned = 'No'
             emb.add_field(name="Description", value=desc, inline=False)
-            emb.add_field(name="Is banned?", value=is_banned, inline=True)
             presence = await rouser.get_presence()
-            print(presence)
             if presence.user_presence_type == 0:
                  status = 'Offline'
             elif presence.user_presence_type == 1:
@@ -561,13 +559,25 @@ async def get_user(interaction: discord.Interaction, user: str):
                  status = 'In Studio'
             else:
                  status = '*Unknown*'
+            has_premium_raw = await rouser.has_premium()
+            if has_premium_raw == True:
+                 has_premium = 'Yes'
+            else:
+                 has_premium = 'No'
+            emb.add_field(name='Has Premium?', value=has_premium)
             followers = await rouser.get_follower_count()
             emb.add_field(name="Followers", value=followers, inline=True)
             emb.add_field(name="Status", value=status, inline=True)
             if presence.user_presence_type > 0:
-                last_online = "Right now"
+                last_online_raw = "Right now"
             else:
-                last_online = f'<t:{str(presence.last_online.timestamp())[0:10]}>'
+                last_online_raw = f'<t:{str(presence.last_online.timestamp())[0:10]}>'
+            if last_online_raw == created:
+                last_online = '*Unknown*'
+            else:
+                last_online = last_online_raw
+                
+            
             emb.add_field(name="Last online", value=f"{last_online}", inline=True)
             user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(
                 users=[rouser],
