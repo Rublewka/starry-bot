@@ -31,7 +31,7 @@ RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 
 
-run_nightly = False
+run_nightly = True
 
 
 RoConnected = None
@@ -425,7 +425,6 @@ async def set_rank(interaction: discord.Interaction, user: str, choices: app_com
             emb = discord.Embed(title="Member Info", colour=DARK_RED)
             emb.add_field(name="Not found", value=f"Couln't find user with specified username (`{user}`)")
             emb.set_footer(text="Try checking username spelling!")
-            await interaction.response.defer(ephemeral=False, thinking=True)
             await interaction.followup.send(embed=emb)
     else:
         emb = discord.Embed(title="Uh-uh", colour=RED)
