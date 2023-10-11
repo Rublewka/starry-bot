@@ -616,17 +616,20 @@ async def get_user(interaction: discord.Interaction, user: str):
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send("I could not connect to Roblox. Please contact my developer. (<@1006501114419630081>)")
 
+@client.tree.command(name='get-members', description='Get group members, their ID, and rank')
+async def get_members(interaction: discord.Interaction, *, page_size: int):
+    group = await RoClient.get_group(group_id=16965138)
+    page_size_raw = page_size
+    members_raw = await group.get_members(page_size=page_size_raw).flatten()
+    if page_size_raw == None:
+        page_size_raw = 10
+    members = []
+    for member in members_raw:
+        members.append(f'{member.name}, {member.id}')
+    await interaction.response.defer(ephemeral=False, thinking=True)
+    await interaction.followup.send(f'{', '.join(members)}')
 
-
-
-   
-
-
-
-
-
-#hello
-
+    
 
 
 
@@ -806,31 +809,8 @@ async def get_user(interaction: discord.Interaction, user: str):
 
 
 if run_nightly == True:
-				  DISTOKEN = settings['NIGHTLY_TOKEN']
+	DISTOKEN = settings['NIGHTLY_TOKEN']
 else:
-				  DISTOKEN = settings['TOKEN']
+	DISTOKEN = settings['TOKEN']
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-client.run (DISTOKEN) #DON'T TOUCH IT
+client.run(DISTOKEN)
