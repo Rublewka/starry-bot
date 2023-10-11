@@ -19,10 +19,9 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from roblox import Client
 from roblox.utilities.exceptions import *
+from roblox.utilities.iterators import SortOrder
 from config import settings
 #from config import roles
-
-
 prefix = settings['PREFIX']
 
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
@@ -38,9 +37,9 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 uri = "mongodb+srv://starry_bot:TPth5ILO9WiJUcKU@rublewka-bot.b7dexs8.mongodb.net/?retryWrites=true&w=majority"
 # Create a new client and connect to the server
-db = MongoClient(uri, server_api=ServerApi('1'))
-# Send a ping to confirm a successful connection
-
+mclient = MongoClient(uri, server_api=ServerApi('1'))
+db_raw = mclient.starry_bot
+db = db_raw.users
 
 RoConnected = None
 
@@ -157,7 +156,7 @@ async def get_verification_thread(interaction: discord.Interaction) -> discord.T
     thread_name = f"{user.name} Verification"
     thread = await channel.create_thread(
         name=thread_name,
-        auto_archive_duration=1440,
+        auto_archive_duration=60,
         type=discord.ChannelType.private_thread,
         invitable=False
     )
@@ -204,13 +203,13 @@ async def get_rouser_info(roblox_username: str, thread: discord.Thread) -> dict:
     return rouser
 
 @client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
-async def verify_member(interaction: discord.Interaction, member: discord.Member):
+async def verify_member(interaction: discord.Interaction):
     global commands_ran
     commands_ran += 1
     thread = await get_verification_thread(interaction)
     await interaction.response.defer(ephemeral=True, thinking=True)
-    await interaction.response.send_message('Opened new verification thread for you')
-
+    await interaction.followup.send('Opened new verification thread for you')
+    member = interaction.user
     roblox_username = await get_roblox_username(interaction, thread)
     rouser = await get_rouser_info(roblox_username, thread)
 
@@ -240,11 +239,19 @@ async def verify_member(interaction: discord.Interaction, member: discord.Member
     while True:
         await thread.send(f"Type `Done` when you are done")
         done = await client.wait_for('message', check=check)
-        if done.content.lower() == 'done' and rouser.description == verif_words:
+        rouser_a = await get_rouser_info(roblox_username, thread)
+        if done.content.lower() == 'done' and rouser_a.description == verif_words:
             try:
+                entry = {
+                "username": f"{rouser.name}",
+                "discordID": f"{interaction.user.id}",
+                "robloxID": f"{rouser.id}"
+                }    
+                post_id = db.insert_one(entry).inserted_id
+                print(f'Verified user and created entry with ID {post_id}')
+                await thread.send("Verification process complete, enjoy your stay!")
                 await member.add_roles(discord.utils.get(member.guild.roles, name="Members"))
                 await member.edit(nick=rouser.name)
-                await thread.send("Verification process complete, enjoy your stay!")
                 await thread.edit(name=f"{interaction.user.name} Verification (Completed)", locked=True)
                 break
             except discord.Forbidden:
@@ -256,6 +263,12 @@ async def verify_member(interaction: discord.Interaction, member: discord.Member
                 await thread.edit(name=f"{interaction.user.name} Verification (Error)", locked=True)
                 break
         elif done.content.lower() == 'new words':
+            continue
+        elif done.content.lower() == 'cancel':
+            await thread.send("Verification proccess canceled")
+            await thread.edit(name=f"{interaction.user.name} Verification (Canceled)")
+        elif done.content.lower() == 'done' and rouser_a.description != verif_words:
+            await thread.send("I couldn't find verification words in your **Roblox Profile Description**, try again!")
             continue
         else:
             await thread.send("Couldn't verify your account, please try again later")
@@ -450,12 +463,12 @@ async def status(interaction: discord.Interaction):
     ping = client.ws.latency
     global commands_ran
     try:
-        db.admin.command('ping')
+        mclient.admin.command('ping')
         db_connected_raw= True
-        db.close()
+        mclient.close()
     except Exception:
         db_connected_raw = False
-        db.close()
+        mclient.close()
         
     # Define the green bar emoji as the default
     ping_emoji = '<:icons_goodping:880113406915538995>' # 100ms
@@ -616,21 +629,23 @@ async def get_user(interaction: discord.Interaction, user: str):
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send("I could not connect to Roblox. Please contact my developer. (<@1006501114419630081>)")
 
-@client.tree.command(name='get-members', description='Get group members, their ID, and rank')
-async def get_members(interaction: discord.Interaction, *, page_size: int):
+@client.tree.command(name='get-members', description='How many members in group')
+async def get_members(interaction: discord.Interaction):
     group = await RoClient.get_group(group_id=16965138)
-    page_size_raw = page_size
-    members_raw = await group.get_members(page_size=page_size_raw).flatten()
-    if page_size_raw == None:
-        page_size_raw = 10
-    members = []
-    for member in members_raw:
-        members.append(f'{member.name}, {member.id}')
+    members = await group.get_members().flatten()
     await interaction.response.defer(ephemeral=False, thinking=True)
-    await interaction.followup.send(f'{', '.join(members)}')
+    await interaction.followup.send(f'There are `{len(members)}` members in the group')
 
     
-
+@client.command()
+async def db_manual_entry(ctx, discordID: int, robloxID: int, username: str):
+    entry = {
+        "username": f"{username}",
+        "discordID": f"{discordID}",
+        "robloxID": f"{robloxID}"
+    }    
+    post_id = db.insert_one(entry).inserted_id
+    await ctx.reply(f'Created new entry with ID `{post_id}`')
 
 
 
