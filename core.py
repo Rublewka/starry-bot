@@ -9,6 +9,7 @@ import discord
 import requests
 import urllib.request
 import logging
+import sqlite3
 from logging import *
 from discord import app_commands
 from dislog import DiscordWebhookHandler
@@ -29,9 +30,16 @@ client.remove_command('help')
 load_dotenv()
 RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
-
+db_token = os.getenv("DBTOKEN")
 
 run_nightly = True
+
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+uri = "mongodb+srv://starry_bot:TPth5ILO9WiJUcKU@rublewka-bot.b7dexs8.mongodb.net/?retryWrites=true&w=majority"
+# Create a new client and connect to the server
+db = MongoClient(uri, server_api=ServerApi('1'))
+# Send a ping to confirm a successful connection
 
 
 RoConnected = None
@@ -255,6 +263,8 @@ async def verify_member(interaction: discord.Interaction, member: discord.Member
             break
 
 
+
+
 @client.tree.command(name="group-shout", description="Set new group shout")
 async def group_shout(interaction: discord.Interaction, shout: str):
     if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in interaction.user.roles):
@@ -439,7 +449,14 @@ async def status(interaction: discord.Interaction):
     # Get the websocket latency
     ping = client.ws.latency
     global commands_ran
-
+    try:
+        db.admin.command('ping')
+        db_connected_raw= True
+        db.close()
+    except Exception:
+        db_connected_raw = False
+        db.close()
+        
     # Define the green bar emoji as the default
     ping_emoji = '<:icons_goodping:880113406915538995>' # 100ms
 
@@ -468,10 +485,15 @@ async def status(interaction: discord.Interaction):
         con = "<:icons_warning:908958943466893323> The bot haven\'t properly initialized, please contact bot developer"
     else:
         con = "<:icons_outage:868122243845206087> Not connected to Roblox API"
+    if db_connected_raw == True:
+        db_connected = "<:icons_online:860123643395571713> Connected to Database Services"
+    else:
+        db_connected = "<:icons_outage:868122243845206087> Not connected to Database Services"
         
     emb = discord.Embed(title="Bot Status", description=None, color=BLUE)
     emb.add_field(name="Latency", value=f"{ping_emoji} `{ping * 1000:.0f}ms`", inline=False)
     emb.add_field(name="Roblox API", value=f"{con}", inline=False)
+    emb.add_field(name="Database Connection", value=db_connected, inline=False)
     emb.add_field(name="Uptime", value=f"<:clock:1113391359274000394> {clock}", inline=False)
     emb.add_field(name="Commands ran this session", value=f"<:icons_slashcmd:860133546315218944> I've ran `{commands_ran}` command(s) this session.", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
@@ -597,7 +619,7 @@ async def get_user(interaction: discord.Interaction, user: str):
 
 
 
-
+   
 
 
 
