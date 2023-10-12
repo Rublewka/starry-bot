@@ -1,4 +1,7 @@
 # setup
+import dns.resolver
+dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
+dns.resolver.default_resolver.nameservers = ['1.1.1.1']
 import json
 import os
 import os.path
