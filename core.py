@@ -31,7 +31,7 @@ RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 db_token = os.getenv("DBTOKEN")
 
-run_nightly = True
+run_nightly = False
 
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
