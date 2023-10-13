@@ -1,7 +1,7 @@
 # setup
-import dns.resolver
-dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
-dns.resolver.default_resolver.nameservers = ['1.1.1.1']
+#import dns.resolver
+#dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
+#dns.resolver.default_resolver.nameservers = ['1.1.1.1']
 import json
 import os
 import os.path
@@ -34,7 +34,7 @@ RoClient = Client(os.getenv("ROBLOXTOKEN"))
 # setup end
 db_token = os.getenv("DBTOKEN")
 
-run_nightly = False
+run_nightly = True
 
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi

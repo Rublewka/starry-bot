@@ -1,4 +1,5 @@
 start.bat
+start.py
 settings.json
 .devcontainer
 images
