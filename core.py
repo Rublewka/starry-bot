@@ -716,13 +716,20 @@ async def get_members(interaction: discord.Interaction):
 @client.command()
 async def db_create_entry(ctx, discordID: int, robloxID: int, username: str):
     if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in ctx.author.roles):
-        entry = {
-            "username": f"{username}",
-            "discordID": f"{discordID}",
-            "robloxID": f"{robloxID}"
-        }    
-        post_id = db.insert_one(entry).inserted_id
-        await ctx.reply(f'Created new entry with ID `{post_id}`')
+        alr_verified_raw1 = db.find({"discordID": f"{discordID}"})
+        alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
+        alr_verified_raw3 = ''.join(alr_verified_raw2)
+        alr_verified = alr_verified_raw3.replace("'", "")
+        if len(alr_verified) == 0:
+            entry = {
+                "username": f"{username}",
+                "discordID": f"{discordID}",
+                "robloxID": f"{robloxID}"
+            }    
+            post_id = db.insert_one(entry).inserted_id
+            await ctx.reply(f'Created new entry with ID `{post_id}`')
+        else:
+            await ctx.reply('Entry for this user already exists')
     else:
         emb = discord.Embed(title="Uh-uh", colour=RED)
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687621411786772>")
@@ -748,6 +755,37 @@ async def db_delete_entry(ctx, discordID: int):
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687621411786772>")
         await ctx.reply(embed=emb)
         logging.info(f"@{ctx.author.name} tried to run `;db_delete_entry` command, but they had no sufficient perms")
+
+
+@client.command()
+async def db_get_entry(ctx, discordID: int):
+    if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in ctx.author.roles):
+        cur = db.find({"discordID": f"{discordID}"})
+        if len(cur.distinct(key="robloxID")) > 0:
+            is_there = True
+        else:
+            is_there = False
+        if is_there == True:
+            dscID_raw1 = cur.distinct(key="discordID")
+            dscID_raw2 = ''.join(dscID_raw1)
+            dscID = dscID_raw2.replace("'", "")
+            roID_raw1 = cur.distinct(key="robloxID")
+            roID_raw2 = ''.join(roID_raw1)
+            roID = roID_raw2.replace("'", "")
+            roUSNM_raw1 = cur.distinct(key="username")
+            roUSMN_raw2 = ''.join(roUSNM_raw1)
+            roUSNM = roUSMN_raw2.replace("'", "")
+            emb = discord.Embed(title='Database export')
+            emb.add_field(name='Discord ID', value=f'{dscID}', inline=False)
+            emb.add_field(name='Discord user', value=f'<@{dscID}>', inline=False)
+            emb.add_field(name='Roblox ID', value=f'{roID}', inline=False)
+            emb.add_field(name='Roblox Username', value=f'{roUSNM}', inline=False)
+            await ctx.reply(embed=emb)
+        else:
+            await ctx.reply('Could not find specified entry')
+        
+
+
 
 
 
