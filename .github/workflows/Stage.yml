@@ -16,12 +16,12 @@ jobs:
         
       - name: run_nightly = False
         run: |
-          LINE_NUMBER=34  # Replace with the desired line number
+          LINE_NUMBER=3  # Replace with the desired line number
           NEW_LINE="run_nightly = False"  # Replace with the new content
-          sed -i "${LINE_NUMBER}s/.*/${NEW_LINE}/" core.py
+          sed -i "${LINE_NUMBER}s/.*/${NEW_LINE}/" .env
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
           git add core.py
-          git commit -m "Update line ${LINE_NUMBER}"
+          git commit -m "Staging for deploy"
           git push origin main  # Adjust the branch name if needed
         continue-on-error: true
