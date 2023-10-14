@@ -1,7 +1,7 @@
 # setup
 import dns.resolver
 dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
-dns.resolver.default_resolver.nameservers = ['1.1.1.1']
+dns.resolver.default_resolver.nameservers = ['1.1.1.1', '1.0.0.1']
 import json
 import os
 import os.path
@@ -12,10 +12,8 @@ import discord
 import requests
 import urllib.request
 import logging
-import sqlite3
 from logging import *
 from discord import app_commands
-from dislog import DiscordWebhookHandler
 from roblox import AvatarThumbnailType
 from src.verif_words import verification_words
 from dotenv import load_dotenv
@@ -704,6 +702,53 @@ async def get_user_via_discord(interaction: discord.Interaction, user: discord.M
     await interaction.response.defer(ephemeral=False, thinking=True)
     await interaction.followup.send(embed=emb)
 
+@client.tree.command(name='who-is-via-roblox', description='Get user verified with specified Roblox account')
+async def who_is_via_discord(interaction: discord.Interaction, user: str):
+    if user.isdigit() == True:
+        cur = db.find({"robloxID": f"{user}"})
+        dscuser = cur.distinct(key="discordID")
+        rouser = await RoClient.get_user(user_id=user)
+        if len(dscuser) > 0:
+            append_str1 = '<@'
+            append_str2 = '>' 
+            users1 = [append_str1 + sub + append_str2 for sub in dscuser]
+            users = ', '.join(users1)
+            emb = discord.Embed(title='User lookup via Roblox')
+            emb.add_field(name=f'Following users verified as `{rouser.name}`', value=f'{users}')
+            await interaction.response.defer(ephemeral=False, thinking=True)
+            await interaction.followup.send(embed=emb)
+        else:
+            await interaction.response.defer(ephemeral=True, thinking=True)
+            await interaction.followup.send(f'Couldn\'t find anyone verified as `{rouser.name}`')
+    elif user.isdigit() == False:
+        try:
+            rouser = await RoClient.get_user_by_username(username=user)
+            rouser_found = True
+        except UserNotFound:
+            await interaction.response.defer(ephemeral=True, thinking=True)
+            await interaction.followup.send(f'Couldn\'t find specified user (`{user}`)')
+            rouser_found = False
+        
+        if rouser_found :    
+            cur = db.find({"robloxID": f"{rouser.id}"})
+            dscuser = cur.distinct(key="discordID")
+            print(dscuser)
+            if len(dscuser) > 0:
+                append_str1 = '<@'
+                append_str2 = '>' 
+                users1 = [append_str1 + sub + append_str2 for sub in dscuser]
+                users = ', '.join(users1)
+                emb = discord.Embed(title='User lookup via Roblox')
+                emb.add_field(name=f'Following users verified as `{rouser.name}`', value=f'{users}')
+                await interaction.response.defer(ephemeral=False, thinking=True)
+                await interaction.followup.send(embed=emb)
+            else:
+                await interaction.response.defer(ephemeral=True, thinking=True)
+                await interaction.followup.send(f'Couldn\'t find anyone verified as `{rouser.name}`')
+    else:
+        await interaction.response.defer(ephemeral=True, thinking=False)
+        await interaction.followup.send('Please specify **Roblox username** or **ID**')
+
 
 @client.tree.command(name='get-members', description='How many members in group')
 async def get_members(interaction: discord.Interaction):
@@ -712,7 +757,6 @@ async def get_members(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=False, thinking=True)
     await interaction.followup.send(f'There are `{len(members)}` members in the group')
 
-    
 @client.command()
 async def db_create_entry(ctx, discordID: int, robloxID: int, username: str):
     if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in ctx.author.roles):
@@ -720,6 +764,7 @@ async def db_create_entry(ctx, discordID: int, robloxID: int, username: str):
         alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
         alr_verified_raw3 = ''.join(alr_verified_raw2)
         alr_verified = alr_verified_raw3.replace("'", "")
+        print(alr_verified)
         if len(alr_verified) == 0:
             entry = {
                 "username": f"{username}",
@@ -783,6 +828,8 @@ async def db_get_entry(ctx, discordID: int):
             await ctx.reply(embed=emb)
         else:
             await ctx.reply('Could not find specified entry')
+
+
         
 
 
