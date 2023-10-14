@@ -705,21 +705,28 @@ async def get_user_via_discord(interaction: discord.Interaction, user: discord.M
 @client.tree.command(name='who-is-via-roblox', description='Get user verified with specified Roblox account')
 async def who_is_via_discord(interaction: discord.Interaction, user: str):
     if user.isdigit() == True:
-        cur = db.find({"robloxID": f"{user}"})
-        dscuser = cur.distinct(key="discordID")
-        rouser = await RoClient.get_user(user_id=user)
-        if len(dscuser) > 0:
-            append_str1 = '<@'
-            append_str2 = '>' 
-            users1 = [append_str1 + sub + append_str2 for sub in dscuser]
-            users = ', '.join(users1)
-            emb = discord.Embed(title='User lookup via Roblox')
-            emb.add_field(name=f'Following users verified as `{rouser.name}`', value=f'{users}')
-            await interaction.response.defer(ephemeral=False, thinking=True)
-            await interaction.followup.send(embed=emb)
-        else:
+        try:
+            rouser = await RoClient.get_user(user_id=user)
+            rouser_found = True
+        except UserNotFound:
             await interaction.response.defer(ephemeral=True, thinking=True)
-            await interaction.followup.send(f'Couldn\'t find anyone verified as `{rouser.name}`')
+            await interaction.followup.send(f'Couldn\'t find specified user (`{user}`)')
+            rouser_found = False
+        if rouser_found:
+            cur = db.find({"robloxID": f"{user}"})
+            dscuser = cur.distinct(key="discordID")
+            if len(dscuser) > 0:
+                append_str1 = '<@'
+                append_str2 = '>' 
+                users1 = [append_str1 + sub + append_str2 for sub in dscuser]
+                users = ', '.join(users1)
+                emb = discord.Embed(title='User lookup via Roblox')
+                emb.add_field(name=f'Following users verified as `{rouser.name}`', value=f'{users}')
+                await interaction.response.defer(ephemeral=False, thinking=True)
+                await interaction.followup.send(embed=emb)
+            else:
+                await interaction.response.defer(ephemeral=True, thinking=True)
+                await interaction.followup.send(f'Couldn\'t find anyone verified as `{rouser.name}`')
     elif user.isdigit() == False:
         try:
             rouser = await RoClient.get_user_by_username(username=user)
