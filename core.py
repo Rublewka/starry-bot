@@ -18,6 +18,7 @@ from roblox import AvatarThumbnailType
 from src.verif_words import verification_words
 from dotenv import load_dotenv
 from discord.ext import commands
+from discord.ui import Button, View
 from roblox import Client
 from roblox.utilities.exceptions import *
 from roblox.utilities.iterators import SortOrder
@@ -37,8 +38,8 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 uri = "mongodb+srv://starry_bot:TPth5ILO9WiJUcKU@rublewka-bot.b7dexs8.mongodb.net/?retryWrites=true&w=majority"
 # Create a new client and connect to the server
-mclient = MongoClient(uri, server_api=ServerApi('1'))
-db_raw = mclient.starry_bot
+dbclient = MongoClient(uri, server_api=ServerApi('1'))
+db_raw = dbclient.starry_bot
 db = db_raw.users
 
 RoConnected = None
@@ -145,143 +146,155 @@ DARKER_GREY = 0x546e7a
 BLURPLE = 0x7289da
 GREYPLE = 0x99aab5
 
-
-
-
-async def get_verification_thread(interaction: discord.Interaction) -> discord.Thread:
-    user = interaction.user
-    channel = interaction.channel
-    thread_name = f"{user.name} Verification"
-    thread = await channel.create_thread(
-        name=thread_name,
-        auto_archive_duration=60,
-        type=discord.ChannelType.private_thread,
-        invitable=False
-    )
-    await thread.add_user(user)
-    return thread
-
-
-async def get_roblox_username(interaction: discord.Interaction, thread: discord.Thread) -> str:
-    user = interaction.user
-
-    def check(message):
-        return message.author == user
-
-    await thread.send(f"{interaction.user.mention} please type in your Roblox Username to verify")
-    user_message = await client.wait_for('message', check=check)
-    return user_message.content
-
-
-async def get_rouser_info(roblox_username: str, thread: discord.Thread) -> dict:
-    rouser = await RoClient.get_user_by_username(roblox_username)
-    emb = discord.Embed(
-        title="Check your account info",
-        description="""If this is your account - type `Continue` to continue; 
-        If not - type `Back` to go back."""
-    )
-    emb.add_field(name="Username", value=rouser.name, inline=False)
-    emb.add_field(name="Display Name", value=rouser.display_name, inline=False)
-    emb.add_field(name="ID", value=rouser.id, inline=False)
-    if rouser.description == '':
-        desc = '*None*'
-    else:
-        desc = rouser.description
-    emb.add_field(name="Description", value=desc, inline=False)
-    emb.add_field(name="Created At", value=rouser.created, inline=False)
-    user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(
-        users=[rouser],
-        type=AvatarThumbnailType.full_body,
-        size=(420, 420)
-    )
-    if len(user_thumbnails) > 0:
-        user_thumbnail = user_thumbnails[0]
-        emb.set_thumbnail(url=user_thumbnail.image_url)
-    await thread.send(embed=emb)
-    return rouser
-
-@client.tree.command(name="verify", description="Link your Roblox account with your Discord account")
-async def verify_member(interaction: discord.Interaction):
-    global commands_ran
-    commands_ran += 1
+@client.tree.command(name='verify', description='Link your Disord account with Discord account')
+async def verify(interaction: discord.Interaction, username: str):
     alr_verified_raw1 = db.find({"discordID": f"{interaction.user.id}"})
     alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
     alr_verified_raw3 = ''.join(alr_verified_raw2)
     alr_verified = alr_verified_raw3.replace("'", "")
     if len(alr_verified) == 0:
-        thread = await get_verification_thread(interaction)
-        await interaction.response.defer(ephemeral=True, thinking=True)
-        await interaction.followup.send('Opened new verification thread for you')
-        member = interaction.user
-        roblox_username = await get_roblox_username(interaction, thread)
-        rouser = await get_rouser_info(roblox_username, thread)
-
-        def check(message):
-            return message.author == interaction.user
-
-        while True:
-            await thread.send("If this is your account - type `Continue` to continue; If not - type `Cancel` to cancel verification.")
-            con = await client.wait_for('message', check=check)
-            if con.content.lower() == 'continue':
-                break
-    
-        words = verification_words
-        random_words = []
-        for i in range(5):
-            word = random.choice(words)
-            random_words.append(word)
-        verif_words = ", ".join(random_words)
-        emb = discord.Embed(
-            title=f"Verification words for {interaction.user.name}",
-            description='Please paste these verification words into your Roblox Profile Description'
-        )
-        emb.add_field(name="Verification words", value=f'`{verif_words}`', inline=False)
-        emb.set_footer(text="If Roblox Filtered these verification words, type \"New words\" to get a new ones")
-        await thread.send(embed=emb)
-
-        while True:
-            await thread.send(f"Type `Done` when you are done")
-            done = await client.wait_for('message', check=check)
-            rouser_a = await RoClient.get_user_by_username(username=f'{roblox_username}')
-            if done.content.lower() == 'done' and rouser_a.description == verif_words:
-                try:
-                    entry = {
+        button_ingame = Button(label='Game', custom_id='ingame', style=discord.ButtonStyle.green, disabled=False)
+        button_desc = Button(label='Profile Description', custom_id='desc', style=discord.ButtonStyle.blurple)
+        async def verify_ingame(interaction=interaction):
+            try:
+                rouser = await RoClient.get_user_by_username(username=username)
+                rouser_found = True
+            except UserNotFound:
+                await interaction.response.edit_message(content=f'Could\'t find specified user `{username}` \nTry again!', view=None)
+                rouser_found = False
+            if rouser_found:
+                emb = discord.Embed(title='Check your account info')
+                emb.add_field(name='Username', value=f'{rouser.name}')
+                if rouser.description == '':
+                    desc = '*None*'
+                else:
+                    desc = rouser.description
+                emb.add_field(name='Description', value=f'{desc}')
+                emb.add_field(name='ID', value=f'{rouser.id}')
+                user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(
+                    users=[rouser],
+                    type=AvatarThumbnailType.full_body,
+                    size=(720, 720)
+                    )
+                if len(user_thumbnails) > 0:
+                    user_thumbnail = user_thumbnails[0]
+                    emb.set_image(url=user_thumbnail.image_url)
+                created = f'<t:{str(rouser.created.timestamp())[0:10]}>'
+                emb.add_field(name='Joined platform', value=f'{created}')
+            
+                button_me = Button(label='It\'s me', custom_id='button_me', style=discord.ButtonStyle.green)
+                button_notme = Button(label='No, It\'s not me', custom_id='button_notme', style=discord.ButtonStyle.danger)
+            async def verif_ingame_me(interaction=interaction):
+                db_verif = db_raw.pending_verificatons
+                entry = {
                     "username": f"{rouser.name}",
                     "discordID": f"{interaction.user.id}",
-                    "robloxID": f"{rouser.id}"
-                    }    
-                    post_id = db.insert_one(entry).inserted_id
-                    print(f'Verified user and created entry with ID {post_id}')
-                    await thread.send("Verification process complete, enjoy your stay!")
-                    await member.add_roles(discord.utils.get(member.guild.roles, name="Members"))
-                    await member.edit(nick=rouser.name)
-                    await thread.edit(name=f"{interaction.user.name} Verification (Completed)", locked=True)
-                    break
-                except discord.Forbidden:
-                    await thread.send("Couldn't verify your account, contact bot developer `(Error code: 403)`")
-                    await thread.edit(name=f"{interaction.user.name} Verification (Error)", locked=True)
-                    break
-                except discord.HTTPException:
-                    await thread.send("Couldn't verify your account, contact bot developer `(Error code: 500)`")
-                    await thread.edit(name=f"{interaction.user.name} Verification (Error)", locked=True)
-                    break
-            elif done.content.lower() == 'new words':
-                continue
-            elif done.content.lower() == 'cancel':
-                await thread.send("Verification proccess canceled")
-                await thread.edit(name=f"{interaction.user.name} Verification (Canceled)")
-                break
-            elif done.content.lower() == 'done' and rouser_a.description != verif_words:
-                await thread.send("I couldn't find verification words in your **Roblox Profile Description**, try again!")
-                continue
-            else:
-                await thread.send("Couldn't verify your account, please try again later")
-                await thread.edit(name=f"{interaction.user.name} Verification (Failed)", locked=True)
-                break
+                    "robloxID": f"{rouser.id}",
+                    "confirmed": "False"
+                }
+                db_verif.insert_one(entry)
+
+                async def verif_ingame_done(interaction=interaction):
+                    done_check_raw = db_verif.find({"discordID": f"{interaction.user.id}"})
+                    done_check = ''.join(done_check_raw.distinct(key="confirmed"))
+                    if done_check == 'True':
+                        entry = {
+                            "username": f"{rouser.name}",
+                            "discordID": f"{interaction.user.id}",
+                            "robloxID": f"{rouser.id}"
+                            }
+                        db.insert_one(entry)
+                        try:
+                            await interaction.user.edit(nick=f'{rouser.name} ({interaction.user.display_name})')
+                            await interaction.response.edit_message(content=f'Successfuly verified you as **{rouser.name}**', view=None)
+                            await interaction.user.add_roles(roles=1094687628357537852)
+                        except discord.Forbidden:
+                            await interaction.response.edit_message(content=f'Successfuly verified you as {rouser.name} \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
+                button_done = Button(label='Done', style=discord.ButtonStyle.green)
+                button_done.callback = verif_ingame_done    
+                view = View()
+                view.add_item(button_done)
+                await interaction.response.edit_message(content='Join [this](https://www.roblox.com/games/15055138791/Starry-Bot-Verification-Place) game and follow instructions in there', view=view, embed=None)
+                
+            button_me.callback = verif_ingame_me
+            view = View()
+            view.add_item(button_me)
+#            view.add_item(button_notme)
+            await interaction.response.edit_message(content=None, view=view, embed=emb)
+
+        async def verify_desc(interaction=interaction):
+            try:
+                rouser = await RoClient.get_user_by_username(username=username)
+                rouser_found = True
+            except UserNotFound:
+                await interaction.response.edit_message(content=f'Could\'t find specified user `{username}` \nTry again!', view=None)
+                rouser_found = False
+            if rouser_found:
+                emb = discord.Embed(title='Check your account info')
+                emb.add_field(name='Username', value=f'{rouser.name}')
+                if rouser.description == '':
+                    desc = '*None*'
+                else:
+                    desc = rouser.description
+                emb.add_field(name='Description', value=f'{desc}')
+                emb.add_field(name='ID', value=f'{rouser.id}')
+                user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(
+                    users=[rouser],
+                    type=AvatarThumbnailType.full_body,
+                    size=(720, 720)
+                    )
+                if len(user_thumbnails) > 0:
+                    user_thumbnail = user_thumbnails[0]
+                    emb.set_image(url=user_thumbnail.image_url)
+                created = f'<t:{str(rouser.created.timestamp())[0:10]}>'
+                emb.add_field(name='Joined platform', value=f'{created}')
+            
+                button_me = Button(label='It\'s me', custom_id='button_me', style=discord.ButtonStyle.green)
+                button_notme = Button(label='No, It\'s not me', custom_id='button_notme', style=discord.ButtonStyle.danger)
+            
+                async def verif_desc_me(interaction=interaction):
+                    for i in range(1):
+                        verif_words_raw = random.choices(verification_words, k=6)
+                        verif_words = ', '.join(verif_words_raw)
+                    async def verif_desc_done(interaction=interaction):
+                        rouser = await RoClient.get_user_by_username(username=username)
+                        if verif_words in rouser.description:
+                            entry = {
+                            "username": f"{rouser.name}",
+                            "discordID": f"{interaction.user.id}",
+                            "robloxID": f"{rouser.id}"
+                            }    
+                            db.insert_one(entry)
+                            try:
+                                await interaction.user.edit(nick=f'{rouser.name} ({interaction.user.display_name})')
+                                await interaction.response.edit_message(content=f'Successfuly verified you as **{rouser.name}**', view=None)
+                                await interaction.user.add_roles(roles=1094687628357537852)
+                            except discord.Forbidden:
+                                await interaction.response.edit_message(content=f'Successfuly verified you as {rouser.name} \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
+
+                    button_done = Button(label='Done', style=discord.ButtonStyle.green)
+                    button_done.callback = verif_desc_done
+                    view = View()
+                    view.add_item(button_done)
+                    await interaction.response.edit_message(content=f'Paste these words into your Roblox profile description \n`{verif_words}`', view=view, embed=None)
+
+                button_me.callback = verif_desc_me
+#                button_notme.callback = verif_desc_notme
+                view = View()
+                view.add_item(button_me)
+                view.add_item(button_notme)
+
+                await interaction.response.edit_message(content=None, embed=emb, view=view)
+            
+        button_ingame.callback = verify_ingame
+        button_desc.callback = verify_desc
+        view = View()
+        view.add_item(button_ingame)
+        view.add_item(button_desc)
+        await interaction.response.send_message(f'# Hello, welcome to verification! You are verifying as **`{username}`** \n## Please choose verification method below \nGame verification method recommended', ephemeral=True, view=view)
     else:
-        rouser_alr_verified = await RoClient.get_user(user_id=alr_verified)
-        await interaction.response.defer(ephemeral=True, thinking=True)
-        await interaction.followup.send(f"You are already verified as **`{rouser_alr_verified.name}`**")
+        rouser = await RoClient.get_user(user_id=alr_verified)
+        await interaction.response.send_message(f'You are already verified as `{rouser.name}` \n||reverification coming soon||')
 
 
 
@@ -470,7 +483,7 @@ async def status(interaction: discord.Interaction):
     ping = client.ws.latency
     global commands_ran
     try:
-        mclient.admin.command('ping')
+        dbclient.admin.command('ping')
         db_connected_raw= True
     except Exception:
         db_connected_raw = False
@@ -556,7 +569,7 @@ async def dsc_cmds_sync(ctx):
      await ctx.reply('<:checkmark:1155750377178804286> Synced!')
 
 
-@client.tree.command(name="get-user", description="Get user info from Roblox")
+@client.tree.command(name="who-is-via-username", description="Get user info from Roblox by their username")
 async def get_user(interaction: discord.Interaction, user: str):
     global commands_ran
     commands_ran += 1
@@ -634,7 +647,7 @@ async def get_user(interaction: discord.Interaction, user: str):
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send("I could not connect to Roblox. Please contact my developer. (<@1006501114419630081>)")
 
-@client.tree.command(name='get-user-via-discord', description='Get user info via Discord')
+@client.tree.command(name='who-is-via-discord', description='Get user info via Discord')
 async def get_user_via_discord(interaction: discord.Interaction, user: discord.Member):
     get_user_raw1 = db.find({"discordID": f"{user.id}"})
     get_user_raw2 = get_user_raw1.distinct(key="robloxID")
@@ -739,7 +752,6 @@ async def who_is_via_discord(interaction: discord.Interaction, user: str):
         if rouser_found :    
             cur = db.find({"robloxID": f"{rouser.id}"})
             dscuser = cur.distinct(key="discordID")
-            print(dscuser)
             if len(dscuser) > 0:
                 append_str1 = '<@'
                 append_str2 = '>' 
