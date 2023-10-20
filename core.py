@@ -153,7 +153,7 @@ async def verify(interaction: discord.Interaction, username: str):
     alr_verified_raw3 = ''.join(alr_verified_raw2)
     alr_verified = alr_verified_raw3.replace("'", "")
     if len(alr_verified) == 0:
-        button_ingame = Button(label='Game', custom_id='ingame', style=discord.ButtonStyle.green, disabled=False)
+        button_ingame = Button(label='Game (WIP)', custom_id='ingame', style=discord.ButtonStyle.green, disabled=True)
         button_desc = Button(label='Profile Description', custom_id='desc', style=discord.ButtonStyle.blurple)
         async def verify_ingame(interaction=interaction):
             try:
@@ -204,12 +204,17 @@ async def verify(interaction: discord.Interaction, username: str):
                             "robloxID": f"{rouser.id}"
                             }
                         db.insert_one(entry)
+                        if rouser.name != interaction.user.display_name:
+                            nick = f'{rouser.name} ({interaction.user.display_name})'
+                        else:
+                            nick = f'{rouser.name}'
                         try:
-                            await interaction.user.edit(nick=f'{rouser.name} ({interaction.user.display_name})')
-                            await interaction.response.edit_message(content=f'Successfuly verified you as **{rouser.name}**', view=None)
-                            await interaction.user.add_roles(roles=1094687628357537852)
+                            await interaction.user.edit(nick=f'{nick}')
+                            await interaction.response.edit_message(content=f'Successfully verified you as **{rouser.name}**', view=None)
+                            role = interaction.guild.get_role(1094687628357537852)
+                            await interaction.user.add_roles(role)
                         except discord.Forbidden:
-                            await interaction.response.edit_message(content=f'Successfuly verified you as {rouser.name} \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
+                            await interaction.response.edit_message(content=f'Successfully verified you as {rouser.name} \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
                 button_done = Button(label='Done', style=discord.ButtonStyle.green)
                 button_done.callback = verif_ingame_done    
                 view = View()
@@ -265,12 +270,17 @@ async def verify(interaction: discord.Interaction, username: str):
                             "robloxID": f"{rouser.id}"
                             }    
                             db.insert_one(entry)
+                            if rouser.name != interaction.user.display_name:
+                                nick = f'{rouser.name} ({interaction.user.display_name})'
+                            else:
+                                nick = f'{rouser.name}'
                             try:
-                                await interaction.user.edit(nick=f'{rouser.name} ({interaction.user.display_name})')
-                                await interaction.response.edit_message(content=f'Successfuly verified you as **{rouser.name}**', view=None)
-                                await interaction.user.add_roles(roles=1094687628357537852)
+                                await interaction.user.edit(nick=f'{nick}')
+                                await interaction.response.edit_message(content=f'Successfully verified you as **{rouser.name}**', view=None)
+                                role = interaction.guild.get_role(1094687628357537852)
+                                await interaction.user.add_roles(role)
                             except discord.Forbidden:
-                                await interaction.response.edit_message(content=f'Successfuly verified you as {rouser.name} \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
+                                await interaction.response.edit_message(content=f'Successfully verified you as {rouser.name} \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
 
                     button_done = Button(label='Done', style=discord.ButtonStyle.green)
                     button_done.callback = verif_desc_done
