@@ -118,7 +118,8 @@ async def on_ready():
 
 commands_ran = 0
 
-rvr_token = 'rvr2b087uhj4acpftd4vs7dbvgyow4a5ujfz2hkvs0w4j5nzzq8gdftgcadrewulalkx'
+rvr_token = 'rvr2b087uhj4acpftd2hgnya450sqjoar2lce6wk9mppsiy59f80uxuc37tvsuh99cef'
+blx_token = 'd28965c0-dce1-40ef-99de-a5411b32e5b4'
 
 # ___________
 # colors
@@ -155,6 +156,7 @@ async def verify(interaction: discord.Interaction, username: str):
     if len(alr_verified) == 0:
         button_ingame = Button(label='Game (WIP)', custom_id='ingame', style=discord.ButtonStyle.green, disabled=True)
         button_desc = Button(label='Profile Description', custom_id='desc', style=discord.ButtonStyle.blurple)
+        button_thirdparty = Button(label='Third party', style=discord.ButtonStyle.blurple)
         async def verify_ingame(interaction=interaction):
             try:
                 rouser = await RoClient.get_user_by_username(username=username)
@@ -184,6 +186,8 @@ async def verify(interaction: discord.Interaction, username: str):
             
                 button_me = Button(label='It\'s me', custom_id='button_me', style=discord.ButtonStyle.green)
                 button_notme = Button(label='No, It\'s not me', custom_id='button_notme', style=discord.ButtonStyle.danger)
+            async def verif_ingame_notme(interaction=interaction):
+                await interaction.response.edit_message(content=f"Verification cancelled. Try again", view=None, embed=None)
             async def verif_ingame_me(interaction=interaction):
                 db_verif = db_raw.pending_verificatons
                 entry = {
@@ -204,8 +208,8 @@ async def verify(interaction: discord.Interaction, username: str):
                             "robloxID": f"{rouser.id}"
                             }
                         db.insert_one(entry)
-                        if rouser.name != interaction.user.display_name:
-                            nick = f'{rouser.name} ({interaction.user.display_name})'
+                        if rouser.display_name != rouser.name:
+                            nick = f'{rouser.display_name} ({rouser.name})'
                         else:
                             nick = f'{rouser.name}'
                         try:
@@ -222,9 +226,10 @@ async def verify(interaction: discord.Interaction, username: str):
                 await interaction.response.edit_message(content='Join [this](https://www.roblox.com/games/15055138791/Starry-Bot-Verification-Place) game and follow instructions in there', view=view, embed=None)
                 
             button_me.callback = verif_ingame_me
+            button_notme.callback = verif_ingame_notme
             view = View()
             view.add_item(button_me)
-#            view.add_item(button_notme)
+            view.add_item(button_notme)
             await interaction.response.edit_message(content=None, view=view, embed=emb)
 
         async def verify_desc(interaction=interaction):
@@ -256,7 +261,8 @@ async def verify(interaction: discord.Interaction, username: str):
             
                 button_me = Button(label='It\'s me', custom_id='button_me', style=discord.ButtonStyle.green)
                 button_notme = Button(label='No, It\'s not me', custom_id='button_notme', style=discord.ButtonStyle.danger)
-            
+                async def verif_desc_notme(interaction=interaction):
+                    await interaction.response.edit_message(content=f"Verification cancelled. Try again", view=None, embed=None)
                 async def verif_desc_me(interaction=interaction):
                     for i in range(1):
                         verif_words_raw = random.choices(verification_words, k=6)
@@ -270,8 +276,8 @@ async def verify(interaction: discord.Interaction, username: str):
                             "robloxID": f"{rouser.id}"
                             }    
                             db.insert_one(entry)
-                            if rouser.name != interaction.user.display_name:
-                                nick = f'{rouser.name} ({interaction.user.display_name})'
+                            if rouser.display_name != rouser.name:
+                                nick = f'{rouser.display_name} ({rouser.name})'
                             else:
                                 nick = f'{rouser.name}'
                             try:
@@ -281,7 +287,7 @@ async def verify(interaction: discord.Interaction, username: str):
                                 await interaction.user.add_roles(role)
                             except discord.Forbidden:
                                 await interaction.response.edit_message(content=f'Successfully verified you as {rouser.name} \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
-
+                    
                     button_done = Button(label='Done', style=discord.ButtonStyle.green)
                     button_done.callback = verif_desc_done
                     view = View()
@@ -289,22 +295,109 @@ async def verify(interaction: discord.Interaction, username: str):
                     await interaction.response.edit_message(content=f'Paste these words into your Roblox profile description \n`{verif_words}`', view=view, embed=None)
 
                 button_me.callback = verif_desc_me
-#                button_notme.callback = verif_desc_notme
+                button_notme.callback = verif_desc_notme
                 view = View()
                 view.add_item(button_me)
                 view.add_item(button_notme)
 
                 await interaction.response.edit_message(content=None, embed=emb, view=view)
-            
+
+        async def verify_third_party(interaction=interaction):
+            button_thirdparty_rover = Button(label='RoVer')
+            button_thirdparty_bloxlink = Button(label='Bloxlink')
+            async def verify_thirdparty_rover(interaction=interaction):
+                r = requests.get(
+                                f'https://registry.rover.link/api/guilds/1018415075255668746/discord-to-roblox/{interaction.user.id}',
+                                headers={'Authorization': f'Bearer {rvr_token}'},
+                                timeout=10)
+                data = r.json()
+                json_str = json.dumps(data)
+                resp = json.loads(json_str)
+                if len(str(resp['robloxId'])) > 0:
+
+                    try:
+                        rouser = await RoClient.get_user(user_id=resp['robloxId'])
+                        ro_found = True
+                    except UserNotFound:
+                        ro_found = False
+                        await interaction.response.edit_message(content='Couldn\'t find your Roblox account via RoVer, try again', view=None)
+                else:
+                    ro_found = False
+                    await interaction.response.edit_message(content='Couldn\'t find your Roblox account via RoVer, try again', view=None)
+                if ro_found:
+                    entry = {
+                            "username": f"{rouser.name}",
+                            "discordID": f"{interaction.user.id}",
+                            "robloxID": f"{rouser.id}"
+                            }    
+                    db.insert_one(entry)
+                    if rouser.display_name != rouser.name:
+                        nick = f'{rouser.display_name} ({rouser.name})'
+                    else:
+                        nick = f'{rouser.name}'
+                    try:
+                        await interaction.user.edit(nick=f'{nick}')
+                        await interaction.response.edit_message(content=f'Successfully verified you as **{rouser.name}**', view=None)
+                        role = interaction.guild.get_role(1094687628357537852)
+                        await interaction.user.add_roles(role)
+                    except discord.Forbidden:
+                        await interaction.response.edit_message(content=f'Successfully verified you as **{rouser.name}** \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
+            async def verify_thirdparty_bloxlink(interaction=interaction):
+                r = requests.get(
+                                f'https://api.blox.link/v4/public/guilds/1018415075255668746/discord-to-roblox/{interaction.user.id}',
+                                headers={'Authorization': f'{blx_token}'},
+                                timeout=10)
+                data = r.json()
+                json_str = json.dumps(data)
+                resp = json.loads(json_str)
+                if len(resp['robloxID']) > 0:    
+                    try:
+                        rouser = await RoClient.get_user(user_id=resp['robloxID'])
+                        ro_found = True
+                    except UserNotFound:
+                        ro_found = False
+                        await interaction.response.edit_message(content='Couldn\'t find your Roblox account via Bloxlink, try again', view=None)
+                else:
+                    ro_found = False
+                    await interaction.response.edit_message(content='Couldn\'t find your Roblox account via Bloxlink, try again', view=None)
+
+                if ro_found:
+                    entry = {
+                            "username": f"{rouser.name}",
+                            "discordID": f"{interaction.user.id}",
+                            "robloxID": f"{rouser.id}"
+                            }    
+                    db.insert_one(entry)
+                    if rouser.display_name != rouser.name:
+                        nick = f'{rouser.display_name} ({rouser.name})'
+                    else:
+                        nick = f'{rouser.name}'
+                    try:
+                        await interaction.user.edit(nick=f'{nick}')
+                        await interaction.response.edit_message(content=f'Successfully verified you as **{rouser.name}**', view=None)
+                        role = interaction.guild.get_role(1094687628357537852)
+                        await interaction.user.add_roles(role)
+                    except discord.Forbidden:
+                        await interaction.response.edit_message(content=f'Successfully verified you as **{rouser.name}** \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
+
+            button_thirdparty_rover.callback = verify_thirdparty_rover
+            button_thirdparty_bloxlink.callback = verify_thirdparty_bloxlink
+            view = View()
+            view.add_item(button_thirdparty_rover)
+            view.add_item(button_thirdparty_bloxlink)
+            await interaction.response.edit_message(content='Choose Third Party provider below', view=view)
         button_ingame.callback = verify_ingame
         button_desc.callback = verify_desc
+        button_thirdparty.callback = verify_third_party
         view = View()
         view.add_item(button_ingame)
         view.add_item(button_desc)
+        view.add_item(button_thirdparty)
         await interaction.response.send_message(f'# Hello, welcome to verification! You are verifying as **`{username}`** \n## Please choose verification method below \nGame verification method recommended', ephemeral=True, view=view)
     else:
         rouser = await RoClient.get_user(user_id=alr_verified)
-        await interaction.response.send_message(f'You are already verified as `{rouser.name}` \n||reverification coming soon||')
+        button = Button(label='Reverify')
+        await interaction.response.send_message(f'You are already verified as `{rouser.name}`')
 
 
 
