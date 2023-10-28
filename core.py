@@ -12,6 +12,7 @@ import discord
 import requests
 import urllib.request
 import logging
+import typing
 from logging import *
 from discord import app_commands
 from roblox import AvatarThumbnailType
@@ -147,14 +148,26 @@ DARKER_GREY = 0x546e7a
 BLURPLE = 0x7289da
 GREYPLE = 0x99aab5
 
-@client.tree.command(name='verify', description='Link your Disord account with Discord account')
+#@client.tree.command(name='update', description='Update user\'s roles and nick in this server')
+async def user_update(interaction: discord.Interaction, user=None):
+    if user == None:
+        alr_verified_raw1 = db.find({"discordID": f"{interaction.user.id}"})
+        alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
+        alr_verified_raw3 = ''.join(alr_verified_raw2)
+        alr_verified = alr_verified_raw3.replace("'", "")
+        rouser = await RoClient.get_user(user_id=alr_verified)
+    else:
+        rouser = await RoClient.get_user_by_username(username=user)
+    group = await RoClient.get_group(group_id=16965138)
+    
+@client.tree.command(name='verify', description='Link your Roblox account with Discord account')
 async def verify(interaction: discord.Interaction, username: str):
     alr_verified_raw1 = db.find({"discordID": f"{interaction.user.id}"})
     alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
     alr_verified_raw3 = ''.join(alr_verified_raw2)
     alr_verified = alr_verified_raw3.replace("'", "")
     if len(alr_verified) == 0:
-        button_ingame = Button(label='Game (WIP)', custom_id='ingame', style=discord.ButtonStyle.green, disabled=True)
+        button_ingame = Button(label='Game (Recommended)', custom_id='ingame', style=discord.ButtonStyle.green)
         button_desc = Button(label='Profile Description', custom_id='desc', style=discord.ButtonStyle.blurple)
         button_thirdparty = Button(label='Third party', style=discord.ButtonStyle.blurple)
         async def verify_ingame(interaction=interaction):
@@ -189,9 +202,10 @@ async def verify(interaction: discord.Interaction, username: str):
             async def verif_ingame_notme(interaction=interaction):
                 await interaction.response.edit_message(content=f"Verification cancelled. Try again", view=None, embed=None)
             async def verif_ingame_me(interaction=interaction):
-                db_verif = db_raw.pending_verificatons
+                db_verif = db_raw.pending_verifications
                 entry = {
                     "username": f"{rouser.name}",
+                    "discordUsername": f"{interaction.user.name}",
                     "discordID": f"{interaction.user.id}",
                     "robloxID": f"{rouser.id}",
                     "confirmed": "False"
@@ -218,7 +232,14 @@ async def verify(interaction: discord.Interaction, username: str):
                             role = interaction.guild.get_role(1094687628357537852)
                             await interaction.user.add_roles(role)
                         except discord.Forbidden:
-                            await interaction.response.edit_message(content=f'Successfully verified you as {rouser.name} \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
+                            await interaction.response.edit_message(content=f'Successfully verified you as **{rouser.name}** \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
+                        db_verif.find_one_and_delete({"discordID": f"{interaction.user.id}"})
+                    elif done_check == 'Cancelled':
+                        await interaction.response.edit_message(content='Verification was cancelled ingame', view=None)
+                        db_verif.find_one_and_delete({"discordID": f"{interaction.user.id}"})
+                    else:
+                        await interaction.response.edit_message(content='Couldn\'t verify you, please try again..', view=None)
+                        db_verif.find_one_and_delete({"discordID": f"{interaction.user.id}"})
                 button_done = Button(label='Done', style=discord.ButtonStyle.green)
                 button_done.callback = verif_ingame_done    
                 view = View()
@@ -313,8 +334,7 @@ async def verify(interaction: discord.Interaction, username: str):
                 data = r.json()
                 json_str = json.dumps(data)
                 resp = json.loads(json_str)
-                if len(str(resp['robloxId'])) > 0:
-
+                if 'robloxId' in resp:
                     try:
                         rouser = await RoClient.get_user(user_id=resp['robloxId'])
                         ro_found = True
@@ -350,7 +370,7 @@ async def verify(interaction: discord.Interaction, username: str):
                 data = r.json()
                 json_str = json.dumps(data)
                 resp = json.loads(json_str)
-                if len(resp['robloxID']) > 0:    
+                if 'robloxID' in resp:    
                     try:
                         rouser = await RoClient.get_user(user_id=resp['robloxID'])
                         ro_found = True
@@ -393,12 +413,11 @@ async def verify(interaction: discord.Interaction, username: str):
         view.add_item(button_ingame)
         view.add_item(button_desc)
         view.add_item(button_thirdparty)
-        await interaction.response.send_message(f'# Hello, welcome to verification! You are verifying as **`{username}`** \n## Please choose verification method below \nGame verification method recommended', ephemeral=True, view=view)
+        await interaction.response.send_message(f'# Hello, welcome to verification! You are verifying as **`{username}`** \n## Please choose verification method below', ephemeral=True, view=view)
     else:
         rouser = await RoClient.get_user(user_id=alr_verified)
         button = Button(label='Reverify')
         await interaction.response.send_message(f'You are already verified as `{rouser.name}`')
-
 
 
 @client.tree.command(name="group-shout", description="Set new group shout")
