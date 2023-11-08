@@ -1127,9 +1127,9 @@ async def db_get_entry(ctx, discordID: int):
 
 
 
-#if run_nightly == True:
-DISTOKEN = settings['NIGHTLY_TOKEN']
-#else:
-#	DISTOKEN = settings['TOKEN']
+if run_nightly == True:
+    DISTOKEN = settings['NIGHTLY_TOKEN']
+else:
+	DISTOKEN = settings['TOKEN']
 
 client.run(DISTOKEN)
