@@ -101,8 +101,8 @@ async def on_ready():
         error(f"Bot inizializition incomplete")
         RoConnected = None
     else:
-        warn(f'`Could not connect to Roblox API. Try again later`')
-        warn(f"Roblox session could not fully initialize")
+        warning(f'`Could not connect to Roblox API. Try again later`')
+        warning(f"Roblox session could not fully initialize")
         RoConnected = False
 
         
@@ -611,16 +611,16 @@ async def status(interaction: discord.Interaction):
         db_connected_raw = False
         
     # Define the green bar emoji as the default
-    ping_emoji = '<:icons_goodping:880113406915538995>' # 100ms
+    ping_emoji = '<:starry_gudping:1171806377371521095>' # 100ms
 
 
     # Check if ping is greater than 250ms and if so, update the emoji
     if ping > 0.25000000000000000:
-        ping_emoji = '<:icons_idelping:880113405720145990>' # 250ms
+        ping_emoji = '<:starry_medping:1171806470552174603>' # 250ms
 
     # Check if ping is greater than 400ms and if so, update the emoji
     if ping > 0.40000000000000000:
-        ping_emoji = '<:icons_badping:880113405007114271>' # 400ms
+        ping_emoji = '<:starry_badping:1171806521823342664>' # 400ms
 
     # Send a message back to the user with the ping emoji and the ping time in milliseconds
     await interaction.response.defer(ephemeral=False, thinking=True)
@@ -633,48 +633,26 @@ async def status(interaction: discord.Interaction):
         days, hours = divmod(hours, 24)
         clock = f"I've been up for `{days} days, {hours} hours, {minutes} minutes and {seconds} seconds`"
     if RoConnected == True:
-        con = "<:icons_online:860123643395571713> Connected to Roblox API"
+        con = "<:starry_online:1171807873458770003> Connected to Roblox API"
     elif RoConnected == None:
-        con = "<:icons_warning:908958943466893323> The bot haven\'t properly initialized, please contact bot developer"
+        con = "<:starry_warn:1171811103714586674> The bot haven\'t properly initialized, please contact bot developer"
     else:
-        con = "<:icons_outage:868122243845206087> Not connected to Roblox API"
+        con = "<:starry_outage:1171807914323878020> Not connected to Roblox API"
     if db_connected_raw == True:
-        db_connected = "<:icons_online:860123643395571713> Connected to Database Services"
+        db_connected = "<:starry_online:1171807873458770003> Connected to Database Services"
     else:
-        db_connected = "<:icons_outage:868122243845206087> Not connected to Database Services"
+        db_connected = "<:starry_outage:1171807914323878020> Not connected to Database Services"
         
     emb = discord.Embed(title="Bot Status", description=None, color=BLUE)
     emb.add_field(name="Latency", value=f"{ping_emoji} `{ping * 1000:.0f}ms`", inline=False)
     emb.add_field(name="Roblox API", value=f"{con}", inline=False)
     emb.add_field(name="Database Connection", value=db_connected, inline=False)
-    emb.add_field(name="Uptime", value=f"<:clock:1113391359274000394> {clock}", inline=False)
-    emb.add_field(name="Commands ran this session", value=f"<:icons_slashcmd:860133546315218944> I've ran `{commands_ran}` command(s) this session.", inline=False)
+    emb.add_field(name="Uptime", value=f"<:starry_clock:1113391359274000394> {clock}", inline=False)
+    emb.add_field(name="Commands ran this session", value=f"<:starry_cmd:1171807971274149908> I've ran `{commands_ran}` command(s) this session.", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
     await interaction.followup.send(embed=emb)
     commands_ran += 1
 
-# Help
-@client.tree.command(name="help", description="Show help for the bot")
-async def help(interaction: discord.Interaction):
-        global commands_ran
-        commands_ran += 1
-        await interaction.response.defer(ephemeral=False)
-        await interaction.followup.send("""
-
-<:icons_generalinfo:866599434098835486> **Basic** 
-> - </help:1119362371710898308> - Shows this message
-> - </version:1098672847469150248> - Shows the bot's version
-> - </status:1145344954936332291> Shows the bot's status
-
-
-<:roblox:1023778640145694740> **Roblox** 
-> - </getuser:1114578145157320876> Get user info from Roblox
-> - </verify:1119362371710898307> Verify yourself with Roblox account
-> - </group-shout:1115625318238142486> Updates Roblox group shout
-
-
-<:icons_warning:908958943466893323> *The Bot is still in heavy development, more commands and functions are coming in future* <:icons_warning:908958943466893323>
-""")
 
 
 @client.tree.command(name="version", description="Shows the bot's version")
@@ -1149,9 +1127,9 @@ async def db_get_entry(ctx, discordID: int):
 
 
 
-if run_nightly == True:
-	DISTOKEN = settings['NIGHTLY_TOKEN']
-else:
-	DISTOKEN = settings['TOKEN']
+#if run_nightly == True:
+DISTOKEN = settings['NIGHTLY_TOKEN']
+#else:
+#	DISTOKEN = settings['TOKEN']
 
 client.run(DISTOKEN)
