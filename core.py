@@ -12,7 +12,6 @@ import discord
 import requests
 import urllib.request
 import logging
-import typing
 from logging import *
 from discord import app_commands
 from roblox import AvatarThumbnailType
@@ -148,18 +147,60 @@ DARKER_GREY = 0x546e7a
 BLURPLE = 0x7289da
 GREYPLE = 0x99aab5
 
-#@client.tree.command(name='update', description='Update user\'s roles and nick in this server')
-async def user_update(interaction: discord.Interaction, user=None):
-    if user == None:
-        alr_verified_raw1 = db.find({"discordID": f"{interaction.user.id}"})
-        alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
-        alr_verified_raw3 = ''.join(alr_verified_raw2)
-        alr_verified = alr_verified_raw3.replace("'", "")
+@client.tree.command(name='update', description='Update user\'s roles and nick in this server')
+async def user_update(interaction: discord.Interaction, user: discord.Member):
+    alr_verified_raw1 = db.find({"discordID": f"{user.id}"})
+    alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
+    alr_verified_raw3 = ''.join(alr_verified_raw2)
+    alr_verified = alr_verified_raw3.replace("'", "")
+    try:
         rouser = await RoClient.get_user(user_id=alr_verified)
-    else:
-        rouser = await RoClient.get_user_by_username(username=user)
-    group = await RoClient.get_group(group_id=16965138)
-    
+        rouser_found = True
+    except UserNotFound:
+        rouser_found = False
+    role_casual = interaction.guild.get_role(1155893908501442702)
+    role_above = interaction.guild.get_role(1155894250010050601)
+    role_admin = interaction.guild.get_role(1155894433250811984)
+    if rouser_found:
+        group_id = 16965138
+        roles = await rouser.get_group_roles()
+        role = None
+        for test_role in roles:
+            if test_role.group.id == group_id:
+                role = test_role.rank
+                break
+        emb = discord.Embed(title='Update Complete')
+        match role:
+            case 1:
+                try:
+                    await user.add_roles(role_casual)
+                    emb.add_field(name='Role added', value='<@&1155893908501442702>')
+                    #emb.add_field(name='Username', value=f'{rouser.name}')
+                except discord.Forbidden:
+                    emb.add_field(name='Role added', value='<@&1155893908501442702>')
+                    emb.add_field(name='Error', value='Some roles failed to process (403)')
+                await interaction.response.send_message(embed=emb)
+            case 75:
+                try:
+                    await user.add_roles(role_above)
+                    emb.add_field(name='Role added', value='<@&1155894250010050601>')
+                    #emb.add_field(name='Username', value=f'{rouser.name}')
+                except discord.Forbidden:
+                    emb.add_field(name='Role added', value='<@&1155894250010050601>')
+                    emb.add_field(name='Error', value='Some roles failed to process (403)')
+                await interaction.response.send_message(embed=emb)
+            case 150:
+                try:
+                    await user.add_roles(role_admin)
+                    emb.add_field(name='Role added', value='<@&1155894433250811984>')
+                    #emb.add_field(name='Username', value=f'{rouser.name}')
+                except discord.Forbidden:
+                    emb.add_field(name='Role added', value='<@&1155894433250811984>')
+                    emb.add_field(name='Error', value='Some roles failed to process (403)')
+                await interaction.response.send_message(embed=emb)
+
+            
+
 @client.tree.command(name='verify', description='Link your Roblox account with Discord account')
 async def verify(interaction: discord.Interaction, username: str):
     alr_verified_raw1 = db.find({"discordID": f"{interaction.user.id}"})
@@ -621,8 +662,6 @@ async def status(interaction: discord.Interaction):
     # Check if ping is greater than 400ms and if so, update the emoji
     if ping > 0.40000000000000000:
         ping_emoji = '<:starry_badping:1171806521823342664>' # 400ms
-
-    # Send a message back to the user with the ping emoji and the ping time in milliseconds
     await interaction.response.defer(ephemeral=False, thinking=True)
     if start_time == None:
          clock = '*not defined*'

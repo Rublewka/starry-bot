@@ -6,3 +6,4 @@
 
 # trello email - theskout001+qupnxebxbykcivwrxz8g@boards.trello.com
 # RoVer token - rvr2b087uhj4acpftd2dc32kw5z7uzcryf9rg21figqs6byvnyrky8q8q7ygc7jrea6o
+# Mongo connection string - mongodb+srv://theskout001:fQnslaHCsKVbAcdm@rublewka-bot.b7dexs8.mongodb.net/?retryWrites=true&w=majority
