@@ -66,7 +66,6 @@ async def status_swap():
         await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=f"/help"))
         await asyncio.sleep(15)
 
-
 #startup
 @client.event
 async def on_ready(): 
@@ -148,7 +147,8 @@ BLURPLE = 0x7289da
 GREYPLE = 0x99aab5
 
 @client.tree.command(name='update', description='Update user\'s roles and nick in this server')
-async def user_update(interaction: discord.Interaction, user: discord.Member):
+async def user_update(interaction: discord.Interaction):
+    user = interaction.user
     alr_verified_raw1 = db.find({"discordID": f"{user.id}"})
     alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
     alr_verified_raw3 = ''.join(alr_verified_raw2)
@@ -170,34 +170,46 @@ async def user_update(interaction: discord.Interaction, user: discord.Member):
                 role = test_role.rank
                 break
         emb = discord.Embed(title='Update Complete')
+        if rouser.display_name != rouser.name:
+            nick = f'{rouser.display_name} ({rouser.name})'
+        else:
+            nick = f'{rouser.name}'
         match role:
             case 1:
                 try:
+                    await user.edit(nick=nick)
                     await user.add_roles(role_casual)
+                    emb.add_field(name='Username', value=f'{nick}', inline=False)
                     emb.add_field(name='Role added', value='<@&1155893908501442702>')
-                    #emb.add_field(name='Username', value=f'{rouser.name}')
                 except discord.Forbidden:
+                    emb.add_field(name='Username', value=f'{nick}', inline=False)
                     emb.add_field(name='Role added', value='<@&1155893908501442702>')
-                    emb.add_field(name='Error', value='Some roles failed to process (403)')
+                    emb.add_field(name='Error', value='Some roles or username failed to process (403)')
                 await interaction.response.send_message(embed=emb)
             case 75:
                 try:
+                    await user.edit(nick=nick)
                     await user.add_roles(role_above)
+                    emb.add_field(name='Username', value=f'{nick}', inline=False)
                     emb.add_field(name='Role added', value='<@&1155894250010050601>')
-                    #emb.add_field(name='Username', value=f'{rouser.name}')
                 except discord.Forbidden:
+                    emb.add_field(name='Username', value=f'{nick}', inline=False)
                     emb.add_field(name='Role added', value='<@&1155894250010050601>')
-                    emb.add_field(name='Error', value='Some roles failed to process (403)')
+                    emb.add_field(name='Error', value='Some roles or username failed to process (403)')
                 await interaction.response.send_message(embed=emb)
             case 150:
                 try:
+                    await user.edit(nick=nick)
                     await user.add_roles(role_admin)
+                    emb.add_field(name='Username', value=f'{nick}', inline=False)
                     emb.add_field(name='Role added', value='<@&1155894433250811984>')
-                    #emb.add_field(name='Username', value=f'{rouser.name}')
                 except discord.Forbidden:
+                    emb.add_field(name='Username', value=f'{nick}', inline=False)
                     emb.add_field(name='Role added', value='<@&1155894433250811984>')
-                    emb.add_field(name='Error', value='Some roles failed to process (403)')
+                    emb.add_field(name='Error', value='Some roles or username failed to process (403)')
                 await interaction.response.send_message(embed=emb)
+            
+
 
             
 
