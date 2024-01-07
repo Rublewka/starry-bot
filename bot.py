@@ -81,7 +81,6 @@ async def on_ready():
     print(f"--Roblox--")
     global start_time
     start_time = datetime.datetime.now()
-
     host1 = 'https://roblox.com'
     def roconnect(host=host1):
         try:
