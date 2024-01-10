@@ -676,8 +676,8 @@ async def status(interaction: discord.Interaction):
     if temp != "N/A":
         CpuTemp = str(float(CurrentTemp)/1000)
         emb.add_field(name="Cpu Temp", value=f"<:starry_temp:1194624917115764776> `{CpuTemp}°C`")
-    else:
-        emb.add_field(name="Cpu Temp", value=f"<:starry_temp:1194624917115764776> `{CurrentTemp}`")
+#    else:
+#        emb.add_field(name="Cpu Temp", value=f"<:starry_temp:1194624917115764776> `{CurrentTemp}`")
     emb.add_field(name="Commands ran this session", value=f"<:starry_cmd:1171807971274149908> I've ran `{commands_ran}` command(s) this session.", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
     await interaction.followup.send(embed=emb)
