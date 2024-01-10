@@ -512,21 +512,7 @@ async def deploy(ctx):
         await asyncio.sleep(5)
         await ctx.reply("Deploying...")
         await asyncio.sleep(15)        
-        req_client = requests.session()
-        url = 'https://control.bot-hosting.net/api/client/servers/723d4729/power'
-        req_client.get(url)  # sets cookie
-
-        url = 'https://control.bot-hosting.net/api/client/servers/723d4729/power'
-        headers = {
-            "Authorization": "Bearer ptlc_XXfLM4wlfgG6GvZ35VjdhLpvAy2Fs5lrgj839DsIsSZ",
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "cookie": "eyJpdiI6ImRCejZqZU1ZYUwzRnVNQXl3c213bUE9PSIsInZhbHVlIjoiMy9rODRHV3V5MGsrenQrNTY0UEI0NSt4dVBHczBtZlV3YXo4Zk5FKytRWk0xbnRpcjdWME1mdG1tQ2s0ajVPdGwvaCs0UXNhSnU5S2grVjNadkgyaWpjZE1jQ3lFaUFBdVI5bThtVzNGbmREbDdZam9vMVVRS1VmbDExM0lZN3AiLCJtYWMiOiJkZTdmMzQ5OWU2Zjk4YjhkYzhhYzkzYzFhODYzOTU0MTIwMzEyNGFhZGNjNGI5ZmQ0N2FiZDBjN2Q1ZWVhOGZhIiwidGFnIjoiIn0%3D"
-        }
-        payload = '{"signal": "restart"}'
-        await ctx.reply("Sending **Restart** signal to hosting...")
-        response = req_client.request('POST', url, data=payload, headers=headers)
-        print(f"{response.text}")
+        os.system("sudo reboot")
     else:
         emb = discord.Embed(title="Uh-uh", colour=RED)
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687620564529283>")
@@ -536,21 +522,7 @@ async def deploy(ctx):
 @client.command(name="restart")
 async def restart(ctx):
     if any(role.id in [1094687620564529283, 1137847962186289184] for role in ctx.author.roles):
-        req_client = requests.session()
-        url = 'https://control.bot-hosting.net/api/client/servers/723d4729/power'
-        req_client.get(url)  # sets cookie
-
-        url = 'https://control.bot-hosting.net/api/client/servers/723d4729/power'
-        headers = {
-            "Authorization": "Bearer ptlc_XXfLM4wlfgG6GvZ35VjdhLpvAy2Fs5lrgj839DsIsSZ",
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "cookie": "eyJpdiI6ImRCejZqZU1ZYUwzRnVNQXl3c213bUE9PSIsInZhbHVlIjoiMy9rODRHV3V5MGsrenQrNTY0UEI0NSt4dVBHczBtZlV3YXo4Zk5FKytRWk0xbnRpcjdWME1mdG1tQ2s0ajVPdGwvaCs0UXNhSnU5S2grVjNadkgyaWpjZE1jQ3lFaUFBdVI5bThtVzNGbmREbDdZam9vMVVRS1VmbDExM0lZN3AiLCJtYWMiOiJkZTdmMzQ5OWU2Zjk4YjhkYzhhYzkzYzFhODYzOTU0MTIwMzEyNGFhZGNjNGI5ZmQ0N2FiZDBjN2Q1ZWVhOGZhIiwidGFnIjoiIn0%3D"
-        }
-        payload = '{"signal": "restart"}'
-        await ctx.reply("Sending **Restart** signal to hosting...")
-        response = req_client.request('POST', url, data=payload, headers=headers)
-        print(f"{response.text}")
+        os.system("sudo reboot")
     else:
         emb = discord.Embed(title="Uh-uh", colour=RED)
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687620564529283>")
@@ -661,11 +633,15 @@ async def status(interaction: discord.Interaction):
         db_connected_raw= True
     except Exception:
         db_connected_raw = False
-        
+    temp = "N/A"
+    try:
+        with open(r"/sys/class/thermal/thermal_zone0/temp") as File:
+            temp = File.readline()
+    except:
+        CurrentTemp = "N/A"
     # Define the green bar emoji as the default
     ping_emoji = '<:starry_gudping:1171806377371521095>' # 100ms
-
-
+    
     # Check if ping is greater than 250ms and if so, update the emoji
     if ping > 0.25000000000000000:
         ping_emoji = '<:starry_medping:1171806470552174603>' # 250ms
@@ -692,12 +668,16 @@ async def status(interaction: discord.Interaction):
         db_connected = "<:starry_online:1171807873458770003> Connected to Database Services"
     else:
         db_connected = "<:starry_outage:1171807914323878020> Not connected to Database Services"
-        
     emb = discord.Embed(title="Bot Status", description=None, color=BLUE)
     emb.add_field(name="Latency", value=f"{ping_emoji} `{ping * 1000:.0f}ms`", inline=False)
     emb.add_field(name="Roblox API", value=f"{con}", inline=False)
     emb.add_field(name="Database Connection", value=db_connected, inline=False)
     emb.add_field(name="Uptime", value=f"<:starry_clock:1113391359274000394> {clock}", inline=False)
+    if temp != "N/A":
+        CpuTemp = str(float(CurrentTemp)/1000)
+        emb.add_field(name="Cpu Temp", value=f"<:starry_temp:1194624917115764776> `{CpuTemp}°C`")
+    else:
+        emb.add_field(name="Cpu Temp", value=f"<:starry_temp:1194624917115764776> `{CurrentTemp}`")
     emb.add_field(name="Commands ran this session", value=f"<:starry_cmd:1171807971274149908> I've ran `{commands_ran}` command(s) this session.", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
     await interaction.followup.send(embed=emb)
