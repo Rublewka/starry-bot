@@ -634,11 +634,11 @@ async def status(interaction: discord.Interaction):
     except Exception:
         db_connected_raw = False
     temp = "N/A"
-    try:
-        with open(r"/sys/class/thermal/thermal_zone0/temp") as File:
-            temp = File.readline()
-    except:
-        CurrentTemp = "N/A"
+#    try:
+#        with open(r"/sys/class/thermal/thermal_zone0/temp") as File:
+#            temp = File.readline()
+#    except:
+#        CurrentTemp = "N/A"
     # Define the green bar emoji as the default
     ping_emoji = '<:starry_gudping:1171806377371521095>' # 100ms
     
