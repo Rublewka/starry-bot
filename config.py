@@ -6,7 +6,7 @@ settings = {
 	'PREFIX': ';',                                                                                 # PREFIX
 	'OWNER':'@theskout001',                                                                        # OWNER USERNAME
 	'OWNER NAME':'TheSkout',                                                                       # OWNER NAME
-    'VERSION':'0.23.3-ALPHA'                                                                       # BOT VERSION
+    'VERSION':'0.24.0-ALPHA'                                                                       # BOT VERSION
 #			   ^ ^  ^
 #			   | |  | 
 #		   Major |  | 

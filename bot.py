@@ -66,10 +66,18 @@ async def status_swap():
         await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=f"/help"))
         await asyncio.sleep(15)
 
+async def checkly():
+    while True:
+        # Heartbeat URL
+        url = "https://ping.checklyhq.com/e420661a-7cdf-4fec-96ef-09e7f7bf5f64"
+        # A GET request to the Heartbeat
+        response = requests.get(url, timeout=30)
+        await asyncio.sleep(30)
 #startup
 @client.event
 async def on_ready(): 
     client.loop.create_task(status_swap())
+    client.loop.create_task(checkly())
     dsc_err_channel = client.get_channel(1094687676151648286)
     print(f"Starting up {client.user.name}#{client.user.discriminator}")
     print(f"--Discord--")
@@ -673,11 +681,7 @@ async def status(interaction: discord.Interaction):
     emb.add_field(name="Roblox API", value=f"{con}", inline=False)
     emb.add_field(name="Database Connection", value=db_connected, inline=False)
     emb.add_field(name="Uptime", value=f"<:starry_clock:1113391359274000394> {clock}", inline=False)
-    if temp != "N/A":
-        CpuTemp = str(float(CurrentTemp)/1000)
-        emb.add_field(name="Cpu Temp", value=f"<:starry_temp:1194624917115764776> `{CpuTemp}°C`")
-#    else:
-#        emb.add_field(name="Cpu Temp", value=f"<:starry_temp:1194624917115764776> `{CurrentTemp}`")
+
     emb.add_field(name="Commands ran this session", value=f"<:starry_cmd:1171807971274149908> I've ran `{commands_ran}` command(s) this session.", inline=False)
     emb.add_field(name="Version", value=f"`{settings['VERSION']}`", inline=False)
     await interaction.followup.send(embed=emb)
