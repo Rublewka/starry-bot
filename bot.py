@@ -1,4 +1,4 @@
-# setup
+from bson import ObjectId
 import dns.resolver
 dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
 dns.resolver.default_resolver.nameservers = ['1.1.1.1', '1.0.0.1']
@@ -10,7 +10,6 @@ import datetime
 import random
 import discord
 import requests
-import urllib.request
 import logging
 from logging import *
 from discord import app_commands
@@ -29,7 +28,7 @@ prefix = settings['PREFIX']
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
 client.remove_command('help') 
 load_dotenv()
-RoClient = Client(os.getenv("ROBLOXTOKEN"))
+
 run_nightly = bool(os.getenv("RUN_NIGHTLY"))         
 db_token = os.getenv("DBTOKEN")
 
@@ -37,11 +36,12 @@ db_token = os.getenv("DBTOKEN")
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 uri = "mongodb+srv://starry_bot:TPth5ILO9WiJUcKU@rublewka-bot.b7dexs8.mongodb.net/?retryWrites=true&w=majority"
-# Create a new client and connect to the server
 dbclient = MongoClient(uri, server_api=ServerApi('1'))
-db_raw = dbclient.starry_bot
-db = db_raw.users
+db = dbclient.starry_bot
 
+ro_token = db.env.find_one({"_id": ObjectId('65ba990cab2d2b68695abb85')})
+ROBLOSECURITY = str(ro_token.get('ROBLOSECURITY'))
+RoClient = Client(token=ROBLOSECURITY)
 RoConnected = None
 
 bot_logs_webhook_url = "https://discord.com/api/webhooks/1121071054664781844/ANWk7zM02ZnXvDZibg-uNvxTtHKi6sdG5GteFLKW8k53Cuxigfd3BtCtR4J7NgEznrWe"
@@ -66,19 +66,10 @@ async def status_swap():
         await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=f"/help"))
         await asyncio.sleep(15)
 
-async def checkly():
-    while True:
-        # Heartbeat URL
-        url = "https://ping.checklyhq.com/e420661a-7cdf-4fec-96ef-09e7f7bf5f64"
-        # A GET request to the Heartbeat
-        response = requests.get(url, timeout=30)
-        await asyncio.sleep(30)
 #startup
 @client.event
 async def on_ready(): 
     client.loop.create_task(status_swap())
-    client.loop.create_task(checkly())
-    dsc_err_channel = client.get_channel(1094687676151648286)
     print(f"Starting up {client.user.name}#{client.user.discriminator}")
     print(f"--Discord--")
     print(f"Bot Name:  {client.user.name}")
@@ -88,14 +79,14 @@ async def on_ready():
     print(f"--Roblox--")
     global start_time
     start_time = datetime.datetime.now()
-    host1 = 'https://roblox.com'
-    def roconnect(host=host1):
+    def roconnect():
         try:
-            urllib.request.urlopen(host1, timeout=15)
-            return True
-        except urllib.error.URLError:
-            return False
-    if roconnect():
+            r = requests.head("https://auth.roblox.com")
+            return r.status_code
+        except requests.ConnectionError:
+            warning("Failed to connect")
+            return None
+    if roconnect() == 200:
         global RoConnected
         user = await RoClient.get_authenticated_user()
         print(f"Roblox ID:  {user.id}")
@@ -156,7 +147,7 @@ GREYPLE = 0x99aab5
 @client.tree.command(name='update', description='Update user\'s roles and nick in this server')
 async def user_update(interaction: discord.Interaction):
     user = interaction.user
-    alr_verified_raw1 = db.find({"discordID": f"{user.id}"})
+    alr_verified_raw1 = db.users.find({"discordID": f"{user.id}"})
     alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
     alr_verified_raw3 = ''.join(alr_verified_raw2)
     alr_verified = alr_verified_raw3.replace("'", "")
@@ -222,7 +213,7 @@ async def user_update(interaction: discord.Interaction):
 
 @client.tree.command(name='verify', description='Link your Roblox account with Discord account')
 async def verify(interaction: discord.Interaction, username: str):
-    alr_verified_raw1 = db.find({"discordID": f"{interaction.user.id}"})
+    alr_verified_raw1 = db.users.find({"discordID": f"{interaction.user.id}"})
     alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
     alr_verified_raw3 = ''.join(alr_verified_raw2)
     alr_verified = alr_verified_raw3.replace("'", "")
@@ -262,7 +253,7 @@ async def verify(interaction: discord.Interaction, username: str):
             async def verif_ingame_notme(interaction=interaction):
                 await interaction.response.edit_message(content=f"Verification cancelled. Try again", view=None, embed=None)
             async def verif_ingame_me(interaction=interaction):
-                db_verif = db_raw.pending_verifications
+                db_verif = db.pending_verifications
                 entry = {
                     "username": f"{rouser.name}",
                     "discordUsername": f"{interaction.user.name}",
@@ -281,7 +272,7 @@ async def verify(interaction: discord.Interaction, username: str):
                             "discordID": f"{interaction.user.id}",
                             "robloxID": f"{rouser.id}"
                             }
-                        db.insert_one(entry)
+                        db.users.insert_one(entry)
                         if rouser.display_name != rouser.name:
                             nick = f'{rouser.display_name} ({rouser.name})'
                         else:
@@ -356,7 +347,7 @@ async def verify(interaction: discord.Interaction, username: str):
                             "discordID": f"{interaction.user.id}",
                             "robloxID": f"{rouser.id}"
                             }    
-                            db.insert_one(entry)
+                            db.users.insert_one(entry)
                             if rouser.display_name != rouser.name:
                                 nick = f'{rouser.display_name} ({rouser.name})'
                             else:
@@ -410,7 +401,7 @@ async def verify(interaction: discord.Interaction, username: str):
                             "discordID": f"{interaction.user.id}",
                             "robloxID": f"{rouser.id}"
                             }    
-                    db.insert_one(entry)
+                    db.user.insert_one(entry)
                     if rouser.display_name != rouser.name:
                         nick = f'{rouser.display_name} ({rouser.name})'
                     else:
@@ -447,7 +438,7 @@ async def verify(interaction: discord.Interaction, username: str):
                             "discordID": f"{interaction.user.id}",
                             "robloxID": f"{rouser.id}"
                             }    
-                    db.insert_one(entry)
+                    db.user.insert_one(entry)
                     if rouser.display_name != rouser.name:
                         nick = f'{rouser.display_name} ({rouser.name})'
                     else:
@@ -783,7 +774,7 @@ async def get_user(interaction: discord.Interaction, user: str):
 
 @client.tree.command(name='who-is-via-discord', description='Get user info via Discord')
 async def get_user_via_discord(interaction: discord.Interaction, user: discord.Member):
-    get_user_raw1 = db.find({"discordID": f"{user.id}"})
+    get_user_raw1 = db.users.find({"discordID": f"{user.id}"})
     get_user_raw2 = get_user_raw1.distinct(key="robloxID")
     get_user_raw3 = ''.join(get_user_raw2)
     get_user_id = get_user_raw3.replace("'", "")
@@ -860,7 +851,7 @@ async def who_is_via_discord(interaction: discord.Interaction, user: str):
             await interaction.followup.send(f'Couldn\'t find specified user (`{user}`)')
             rouser_found = False
         if rouser_found:
-            cur = db.find({"robloxID": f"{user}"})
+            cur = db.users.find({"robloxID": f"{user}"})
             dscuser = cur.distinct(key="discordID")
             if len(dscuser) > 0:
                 append_str1 = '<@'
@@ -884,7 +875,7 @@ async def who_is_via_discord(interaction: discord.Interaction, user: str):
             rouser_found = False
         
         if rouser_found :    
-            cur = db.find({"robloxID": f"{rouser.id}"})
+            cur = db.users.find({"robloxID": f"{rouser.id}"})
             dscuser = cur.distinct(key="discordID")
             if len(dscuser) > 0:
                 append_str1 = '<@'
@@ -913,7 +904,7 @@ async def get_members(interaction: discord.Interaction):
 @client.command()
 async def db_create_entry(ctx, discordID: int, robloxID: int, username: str):
     if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in ctx.author.roles):
-        alr_verified_raw1 = db.find({"discordID": f"{discordID}"})
+        alr_verified_raw1 = db.users.find({"discordID": f"{discordID}"})
         alr_verified_raw2 = alr_verified_raw1.distinct(key="robloxID")
         alr_verified_raw3 = ''.join(alr_verified_raw2)
         alr_verified = alr_verified_raw3.replace("'", "")
@@ -924,7 +915,7 @@ async def db_create_entry(ctx, discordID: int, robloxID: int, username: str):
                 "discordID": f"{discordID}",
                 "robloxID": f"{robloxID}"
             }    
-            post_id = db.insert_one(entry).inserted_id
+            post_id = db.users.insert_one(entry).inserted_id
             await ctx.reply(f'Created new entry with ID `{post_id}`')
         else:
             await ctx.reply('Entry for this user already exists')
@@ -938,13 +929,13 @@ async def db_create_entry(ctx, discordID: int, robloxID: int, username: str):
 @client.command()
 async def db_delete_entry(ctx, discordID: int):
     if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in ctx.author.roles):
-        cur = db.find({"discordID": f"{discordID}"})
+        cur = db.users.find({"discordID": f"{discordID}"})
         if len(cur.distinct(key="robloxID")) > 0:
             is_there = True
         else:
             is_there = False
         if is_there == True:
-            resp = db.find_one_and_delete({"discordID": f"{discordID}"})
+            resp = db.users.user.find_one_and_delete({"discordID": f"{discordID}"})
             await ctx.reply(f'Deleted entry successfully')
         else:
             await ctx.reply('Could not find specified entry')
@@ -958,7 +949,7 @@ async def db_delete_entry(ctx, discordID: int):
 @client.command()
 async def db_get_entry(ctx, discordID: int):
     if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in ctx.author.roles):
-        cur = db.find({"discordID": f"{discordID}"})
+        cur = db.users.find({"discordID": f"{discordID}"})
         if len(cur.distinct(key="robloxID")) > 0:
             is_there = True
         else:
@@ -981,14 +972,11 @@ async def db_get_entry(ctx, discordID: int):
             await ctx.reply(embed=emb)
         else:
             await ctx.reply('Could not find specified entry')
-
-
-        
-
-
-
-
-
+    else:
+        emb = discord.Embed(title="Uh-uh", colour=RED)
+        emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687621411786772>")
+        await ctx.reply(embed=emb)
+        logging.info(f"@{ctx.author.name} tried to run `;db_get_entry` command, but they had no sufficient perms")  
 
 
 
@@ -997,6 +985,16 @@ async def db_get_entry(ctx, discordID: int):
 
 
 
+
+
+
+
+
+
+
+
+#TODO facts
+#TODO moderation
 
 
 
