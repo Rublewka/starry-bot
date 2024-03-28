@@ -20,9 +20,7 @@ from discord.ext import commands
 from discord.ui import Button, View
 from roblox import Client
 from roblox.utilities.exceptions import *
-from roblox.utilities.iterators import SortOrder
 from config import settings
-#from config import roles
 prefix = settings['PREFIX']
 
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
@@ -39,8 +37,10 @@ uri = "mongodb+srv://starry_bot:TPth5ILO9WiJUcKU@rublewka-bot.b7dexs8.mongodb.ne
 dbclient = MongoClient(uri, server_api=ServerApi('1'))
 db = dbclient.starry_bot
 
+
 ro_token = db.env.find_one({"_id": ObjectId('65ba990cab2d2b68695abb85')})
 ROBLOSECURITY = str(ro_token.get('ROBLOSECURITY'))
+
 RoClient = Client(token=ROBLOSECURITY)
 RoConnected = None
 
@@ -401,7 +401,7 @@ async def verify(interaction: discord.Interaction, username: str):
                             "discordID": f"{interaction.user.id}",
                             "robloxID": f"{rouser.id}"
                             }    
-                    db.user.insert_one(entry)
+                    db.users.insert_one(entry)
                     if rouser.display_name != rouser.name:
                         nick = f'{rouser.display_name} ({rouser.name})'
                     else:
@@ -438,7 +438,7 @@ async def verify(interaction: discord.Interaction, username: str):
                             "discordID": f"{interaction.user.id}",
                             "robloxID": f"{rouser.id}"
                             }    
-                    db.user.insert_one(entry)
+                    db.users.insert_one(entry)
                     if rouser.display_name != rouser.name:
                         nick = f'{rouser.display_name} ({rouser.name})'
                     else:
@@ -935,7 +935,7 @@ async def db_delete_entry(ctx, discordID: int):
         else:
             is_there = False
         if is_there == True:
-            resp = db.users.user.find_one_and_delete({"discordID": f"{discordID}"})
+            resp = db.users.find_one_and_delete({"discordID": f"{discordID}"})
             await ctx.reply(f'Deleted entry successfully')
         else:
             await ctx.reply('Could not find specified entry')
@@ -990,6 +990,51 @@ async def db_get_entry(ctx, discordID: int):
 
 
 
+@client.tree.command(name='gban', description='Ban user from server with database record')
+async def gban(interaction: discord.Interaction, user: discord.Member, reason: str|None):
+    if any(role.id in [1094687621411786772, 1094687620564529283, 1137847962186289184] for role in interaction.user.roles):
+        get_user_raw1 = db.users.find({"discordID": f"{user.id}"})
+        get_user_raw2 = get_user_raw1.distinct(key="robloxID")
+        get_user_raw3 = ''.join(get_user_raw2)
+        get_user_id = get_user_raw3.replace("'", "")
+        db_bans = db.banned_users
+        rouser = await RoClient.get_user(user_id=get_user_id)
+        entry = {
+            'username': f"{rouser.name}",
+            'discordId': f"{user.id}",
+            'robloxId': get_user_id,
+            'reason': reason,
+            'moderator': f"@{interaction.user.name}"
+            }
+        db_bans.insert_one(entry)
+        await interaction.response.defer(ephemeral=False, thinking=False)
+        
+
+        user_dm = await user.create_dm()
+        if reason:
+            emb1 = discord.Embed(title="You have been banned in Immortals Squad")
+            emb1.add_field(name='Reason', value=f"{reason}")
+            emb1.add_field(name='Moderator', value=f"<@{interaction.user.id}>", inline=False)
+            emb2 = discord.Embed(title=f"User `@{user.name}` has been banned")
+            emb2.add_field(name='Reason', value=f"{reason}")
+            emb2.add_field(name='Moderator', value=f"<@{interaction.user.id}>", inline=False)
+            await user_dm.send(embed=emb1)
+            await interaction.followup.send(embed=emb2)
+        else:
+            emb1 = discord.Embed(title="You have been banned in Immortals Squad")
+            emb1.add_field(name='Reason', value="*`No reason provided`*")
+            emb1.add_field(name='Moderator', value=f"<@{interaction.user.id}>", inline=False)
+            emb2 = discord.Embed(title=f"User `@{user.name}` has been banned")
+            emb2.add_field(name='Reason', value="*`No reason provided`*")
+            emb2.add_field(name='Moderator', value=f"<@{interaction.user.id}>", inline=False)
+            await user_dm.send(embed=emb1)
+            await interaction.followup.send(embed=emb2)
+    else:
+        await interaction.response.defer(ephemeral=True, thinking=False)
+        emb = discord.Embed(title="Uh-uh", colour=RED)
+        emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687621411786772>")
+        await interaction.followup.send(embed=emb)
+        logging.info(f"@{interaction.user.name} tried to run `/gban` command, but they had no sufficient perms")
 
 
 
