@@ -43,8 +43,8 @@ async def status_push():
     while True:
         ping = f'{client.ws.latency * 1000:.0f}'
         push_url = f"https://status.immosmp.ru/api/push/MAgoOEp31tOPbEuhLctE6hi4VNsAEKlW?status=up&msg=OK&ping={ping}"
-        interval = 30
-        urllib.request.urlopen(push_url)
+        interval = 40
+        r = requests.get(url=push_url)
         await asyncio.sleep(interval)
 
 ro_token = db.env.find_one({"_id": ObjectId('65ba990cab2d2b68695abb85')})
