@@ -21,6 +21,7 @@ from discord.ui import Button, View
 from roblox import Client
 from roblox.utilities.exceptions import *
 from config import settings
+import urllib.request
 prefix = settings['PREFIX']
 
 client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
@@ -37,6 +38,14 @@ uri = "mongodb+srv://starry_bot:TPth5ILO9WiJUcKU@rublewka-bot.b7dexs8.mongodb.ne
 dbclient = MongoClient(uri, server_api=ServerApi('1'))
 db = dbclient.starry_bot
 
+
+async def status_push():
+    while True:
+        ping = f'{client.ws.latency * 1000:.0f}'
+        push_url = f"https://status.immosmp.ru/api/push/MAgoOEp31tOPbEuhLctE6hi4VNsAEKlW?status=up&msg=OK&ping={ping}"
+        interval = 30
+        urllib.request.urlopen(push_url)
+        await asyncio.sleep(interval)
 
 ro_token = db.env.find_one({"_id": ObjectId('65ba990cab2d2b68695abb85')})
 ROBLOSECURITY = str(ro_token.get('ROBLOSECURITY'))
@@ -70,6 +79,7 @@ async def status_swap():
 @client.event
 async def on_ready(): 
     client.loop.create_task(status_swap())
+    client.loop.create_task(status_push())
     print(f"Starting up {client.user.name}#{client.user.discriminator}")
     print(f"--Discord--")
     print(f"Bot Name:  {client.user.name}")
@@ -629,7 +639,7 @@ async def status(interaction: discord.Interaction):
     global commands_ran
     try:
         dbclient.admin.command('ping')
-        db_connected_raw= True
+        db_connected_raw = True
     except Exception:
         db_connected_raw = False
     temp = "N/A"
