@@ -27,4 +27,4 @@ roblox==2.0.0
 python_dotenv==1.0.0
 discord-webhook==1.3.0
 dislog[discordpy]==3.0.0
-pymongo==4.5.0
+pymongo==4.6.3
