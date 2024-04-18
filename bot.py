@@ -79,7 +79,7 @@ async def status_swap():
 @client.event
 async def on_ready(): 
     client.loop.create_task(status_swap())
-    client.loop.create_task(status_push())
+    #client.loop.create_task(status_push())
     print(f"Starting up {client.user.name}#{client.user.discriminator}")
     print(f"--Discord--")
     print(f"Bot Name:  {client.user.name}")
