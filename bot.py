@@ -42,7 +42,7 @@ db = dbclient.starry_bot
 async def status_push():
     while True:
         ping = f'{client.ws.latency * 1000:.0f}'
-        push_url = f"https://status.immosmp.ru/api/push/MAgoOEp31tOPbEuhLctE6hi4VNsAEKlW?status=up&msg=OK&ping={ping}"
+        push_url = f"https://roblox-status.theskout001.ru/api/push/grpADKmzyX?status=up&msg=OK&ping={ping}"
         interval = 40
         r = requests.get(url=push_url)
         await asyncio.sleep(interval)
@@ -79,7 +79,7 @@ async def status_swap():
 @client.event
 async def on_ready(): 
     client.loop.create_task(status_swap())
-    #client.loop.create_task(status_push())
+    client.loop.create_task(status_push())
     print(f"Starting up {client.user.name}#{client.user.discriminator}")
     print(f"--Discord--")
     print(f"Bot Name:  {client.user.name}")
@@ -1220,3 +1220,4 @@ else:
 	DISTOKEN = settings['TOKEN']
 
 client.run(DISTOKEN)
+ 
