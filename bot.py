@@ -1,51 +1,31 @@
+
+import json, os, os.path, asyncio, datetime, random, discord, requests, logging, dns.resolver
 from bson import ObjectId
-import dns.resolver
-dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
-dns.resolver.default_resolver.nameservers = ['1.1.1.1', '1.0.0.1']
-import json
-import os
-import os.path
-import asyncio
-import datetime
-import random
-import discord
-import requests
-import logging
 from logging import *
 from discord import app_commands
-from roblox import AvatarThumbnailType
-from src.verif_words import verification_words
-from dotenv import load_dotenv
 from discord.ext import commands
 from discord.ui import Button, View
-from roblox import Client
+from roblox import AvatarThumbnailType, Client
 from roblox.utilities.exceptions import *
+from src.verif_words import verification_words
+from dotenv import load_dotenv
 from config import settings
-import urllib.request
+dns.resolver.default_resolver = dns.resolver.Resolver(configure=False)
+dns.resolver.default_resolver.nameservers = ['1.1.1.1', '1.0.0.1']
 prefix = settings['PREFIX']
 
-client = commands.Bot(command_prefix = commands.when_mentioned_or(settings['PREFIX']), intents=discord.Intents.all())
-client.remove_command('help') 
+client = commands.Bot(command_prefix = (settings['PREFIX']), intents=discord.Intents.all())
+client.remove_command('help')
 load_dotenv()
 
-run_nightly = bool(os.getenv("RUN_NIGHTLY"))         
+run_nightly = bool(os.getenv("RUN_NIGHTLY"))
 db_token = os.getenv("DBTOKEN")
-
 
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 uri = "mongodb+srv://starry_bot:TPth5ILO9WiJUcKU@rublewka-bot.b7dexs8.mongodb.net/?retryWrites=true&w=majority"
 dbclient = MongoClient(uri, server_api=ServerApi('1'))
 db = dbclient.starry_bot
-
-
-async def status_push():
-    while True:
-        ping = f'{client.ws.latency * 1000:.0f}'
-        push_url = f"https://roblox-status.theskout001.ru/api/push/grpADKmzyX?status=up&msg=OK&ping={ping}"
-        interval = 40
-        r = requests.get(url=push_url)
-        await asyncio.sleep(interval)
 
 ro_token = db.env.find_one({"_id": ObjectId('65ba990cab2d2b68695abb85')})
 ROBLOSECURITY = str(ro_token.get('ROBLOSECURITY'))
@@ -54,13 +34,6 @@ RoClient = Client(token=ROBLOSECURITY)
 RoConnected = None
 
 bot_logs_webhook_url = "https://discord.com/api/webhooks/1121071054664781844/ANWk7zM02ZnXvDZibg-uNvxTtHKi6sdG5GteFLKW8k53Cuxigfd3BtCtR4J7NgEznrWe"
-
-
-#logger.debug('This is a debug message')
-#logger.info('This is an info message')
-#logger.warning('This is a warning message')
-#error('hi')
-#critical('This is a critical message')
 
 async def status_swap():
     while True:
@@ -77,9 +50,8 @@ async def status_swap():
 
 #startup
 @client.event
-async def on_ready(): 
+async def on_ready():
     client.loop.create_task(status_swap())
-    client.loop.create_task(status_push())
     print(f"Starting up {client.user.name}#{client.user.discriminator}")
     print(f"--Discord--")
     print(f"Bot Name:  {client.user.name}")
@@ -111,17 +83,6 @@ async def on_ready():
         warning(f"Roblox session could not fully initialize")
         RoConnected = False
 
-        
-
-    
-
-
-
-
-
-# startup end
-
-# variables section
 
 commands_ran = 0
 
@@ -216,10 +177,6 @@ async def user_update(interaction: discord.Interaction):
                     emb.add_field(name='Role added', value='<@&1155894433250811984>')
                     emb.add_field(name='Error', value='Some roles or username failed to process (403)')
                 await interaction.response.send_message(embed=emb)
-            
-
-
-            
 
 @client.tree.command(name='verify', description='Link your Roblox account with Discord account')
 async def verify(interaction: discord.Interaction, username: str):
@@ -257,7 +214,7 @@ async def verify(interaction: discord.Interaction, username: str):
                     emb.set_image(url=user_thumbnail.image_url)
                 created = f'<t:{str(rouser.created.timestamp())[0:10]}>'
                 emb.add_field(name='Joined platform', value=f'{created}')
-            
+
                 button_me = Button(label='It\'s me', custom_id='button_me', style=discord.ButtonStyle.green)
                 button_notme = Button(label='No, It\'s not me', custom_id='button_notme', style=discord.ButtonStyle.danger)
             async def verif_ingame_notme(interaction=interaction):
@@ -302,7 +259,7 @@ async def verify(interaction: discord.Interaction, username: str):
                         await interaction.response.edit_message(content='Couldn\'t verify you, please try again..', view=None)
                         db_verif.find_one_and_delete({"discordID": f"{interaction.user.id}"})
                 button_done = Button(label='Done', style=discord.ButtonStyle.green)
-                button_done.callback = verif_ingame_done    
+                button_done.callback = verif_ingame_done
                 view = View()
                 view.add_item(button_done)
                 await interaction.response.edit_message(content='Join [this](https://www.roblox.com/games/15055138791/Starry-Bot-Verification-Place) game and follow instructions in there', view=view, embed=None)
@@ -340,7 +297,7 @@ async def verify(interaction: discord.Interaction, username: str):
                     emb.set_image(url=user_thumbnail.image_url)
                 created = f'<t:{str(rouser.created.timestamp())[0:10]}>'
                 emb.add_field(name='Joined platform', value=f'{created}')
-            
+
                 button_me = Button(label='It\'s me', custom_id='button_me', style=discord.ButtonStyle.green)
                 button_notme = Button(label='No, It\'s not me', custom_id='button_notme', style=discord.ButtonStyle.danger)
                 async def verif_desc_notme(interaction=interaction):
@@ -356,7 +313,7 @@ async def verify(interaction: discord.Interaction, username: str):
                             "username": f"{rouser.name}",
                             "discordID": f"{interaction.user.id}",
                             "robloxID": f"{rouser.id}"
-                            }    
+                            }
                             db.users.insert_one(entry)
                             if rouser.display_name != rouser.name:
                                 nick = f'{rouser.display_name} ({rouser.name})'
@@ -369,7 +326,7 @@ async def verify(interaction: discord.Interaction, username: str):
                                 await interaction.user.add_roles(role)
                             except discord.Forbidden:
                                 await interaction.response.edit_message(content=f'Successfully verified you as {rouser.name} \nSomething went wrong while updating your nickname and roles (403); ping an online <@&1094687621411786772>', view=None)
-                    
+
                     button_done = Button(label='Done', style=discord.ButtonStyle.green)
                     button_done.callback = verif_desc_done
                     view = View()
@@ -410,7 +367,7 @@ async def verify(interaction: discord.Interaction, username: str):
                             "username": f"{rouser.name}",
                             "discordID": f"{interaction.user.id}",
                             "robloxID": f"{rouser.id}"
-                            }    
+                            }
                     db.users.insert_one(entry)
                     if rouser.display_name != rouser.name:
                         nick = f'{rouser.display_name} ({rouser.name})'
@@ -431,7 +388,7 @@ async def verify(interaction: discord.Interaction, username: str):
                 data = r.json()
                 json_str = json.dumps(data)
                 resp = json.loads(json_str)
-                if 'robloxID' in resp:    
+                if 'robloxID' in resp:
                     try:
                         rouser = await RoClient.get_user(user_id=resp['robloxID'])
                         ro_found = True
@@ -447,7 +404,7 @@ async def verify(interaction: discord.Interaction, username: str):
                             "username": f"{rouser.name}",
                             "discordID": f"{interaction.user.id}",
                             "robloxID": f"{rouser.id}"
-                            }    
+                            }
                     db.users.insert_one(entry)
                     if rouser.display_name != rouser.name:
                         nick = f'{rouser.display_name} ({rouser.name})'
@@ -479,7 +436,6 @@ async def verify(interaction: discord.Interaction, username: str):
         rouser = await RoClient.get_user(user_id=alr_verified)
         button = Button(label='Reverify')
         await interaction.response.send_message(f'You are already verified as `{rouser.name}`')
-
 
 @client.tree.command(name="group-shout", description="Set new group shout")
 async def group_shout(interaction: discord.Interaction, shout: str):
@@ -520,7 +476,7 @@ async def deploy(ctx):
         print(f"{response.text}")
         await asyncio.sleep(5)
         await ctx.reply("Deploying...")
-        await asyncio.sleep(15)        
+        await asyncio.sleep(15)
         os.system("sudo reboot")
     else:
         emb = discord.Embed(title="Uh-uh", colour=RED)
@@ -538,7 +494,6 @@ async def restart(ctx):
         await ctx.reply(embed=emb)
         logging.info(f"@{ctx.author.name} tried to run `;restart` command, but they had no sufficient perms")
 
-
 @client.tree.command(name="get-rank", description="Get member's current rank")
 async def get_rank(interaction: discord.Interaction, user: str):
     global commands_ran
@@ -547,7 +502,7 @@ async def get_rank(interaction: discord.Interaction, user: str):
     try:
         target_user = await RoClient.get_user_by_username(user)
     except UserNotFound:
-        target_user = None 
+        target_user = None
     if target_user != None:
         user = await RoClient.get_user(target_user.id)
         roles = await user.get_group_roles()
@@ -574,7 +529,6 @@ async def get_rank(interaction: discord.Interaction, user: str):
         await interaction.response.defer(ephemeral=False, thinking=True)
         await interaction.followup.send(embed=emb)
 
-
 @client.tree.command(name="set-rank", description="Promote or Demote user")
 @app_commands.choices(choices=[
     app_commands.Choice(name="Casuals", value="Casuals"),
@@ -594,7 +548,7 @@ async def set_rank(interaction: discord.Interaction, user: str, choices: app_com
         await interaction.response.defer(ephemeral=False, thinking=True)
         group = await RoClient.get_group(16965138)
         GROUP_ID = 16965138
-        try: 
+        try:
             target_user = await RoClient.get_user_by_username(user)
         except UserNotFound:
             target_user = None
@@ -619,7 +573,7 @@ async def set_rank(interaction: discord.Interaction, user: str, choices: app_com
                 emb=discord.Embed(title="Rank update", colour=GREEN)
                 emb.add_field(name="Success!", value=f"Updated **`{target_user.name}`** rank to **{choices.value}**")
                 await interaction.followup.send(embed=emb)
-        else:  
+        else:
             emb = discord.Embed(title="Member Info", colour=DARK_RED)
             emb.add_field(name="Not found", value=f"Couln't find user with specified username (`{user}`)")
             emb.set_footer(text="Try checking username spelling!")
@@ -631,10 +585,9 @@ async def set_rank(interaction: discord.Interaction, user: str, choices: app_com
         await interaction.followup.send(embed=emb)
         logging.info(f"@{interaction.user.name} tried to run `/set-rank` command, but they had no sufficient perms")
 
-        
+
 @client.tree.command(name="status", description='Shows bot\'s status')
 async def status(interaction: discord.Interaction):
-    # Get the websocket latency
     ping = client.ws.latency
     global commands_ran
     try:
@@ -643,24 +596,17 @@ async def status(interaction: discord.Interaction):
     except Exception:
         db_connected_raw = False
     temp = "N/A"
-#    try:
-#        with open(r"/sys/class/thermal/thermal_zone0/temp") as File:
-#            temp = File.readline()
-#    except:
-#        CurrentTemp = "N/A"
-    # Define the green bar emoji as the default
+
     ping_emoji = '<:starry_gudping:1171806377371521095>' # 100ms
-    
-    # Check if ping is greater than 250ms and if so, update the emoji
+
     if ping > 0.25000000000000000:
         ping_emoji = '<:starry_medping:1171806470552174603>' # 250ms
 
-    # Check if ping is greater than 400ms and if so, update the emoji
     if ping > 0.40000000000000000:
         ping_emoji = '<:starry_badping:1171806521823342664>' # 400ms
     await interaction.response.defer(ephemeral=False, thinking=True)
     if start_time == None:
-         clock = '*not defined*'
+        clock = '*not defined*'
     else:
         delta_uptime = datetime.datetime.now() - start_time
         hours, remainder = divmod(int(delta_uptime.total_seconds()), 3600)
@@ -688,8 +634,6 @@ async def status(interaction: discord.Interaction):
     await interaction.followup.send(embed=emb)
     commands_ran += 1
 
-
-
 @client.tree.command(name="version", description="Shows the bot's version")
 async def version(interaction: discord.Interaction):
     global commands_ran
@@ -699,10 +643,9 @@ async def version(interaction: discord.Interaction):
 
 @client.command(name='dsc-cmds-sync')
 async def dsc_cmds_sync(ctx):
-     await ctx.reply('Syncing...')
-     await client.tree.sync()
-     await ctx.reply('<:checkmark:1155750377178804286> Synced!')
-
+    await ctx.reply('Syncing...')
+    await client.tree.sync()
+    await ctx.reply('<:checkmark:1155750377178804286> Synced!')
 
 @client.tree.command(name="who-is-via-username", description="Get user info from Roblox by their username")
 async def get_user(interaction: discord.Interaction, user: str):
@@ -715,12 +658,12 @@ async def get_user(interaction: discord.Interaction, user: str):
             await interaction.response.defer(ephemeral=True)
             await interaction.followup.send("User not found")
             rouser = NotFound
-        if rouser != NotFound: 
+        if rouser != NotFound:
             if rouser.description == '':
-               desc = '*None*'
+                desc = '*None*'
             else:
                 desc = rouser.description
-        
+
             emb = discord.Embed(title='User Info', description=f"[{rouser.name} Roblox Profile](https://www.roblox.com/users/{rouser.id}/profile)", colour=GREYPLE)
             if rouser.is_banned == True:
                 emb.add_field(name="Account Terminated", value=' ', inline=True)
@@ -737,20 +680,20 @@ async def get_user(interaction: discord.Interaction, user: str):
             emb.add_field(name="Description", value=desc, inline=False)
             presence = await rouser.get_presence()
             if presence.user_presence_type == 0:
-                 status = 'Offline'
+                status = 'Offline'
             elif presence.user_presence_type == 1:
-                 status = 'Online'
+                status = 'Online'
             elif presence.user_presence_type == 2:
-                 status = 'In Game'
+                status = 'In Game'
             elif presence.user_presence_type == 3:
-                 status = 'In Studio'
+                status = 'In Studio'
             else:
-                 status = '*Unknown*'
+                status = '*Unknown*'
             has_premium_raw = await rouser.has_premium()
             if has_premium_raw == True:
-                 has_premium = 'Yes'
+                has_premium = 'Yes'
             else:
-                 has_premium = 'No'
+                has_premium = 'No'
             emb.add_field(name='Has Premium?', value=has_premium)
             followers = await rouser.get_follower_count()
             emb.add_field(name="Followers", value=followers, inline=True)
@@ -763,8 +706,7 @@ async def get_user(interaction: discord.Interaction, user: str):
                 last_online = '*Unknown*'
             else:
                 last_online = last_online_raw
-                
-            
+
             emb.add_field(name="Last online", value=f"{last_online}", inline=True)
             user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(
                 users=[rouser],
@@ -790,10 +732,10 @@ async def get_user_via_discord(interaction: discord.Interaction, user: discord.M
     get_user_id = get_user_raw3.replace("'", "")
     rouser = await RoClient.get_user(user_id=get_user_id)
     if rouser.description == '':
-           desc = '*None*'
+        desc = '*None*'
     else:
         desc = rouser.description
-        
+
     emb = discord.Embed(title='User Info', description=f"[{rouser.name} Roblox Profile](https://www.roblox.com/users/{rouser.id}/profile)", colour=GREYPLE)
     if rouser.is_banned == True:
         emb.add_field(name="Account Terminated", value=' ', inline=True)
@@ -810,20 +752,20 @@ async def get_user_via_discord(interaction: discord.Interaction, user: discord.M
     emb.add_field(name="Description", value=desc, inline=False)
     presence = await rouser.get_presence()
     if presence.user_presence_type == 0:
-         status = 'Offline'
+        status = 'Offline'
     elif presence.user_presence_type == 1:
-         status = 'Online'
+        status = 'Online'
     elif presence.user_presence_type == 2:
-         status = 'In Game'
+        status = 'In Game'
     elif presence.user_presence_type == 3:
-         status = 'In Studio'
+        status = 'In Studio'
     else:
-         status = '*Unknown*'
+        status = '*Unknown*'
     has_premium_raw = await rouser.has_premium()
     if has_premium_raw == True:
-         has_premium = 'Yes'
+        has_premium = 'Yes'
     else:
-         has_premium = 'No'
+        has_premium = 'No'
     emb.add_field(name='Has Premium?', value=has_premium)
     followers = await rouser.get_follower_count()
     emb.add_field(name="Followers", value=followers, inline=True)
@@ -836,8 +778,7 @@ async def get_user_via_discord(interaction: discord.Interaction, user: discord.M
         last_online = '*Unknown*'
     else:
         last_online = last_online_raw
-                
-            
+
     emb.add_field(name="Last online", value=f"{last_online}", inline=True)
     user_thumbnails = await RoClient.thumbnails.get_user_avatar_thumbnails(
         users=[rouser],
@@ -865,7 +806,7 @@ async def who_is_via_discord(interaction: discord.Interaction, user: str):
             dscuser = cur.distinct(key="discordID")
             if len(dscuser) > 0:
                 append_str1 = '<@'
-                append_str2 = '>' 
+                append_str2 = '>'
                 users1 = [append_str1 + sub + append_str2 for sub in dscuser]
                 users = ', '.join(users1)
                 emb = discord.Embed(title='User lookup via Roblox')
@@ -883,13 +824,13 @@ async def who_is_via_discord(interaction: discord.Interaction, user: str):
             await interaction.response.defer(ephemeral=True, thinking=True)
             await interaction.followup.send(f'Couldn\'t find specified user (`{user}`)')
             rouser_found = False
-        
-        if rouser_found :    
+
+        if rouser_found :
             cur = db.users.find({"robloxID": f"{rouser.id}"})
             dscuser = cur.distinct(key="discordID")
             if len(dscuser) > 0:
                 append_str1 = '<@'
-                append_str2 = '>' 
+                append_str2 = '>'
                 users1 = [append_str1 + sub + append_str2 for sub in dscuser]
                 users = ', '.join(users1)
                 emb = discord.Embed(title='User lookup via Roblox')
@@ -902,7 +843,6 @@ async def who_is_via_discord(interaction: discord.Interaction, user: str):
     else:
         await interaction.response.defer(ephemeral=True, thinking=False)
         await interaction.followup.send('Please specify **Roblox username** or **ID**')
-
 
 @client.tree.command(name='get-members', description='How many members in group')
 async def get_members(interaction: discord.Interaction):
@@ -924,7 +864,7 @@ async def db_create_entry(ctx, discordID: int, robloxID: int, username: str):
                 "username": f"{username}",
                 "discordID": f"{discordID}",
                 "robloxID": f"{robloxID}"
-            }    
+            }
             post_id = db.users.insert_one(entry).inserted_id
             await ctx.reply(f'Created new entry with ID `{post_id}`')
         else:
@@ -934,7 +874,6 @@ async def db_create_entry(ctx, discordID: int, robloxID: int, username: str):
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687621411786772>")
         await ctx.reply(embed=emb)
         logging.info(f"@{ctx.author.name} tried to run `;db_create_entry` command, but they had no sufficient perms")
-
 
 @client.command()
 async def db_delete_entry(ctx, discordID: int):
@@ -954,7 +893,6 @@ async def db_delete_entry(ctx, discordID: int):
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687621411786772>")
         await ctx.reply(embed=emb)
         logging.info(f"@{ctx.author.name} tried to run `;db_delete_entry` command, but they had no sufficient perms")
-
 
 @client.command()
 async def db_get_entry(ctx, discordID: int):
@@ -986,19 +924,7 @@ async def db_get_entry(ctx, discordID: int):
         emb = discord.Embed(title="Uh-uh", colour=RED)
         emb.add_field(name="Access Denied!", value="Minimum rank required to run this command: <@&1094687621411786772>")
         await ctx.reply(embed=emb)
-        logging.info(f"@{ctx.author.name} tried to run `;db_get_entry` command, but they had no sufficient perms")  
-
-
-
-
-
-
-
-
-
-
-
-
+        logging.info(f"@{ctx.author.name} tried to run `;db_get_entry` command, but they had no sufficient perms")
 
 @client.tree.command(name='gban', description='Ban user from server with database record')
 async def gban(interaction: discord.Interaction, user: discord.Member, reason: str|None):
@@ -1018,8 +944,6 @@ async def gban(interaction: discord.Interaction, user: discord.Member, reason: s
             }
         db_bans.insert_one(entry)
         await interaction.response.defer(ephemeral=False, thinking=False)
-        
-
         user_dm = await user.create_dm()
         if reason:
             emb1 = discord.Embed(title="You have been banned in Immortals Squad")
@@ -1047,177 +971,10 @@ async def gban(interaction: discord.Interaction, user: discord.Member, reason: s
         logging.info(f"@{interaction.user.name} tried to run `/gban` command, but they had no sufficient perms")
 
 
-
-#TODO facts
-#TODO moderation
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 if run_nightly == True:
     DISTOKEN = settings['NIGHTLY_TOKEN']
 else:
-	DISTOKEN = settings['TOKEN']
+    DISTOKEN = settings['TOKEN']
 
 client.run(DISTOKEN)
  

@@ -8,9 +8,8 @@ settings = {
 	'OWNER NAME':'TheSkout',                                                                       # OWNER NAME
     'VERSION':'0.25.0-ALPHA'                                                                       # BOT VERSION
 #			   ^ ^  ^
-#			   | |  | 
-#		   Major |  | 
-#            Minor  |  
-#		        Patch 
-}					
-
+#			   | |  |
+#		   Major |  |
+#            Minor  |
+#		        Patch
+}
