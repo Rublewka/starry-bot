@@ -4,7 +4,7 @@ aiosqlite==0.18.0
 async-timeout==4.0.2
 attrs==22.2.0
 Brotli==1.0.9
-certifi==2023.7.22
+certifi==2024.7.4
 cffi==1.15.1
 charset-normalizer==3.0.1
 discord.py==2.2.2
